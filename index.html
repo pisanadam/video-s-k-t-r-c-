@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video FPS & Çözünürlük Dönüştürücü</title>
+<style>
+  :root{
+    --bg:#0d1117;
+    --panel:#161b22;
+    --panel-2:#1c2430;
+    --line:#2a3441;
+    --text:#e6edf3;
+    --muted:#8b97a6;
+    --accent:#4c8dff;
+    --accent-2:#7c5cff;
+    --ok:#3fb950;
+    --warn:#d29922;
+    --err:#f85149;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, #1b2740 0%, transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, #241d3d 0%, transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+    min-height:100vh;
+    padding:28px 16px 60px;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+  header{text-align:center;margin-bottom:26px}
+  header h1{
+    margin:0 0 8px;font-size:clamp(22px,3.4vw,34px);letter-spacing:-.5px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  header p{margin:0;color:var(--muted);font-size:14px}
+
+  .grid{display:grid;grid-template-columns:1fr 380px;gap:18px;align-items:start}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.35)
+  }
+  .card h2{margin:0 0 14px;font-size:15px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+
+  /* Drop zone */
+  #drop{
+    border:2px dashed var(--line);border-radius:var(--radius);padding:34px 18px;text-align:center;
+    cursor:pointer;transition:.18s;background:var(--panel-2)
+  }
+  #drop:hover,#drop.drag{border-color:var(--accent);background:#1b2740}
+  #drop .ico{font-size:40px;line-height:1}
+  #drop b{display:block;margin:10px 0 4px;font-size:16px}
+  #drop span{color:var(--muted);font-size:13px}
+
+  .stage{margin-top:16px;display:none}
+  .stage.on{display:block}
+  video{width:100%;border-radius:10px;background:#000;display:block;max-height:52vh}
+  .previews{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:700px){.previews{grid-template-columns:1fr}}
+  .vlabel{font-size:12px;color:var(--muted);margin:0 0 6px;display:flex;justify-content:space-between;gap:8px}
+  .vlabel b{color:var(--text);font-weight:600}
+
+  .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:14px}
+  .meta div{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+  .meta small{display:block;color:var(--muted);font-size:11px;margin-bottom:3px}
+  .meta strong{font-size:14px;font-weight:600}
+
+  /* Controls */
+  .field{margin-bottom:20px}
+  .field > label{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:8px}
+  .field > label .val{
+    font-variant-numeric:tabular-nums;font-weight:700;color:var(--accent);
+    background:#12233f;border:1px solid #23406e;border-radius:999px;padding:2px 10px;font-size:12px
+  }
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:99px;outline:none;
+    background:linear-gradient(90deg,var(--accent) 0%,var(--accent) var(--p,0%),#26303c var(--p,0%),#26303c 100%);
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;
+    border:3px solid var(--accent);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.5)
+  }
+  input[type=range]::-moz-range-thumb{
+    width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--accent);cursor:pointer
+  }
+  .row{display:flex;gap:8px;align-items:center}
+  input[type=number],select{
+    background:var(--panel-2);color:var(--text);border:1px solid var(--line);
+    border-radius:9px;padding:9px 10px;font-size:14px;width:100%;font-family:inherit
+  }
+  input[type=number]{max-width:96px;text-align:center;font-variant-numeric:tabular-nums}
+  select:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px}
+
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+  .chip{
+    background:var(--panel-2);border:1px solid var(--line);color:var(--muted);
+    border-radius:999px;padding:5px 9px;font-size:12px;cursor:pointer;transition:.15s
+  }
+  .chip:hover{border-color:var(--accent);color:var(--text)}
+  .chip.on{background:#12233f;border-color:var(--accent);color:var(--accent);font-weight:600}
+
+  .field > label.check,.check{display:flex;align-items:center;justify-content:flex-start;gap:9px;font-size:13px;color:var(--muted);cursor:pointer;margin-top:10px;line-height:1.35}
+  .check input{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+
+  button.main{
+    width:100%;padding:13px;border:0;border-radius:11px;font-size:15px;font-weight:700;cursor:pointer;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;transition:.15s
+  }
+  button.main:hover:not(:disabled){filter:brightness(1.12)}
+  button.main:disabled{opacity:.45;cursor:not-allowed}
+  button.ghost{
+    width:100%;padding:11px;border:1px solid var(--line);border-radius:11px;background:transparent;
+    color:var(--text);font-size:14px;cursor:pointer;margin-top:9px
+  }
+  button.ghost:hover{border-color:var(--accent)}
+  a.dl{
+    display:block;text-align:center;text-decoration:none;padding:13px;border-radius:11px;
+    background:var(--ok);color:#04140a;font-weight:700;font-size:15px;margin-top:12px
+  }
+  a.dl:hover{filter:brightness(1.1)}
+
+  .bar{height:8px;background:#26303c;border-radius:99px;overflow:hidden;margin:12px 0 8px}
+  .bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .2s}
+  .status{font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;gap:10px}
+  #progWrap{display:none}
+  #progWrap.on{display:block}
+
+  .note{font-size:12px;color:var(--muted);line-height:1.55;margin-top:10px;padding:10px 12px;background:var(--panel-2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0}
+  .note.warn{border-left-color:var(--warn)}
+  .note.err{border-left-color:var(--err);color:#ffb4ae}
+  .hidden{display:none!important}
+  canvas{display:none}
+  .foot{text-align:center;color:var(--muted);font-size:12px;margin-top:26px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Video FPS &amp; Çözünürlük Dönüştürücü</h1>
+    <p>Videonu yükle · FPS'i <b>1–120</b> arasında, çözünürlüğü <b>144p – 4K</b> arasında ayarla · tarayıcıda dönüştür</p>
+  </header>
+
+  <div class="grid">
+    <!-- SOL: video alanı -->
+    <div class="card">
+      <h2>Video</h2>
+      <div id="drop">
+        <div class="ico">🎬</div>
+        <b>Videoyu buraya sürükle veya tıkla</b>
+        <span>MP4, WebM, MOV, MKV… (dosya cihazından çıkmaz, tümü tarayıcıda işlenir)</span>
+      </div>
+      <input type="file" id="file" accept="video/*" class="hidden">
+
+      <div class="stage" id="stage">
+        <div class="previews">
+          <div>
+            <p class="vlabel"><span>Kaynak</span><b id="srcLbl">–</b></p>
+            <video id="src" controls playsinline></video>
+          </div>
+          <div id="outBox" class="hidden">
+            <p class="vlabel"><span>Sonuç</span><b id="outLbl">–</b></p>
+            <video id="out" controls playsinline></video>
+          </div>
+        </div>
+
+        <div class="meta">
+          <div><small>Süre</small><strong id="mDur">–</strong></div>
+          <div><small>Kaynak çözünürlük</small><strong id="mRes">–</strong></div>
+          <div><small>Kaynak FPS (tahmini)</small><strong id="mFps">–</strong></div>
+          <div><small>Dosya boyutu</small><strong id="mSize">–</strong></div>
+          <div><small>Hedef çözünürlük</small><strong id="mTRes">–</strong></div>
+          <div><small>Hedef FPS</small><strong id="mTFps">–</strong></div>
+        </div>
+
+        <div id="msg"></div>
+      </div>
+    </div>
+
+    <!-- SAĞ: ayarlar -->
+    <div class="card">
+      <h2>Ayarlar</h2>
+
+      <div class="field">
+        <label for="fps">Kare hızı (FPS) <span class="val" id="fpsVal">30 fps</span></label>
+        <div class="row">
+          <input type="range" id="fps" min="1" max="120" step="1" value="30">
+          <input type="number" id="fpsNum" min="1" max="120" step="1" value="30">
+        </div>
+        <div class="chips" id="fpsChips">
+          <span class="chip" data-fps="1">1</span>
+          <span class="chip" data-fps="12">12</span>
+          <span class="chip" data-fps="24">24</span>
+          <span class="chip" data-fps="25">25</span>
+          <span class="chip on" data-fps="30">30</span>
+          <span class="chip" data-fps="50">50</span>
+          <span class="chip" data-fps="60">60</span>
+          <span class="chip" data-fps="90">90</span>
+          <span class="chip" data-fps="120">120</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="res">Çözünürlük <span class="val" id="resVal">720p</span></label>
+        <select id="res">
+          <option value="144">144p &nbsp;— 256×144</option>
+          <option value="240">240p &nbsp;— 426×240</option>
+          <option value="360">360p &nbsp;— 640×360</option>
+          <option value="480">480p &nbsp;— 854×480 (SD)</option>
+          <option value="720" selected>720p &nbsp;— 1280×720 (HD)</option>
+          <option value="1080">1080p — 1920×1080 (Full HD)</option>
+          <option value="1440">1440p — 2560×1440 (2K/QHD)</option>
+          <option value="2160">2160p — 3840×2160 (4K UHD)</option>
+          <option value="0">Kaynak çözünürlüğü koru</option>
+        </select>
+        <label class="check"><input type="checkbox" id="pad"> Boş alanları siyahla doldur (en-boy oranını tam koru)</label>
+      </div>
+
+      <div class="field">
+        <label for="mode">Dönüştürme yöntemi</label>
+        <select id="mode">
+          <option value="rt" selected>Gerçek zamanlı — ses dahil (hızlı)</option>
+          <option value="fx">Kare kare — tam hassas FPS (sessiz, yavaş)</option>
+        </select>
+        <label class="check" id="audioWrap"><input type="checkbox" id="audio" checked> Sesi koru</label>
+      </div>
+
+      <div class="field">
+        <label for="q">Görüntü kalitesi (bit hızı) <span class="val" id="qVal">Otomatik</span></label>
+        <input type="range" id="q" min="0" max="40" step="1" value="0">
+        <div class="chips">
+          <span class="chip" data-q="0">Otomatik</span>
+          <span class="chip" data-q="2">2 Mbps</span>
+          <span class="chip" data-q="5">5 Mbps</span>
+          <span class="chip" data-q="10">10 Mbps</span>
+          <span class="chip" data-q="20">20 Mbps</span>
+        </div>
+      </div>
+
+      <button class="main" id="go" disabled>Dönüştür</button>
+      <button class="ghost hidden" id="cancel">İptal et</button>
+      <a class="dl hidden" id="dl" download>⬇ Videoyu indir</a>
+
+      <div id="progWrap">
+        <div class="bar"><i id="barFill"></i></div>
+        <div class="status"><span id="stTxt">Hazır</span><span id="stPct">%0</span></div>
+      </div>
+
+      <div class="note" id="tip">
+        Gerçek zamanlı yöntem videoyu sesiyle birlikte, süresi kadar sürede kaydeder.
+        Kare kare yöntem her kareyi tek tek işler: FPS tam olarak istediğin değer olur ama ses aktarılmaz.
+      </div>
+    </div>
+  </div>
+
+  <p class="foot">Tüm işlem tarayıcında yapılır — video hiçbir sunucuya gönderilmez.</p>
+</div>
+
+<canvas id="cv"></canvas>
+<canvas id="off"></canvas>
+
+<script>
+(() => {
+'use strict';
+
+const $ = id => document.getElementById(id);
+const drop=$('drop'), file=$('file'), stage=$('stage'), src=$('src'), out=$('out'), outBox=$('outBox');
+const fps=$('fps'), fpsNum=$('fpsNum'), fpsVal=$('fpsVal'), fpsChips=$('fpsChips');
+const res=$('res'), resVal=$('resVal'), pad=$('pad'), mode=$('mode'), audio=$('audio'), audioWrap=$('audioWrap');
+const q=$('q'), qVal=$('qVal');
+const go=$('go'), cancelBtn=$('cancel'), dl=$('dl');
+const progWrap=$('progWrap'), barFill=$('barFill'), stTxt=$('stTxt'), stPct=$('stPct');
+const msg=$('msg'), tip=$('tip');
+const cv=$('cv'), off=$('off');
+const ctx=cv.getContext('2d',{alpha:false}), octx=off.getContext('2d',{alpha:false});
+const mDur=$('mDur'), mRes=$('mRes'), mFps=$('mFps'), mSize=$('mSize'), mTRes=$('mTRes'), mTFps=$('mTFps');
+
+const RES_W = {144:256,240:426,360:640,480:854,720:1280,1080:1920,1440:2560,2160:3840};
+
+let srcURL=null, outURL=null, fileName='video', busy=false, cancelled=false;
+let audioCtx=null, mediaSrcNode=null, audioDest=null;
+let recorder=null;
+
+/* ---------- yardımcılar ---------- */
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const even  = n => Math.max(2, Math.round(n/2)*2);
+const fmtTime = s => {
+  if(!isFinite(s)||s<0) return '–';
+  const m=Math.floor(s/60), r=Math.floor(s%60);
+  return `${m}:${String(r).padStart(2,'0')}`;
+};
+const fmtSize = b => b<1024?b+' B':b<1048576?(b/1024).toFixed(1)+' KB':b<1073741824?(b/1048576).toFixed(1)+' MB':(b/1073741824).toFixed(2)+' GB';
+
+function say(text, kind){
+  msg.innerHTML = text ? `<div class="note ${kind||''}">${text}</div>` : '';
+}
+function paintRange(el){
+  const p = (el.value-el.min)/(el.max-el.min)*100;
+  el.style.setProperty('--p', p+'%');
+}
+function setProgress(p, label){
+  progWrap.classList.add('on');
+  const v=Math.max(0,Math.min(100,p));
+  barFill.style.width=v+'%';
+  stPct.textContent='%'+v.toFixed(0);
+  if(label) stTxt.textContent=label;
+}
+
+/* ---------- hedef boyut hesabı ---------- */
+function targetSize(){
+  const vw=src.videoWidth||1280, vh=src.videoHeight||720;
+  const key=+res.value;
+  if(!key) return {w:even(vw), h:even(vh)};
+
+  const portrait = vh>vw;
+  if(pad.checked){
+    // sabit kutu (16:9 veya dikey için 9:16), içerik ortalanır
+    const bw=RES_W[key], bh=key;
+    return portrait ? {w:even(bh), h:even(bw)} : {w:even(bw), h:even(bh)};
+  }
+  // en-boy oranını koru: kısa kenarı hedefe sabitle
+  if(portrait){ const w=key; return {w:even(w), h:even(w*vh/vw)}; }
+  const h=key; return {w:even(h*vw/vh), h:even(h)};
+}
+
+function autoBitrate(w,h,f){
+  const bps = w*h*f*0.07;                    // ~0.07 bit/piksel
+  return Math.round(Math.min(60e6, Math.max(250e3, bps)));
+}
+function chosenBitrate(w,h,f){
+  const mbps=+q.value;
+  return mbps>0 ? mbps*1e6 : autoBitrate(w,h,f);
+}
+
+function pickMime(){
+  const list=[
+    'video/webm;codecs=vp9,opus','video/webm;codecs=vp9',
+    'video/webm;codecs=vp8,opus','video/webm;codecs=vp8',
+    'video/webm','video/mp4;codecs=h264,aac','video/mp4'
+  ];
+  for(const m of list) if(window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m;
+  return '';
+}
+
+function refreshTargets(){
+  if(!src.videoWidth){ mTRes.textContent='–'; mTFps.textContent='–'; return; }
+  const {w,h}=targetSize();
+  mTRes.textContent=`${w}×${h}`;
+  mTFps.textContent=fps.value+' fps';
+  const br=chosenBitrate(w,h,+fps.value);
+  qVal.textContent = +q.value>0 ? q.value+' Mbps' : 'Otomatik (~'+(br/1e6).toFixed(1)+' Mbps)';
+}
+
+/* ---------- kontrol bağlantıları ---------- */
+function syncFps(v){
+  v=Math.min(120,Math.max(1,Math.round(+v||1)));
+  fps.value=v; fpsNum.value=v; fpsVal.textContent=v+' fps';
+  paintRange(fps);
+  [...fpsChips.children].forEach(c=>c.classList.toggle('on', +c.dataset.fps===v));
+  refreshTargets();
+  tip.classList.toggle('warn', v>60 && mode.value==='rt');
+  if(v>60 && mode.value==='rt'){
+    tip.innerHTML='<b>Not:</b> Gerçek zamanlı yöntemde tarayıcı ekran tazeleme hızının (çoğunlukla 60 Hz) üzerine çıkamaz. '+
+                  'Gerçekten 60 fps üstü çıktı için <b>kare kare</b> yöntemini seç.';
+  }else{
+    tip.innerHTML='Gerçek zamanlı yöntem videoyu sesiyle birlikte, süresi kadar sürede kaydeder. '+
+                  'Kare kare yöntem her kareyi tek tek işler: FPS tam olarak istediğin değer olur ama ses aktarılmaz.';
+  }
+}
+fps.addEventListener('input', e=>syncFps(e.target.value));
+fpsNum.addEventListener('input', e=>syncFps(e.target.value));
+fpsNum.addEventListener('blur', e=>syncFps(e.target.value));
+fpsChips.addEventListener('click', e=>{ if(e.target.dataset.fps) syncFps(e.target.dataset.fps); });
+
+res.addEventListener('change', ()=>{
+  resVal.textContent = +res.value ? res.options[res.selectedIndex].text.split('—')[0].trim() : 'Kaynak';
+  refreshTargets();
+});
+pad.addEventListener('change', refreshTargets);
+q.addEventListener('input', ()=>{ paintRange(q); refreshTargets(); });
+document.querySelectorAll('.chip[data-q]').forEach(c=>{
+  c.addEventListener('click',()=>{ q.value=c.dataset.q; paintRange(q); refreshTargets(); });
+});
+mode.addEventListener('change', ()=>{
+  audioWrap.style.opacity = mode.value==='fx' ? .4 : 1;
+  audio.disabled = mode.value==='fx';
+  syncFps(fps.value);
+});
+
+/* ---------- dosya yükleme ---------- */
+drop.addEventListener('click',()=>file.click());
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('drag')});
+drop.addEventListener('dragleave',()=>drop.classList.remove('drag'));
+drop.addEventListener('drop',e=>{
+  e.preventDefault();drop.classList.remove('drag');
+  if(e.dataTransfer.files[0]) load(e.dataTransfer.files[0]);
+});
+file.addEventListener('change',e=>{ if(e.target.files[0]) load(e.target.files[0]); });
+
+function load(f){
+  if(busy) return;
+  if(!f.type.startsWith('video/') && !/\.(mp4|webm|mov|mkv|avi|m4v|ogv)$/i.test(f.name)){
+    say('Bu bir video dosyası değil gibi görünüyor.','err'); return;
+  }
+  if(srcURL) URL.revokeObjectURL(srcURL);
+  if(outURL){ URL.revokeObjectURL(outURL); outURL=null; }
+  outBox.classList.add('hidden'); dl.classList.add('hidden'); progWrap.classList.remove('on');
+  // yeni dosya için ses grafiğini sıfırla
+  mediaSrcNode=null; audioDest=null;
+  if(audioCtx){ audioCtx.close().catch(()=>{}); audioCtx=null; }
+
+  fileName = f.name.replace(/\.[^.]+$/,'') || 'video';
+  srcURL = URL.createObjectURL(f);
+  src.src = srcURL;
+  src.load();
+  stage.classList.add('on');
+  mSize.textContent = fmtSize(f.size);
+  say('');
+
+  src.onloadedmetadata = () => {
+    mDur.textContent = fmtTime(src.duration);
+    mRes.textContent = `${src.videoWidth}×${src.videoHeight}`;
+    $('srcLbl').textContent = `${src.videoWidth}×${src.videoHeight}`;
+    go.disabled = false;
+    refreshTargets();
+    estimateFps();
+  };
+  src.onerror = () => {
+    say('Video açılamadı. Tarayıcı bu formatı/kodeği desteklemiyor olabilir (ör. bazı MKV/AVI dosyaları).','err');
+    go.disabled = true;
+  };
+}
+
+/* kaynak fps tahmini */
+function estimateFps(){
+  mFps.textContent='ölçülüyor…';
+  if(!('requestVideoFrameCallback' in HTMLVideoElement.prototype)){ mFps.textContent='bilinmiyor'; return; }
+  let last=null, n=0, sum=0;
+  const wasPaused = src.paused;
+  const step=(_,md)=>{
+    if(last!==null){ const d=md.mediaTime-last; if(d>0.0005){ sum+=d; n++; } }
+    last=md.mediaTime;
+    if(n<20 && !busy) src.requestVideoFrameCallback(step);
+    else{
+      mFps.textContent = n>3 ? (1/(sum/n)).toFixed(2)+' fps' : 'bilinmiyor';
+      src.pause(); src.currentTime=0;
+    }
+  };
+  src.muted=true;
+  src.play().then(()=>src.requestVideoFrameCallback(step)).catch(()=>{ mFps.textContent='bilinmiyor'; });
+  setTimeout(()=>{ if(mFps.textContent==='ölçülüyor…'){ mFps.textContent = n>3 ? (1/(sum/n)).toFixed(2)+' fps' : 'bilinmiyor'; src.pause(); src.currentTime=0; } }, 3000);
+  void wasPaused;
+}
+
+/* ---------- çizim ---------- */
+function drawFrame(c, w, h){
+  const vw=src.videoWidth, vh=src.videoHeight;
+  if(pad.checked && +res.value){
+    const s=Math.min(w/vw, h/vh), dw=vw*s, dh=vh*s;
+    c.fillStyle='#000'; c.fillRect(0,0,w,h);
+    c.drawImage(src, (w-dw)/2, (h-dh)/2, dw, dh);
+  }else{
+    c.drawImage(src, 0, 0, w, h);
+  }
+}
+
+function seek(t){
+  return new Promise(resolve=>{
+    let done=false;
+    const ok=()=>{ if(done) return; done=true; src.removeEventListener('seeked',ok); resolve(); };
+    src.addEventListener('seeked',ok);
+    src.currentTime=t;
+    setTimeout(ok, 3000);
+  });
+}
+
+/* ---------- dönüştürme ---------- */
+go.addEventListener('click', start);
+cancelBtn.addEventListener('click', ()=>{
+  cancelled=true; stTxt.textContent='İptal ediliyor…';
+  try{ if(recorder && recorder.state!=='inactive') recorder.stop(); }catch(e){}
+  try{ src.pause(); }catch(e){}
+});
+
+async function start(){
+  if(busy || !src.videoWidth) return;
+  if(!window.MediaRecorder){ say('Tarayıcın MediaRecorder API\'sini desteklemiyor. Chrome, Edge veya Firefox\'un güncel sürümünü dene.','err'); return; }
+  const mime=pickMime();
+  if(!mime){ say('Tarayıcın kayıt için uygun bir video kodeki sunmuyor.','err'); return; }
+
+  busy=true; cancelled=false;
+  go.disabled=true; cancelBtn.classList.remove('hidden'); dl.classList.add('hidden'); outBox.classList.add('hidden');
+  file.disabled=true; say('');
+
+  const {w,h}=targetSize();
+  const f=+fps.value;
+  cv.width=w; cv.height=h; off.width=w; off.height=h;
+  ctx.fillStyle='#000'; ctx.fillRect(0,0,w,h);
+
+  const opts={mimeType:mime, videoBitsPerSecond:chosenBitrate(w,h,f)};
+  setProgress(0,'Hazırlanıyor…');
+
+  try{
+    const blob = mode.value==='fx'
+      ? await renderExact(w,h,f,opts)
+      : await renderRealtime(w,h,f,opts);
+
+    if(!blob || !blob.size) throw new Error('Kayıt boş döndü.');
+
+    if(outURL) URL.revokeObjectURL(outURL);
+    outURL=URL.createObjectURL(blob);
+    out.src=outURL;
+    outBox.classList.remove('hidden');
+    $('outLbl').textContent=`${w}×${h} · ${f} fps · ${fmtSize(blob.size)}`;
+    const ext = (opts.mimeType.indexOf('mp4')>-1) ? 'mp4' : 'webm';
+    dl.href=outURL;
+    dl.download=`${fileName}_${w}x${h}_${f}fps.${ext}`;
+    dl.classList.remove('hidden');
+    setProgress(100, cancelled ? 'İptal edildi (kısmi kayıt hazır)' : 'Tamamlandı ✔');
+    say(cancelled
+        ? 'İşlem yarıda kesildi; o ana kadar işlenen bölüm indirilebilir.'
+        : `Hazır: <b>${w}×${h}</b> · <b>${f} fps</b> · ${fmtSize(blob.size)}`);
+  }catch(err){
+    console.error(err);
+    setProgress(0,'Hata');
+    say('Dönüştürme başarısız: '+(err && err.message ? err.message : err),'err');
+  }finally{
+    busy=false; go.disabled=false; file.disabled=false;
+    cancelBtn.classList.add('hidden');
+    recorder=null;
+  }
+}
+
+/* Gerçek zamanlı: ses + görüntü, video süresi kadar sürer */
+function renderRealtime(w,h,f,opts){
+  return new Promise((resolve,reject)=>{
+    const stream = cv.captureStream(f);
+    let tracks = stream.getVideoTracks();
+
+    if(audio.checked){
+      try{
+        if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+        if(audioCtx.state==='suspended') audioCtx.resume();
+        if(!mediaSrcNode) mediaSrcNode = audioCtx.createMediaElementSource(src);
+        if(!audioDest) audioDest = audioCtx.createMediaStreamDestination();
+        mediaSrcNode.connect(audioDest);           // kayda gider
+        mediaSrcNode.connect(audioCtx.destination); // kullanıcı da duysun
+        tracks = tracks.concat(audioDest.stream.getAudioTracks());
+      }catch(e){ console.warn('Ses aktarılamadı:',e); }
+    }
+
+    const mixed = new MediaStream(tracks);
+    const chunks=[];
+    recorder = new MediaRecorder(mixed,opts);
+    recorder.ondataavailable = e => { if(e.data && e.data.size) chunks.push(e.data); };
+    recorder.onerror = e => reject(e.error||new Error('Kayıt hatası'));
+    recorder.onstop = () => {
+      cancelAnimationFrame(raf);
+      clearInterval(tick);
+      src.onended=null;
+      resolve(new Blob(chunks,{type:opts.mimeType.split(';')[0]}));
+    };
+
+    let raf=0, tick=0, lastDraw=-1;
+    const interval = 1000/f;
+    const loop = now => {
+      if(src.paused || src.ended) { raf=requestAnimationFrame(loop); return; }
+      if(lastDraw<0 || now-lastDraw >= interval-1){ lastDraw=now; drawFrame(ctx,w,h); }
+      raf=requestAnimationFrame(loop);
+    };
+
+    const begin = () => {
+      src.muted=false;
+      src.playbackRate=1;
+      src.play().then(()=>{
+        drawFrame(ctx,w,h);
+        recorder.start();   // dilimsiz kayıt: süre bilgisi başlığa doğru yazılır
+        raf=requestAnimationFrame(loop);
+        tick=setInterval(()=>{
+          const p = src.duration ? src.currentTime/src.duration*100 : 0;
+          const kalan = Math.max(0, src.duration-src.currentTime);
+          setProgress(p, `Kaydediliyor… kalan ${fmtTime(kalan)}`);
+        },200);
+        src.onended = () => { if(recorder.state!=='inactive') recorder.stop(); };
+      }).catch(reject);
+    };
+
+    seek(0).then(begin);
+  });
+}
+
+/* Kare kare: tam hassas FPS, ses yok */
+async function renderExact(w,h,f,opts){
+  const total = Math.max(1, Math.round(src.duration*f));
+  const stream = cv.captureStream(0);
+  const track = stream.getVideoTracks()[0];
+  const chunks=[];
+  recorder = new MediaRecorder(stream,opts);
+  recorder.ondataavailable = e => { if(e.data && e.data.size) chunks.push(e.data); };
+
+  const stopped = new Promise(r => { recorder.onstop = r; });
+
+  src.pause(); src.muted=true;
+
+  const QMAX=24, queue=[];
+  let produced=0, prodErr=null;
+
+  const producer = (async () => {
+    try{
+      while(produced<total && !cancelled){
+        if(queue.length>=QMAX){ await sleep(4); continue; }
+        const t=Math.min(Math.max(0, src.duration-1e-3), produced/f);
+        await seek(t);
+        if(cancelled) break;
+        drawFrame(octx,w,h);
+        queue.push(await createImageBitmap(off));
+        produced++;
+      }
+    }catch(e){ prodErr=e; }
+  })();
+
+  // ilk kareler hazır olsun ki zamanlama düzgün olsun
+  while(queue.length<Math.min(QMAX,total) && produced<total && !prodErr && !cancelled){
+    setProgress(produced/total*100, `Ön belleğe alınıyor… ${produced}/${total} kare`);
+    await sleep(30);
+  }
+  if(prodErr) throw prodErr;
+
+  recorder.start();   // dilimsiz kayıt: süre bilgisi başlığa doğru yazılır
+  const t0=performance.now(), step=1000/f;
+
+  for(let i=0;i<total;i++){
+    if(cancelled) break;
+    while(queue.length===0 && (produced<total) && !prodErr){ await sleep(2); }
+    if(prodErr) break;
+    const bmp=queue.shift();
+    if(!bmp) break;
+    const target=t0+i*step, now=performance.now();
+    if(target>now) await sleep(target-now);
+    ctx.drawImage(bmp,0,0);
+    bmp.close();
+    track.requestFrame();
+    if((i&7)===0 || i===total-1){
+      setProgress(i/total*100, `İşleniyor… ${i+1}/${total} kare (${f} fps)`);
+    }
+  }
+
+  // kuyruğun son karesi de yazılsın
+  await sleep(Math.max(60, step));
+  if(recorder.state!=='inactive') recorder.stop();
+  await stopped;
+  await producer;
+  queue.forEach(b=>{ try{b.close();}catch(e){} });
+  if(prodErr) throw prodErr;
+  src.muted=false;
+  return new Blob(chunks,{type:opts.mimeType.split(';')[0]});
+}
+
+/* ---------- ilk durum ---------- */
+paintRange(fps); paintRange(q); syncFps(30);
+window.addEventListener('beforeunload',()=>{
+  if(srcURL) URL.revokeObjectURL(srcURL);
+  if(outURL) URL.revokeObjectURL(outURL);
+});
+})();
+</script>
+</body>
+</html>
