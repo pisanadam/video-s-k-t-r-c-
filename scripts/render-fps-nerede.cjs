@@ -1,5 +1,5 @@
 // Animasyon HTML'ini (varsayılan fps-nerede.html) kare kare MP4'e çevirir.
-// Kullanım: [HTML=ali-jenny.html] node scripts/render-fps-nerede.cjs [çıktı.mp4] [fps]
+// Kullanım: [HTML=ali-jenny.html | HTML='sigma.html?v=3'] node scripts/render-fps-nerede.cjs [çıktı.mp4] [fps]
 // Gerekenler: playwright (chromium) + ffmpeg. three.js CDN'den yüklenir;
 // THREE_PATH ortam değişkeni verilirse yerel three.module.js kullanılır.
 const { chromium } = require('playwright');
@@ -18,7 +18,8 @@ const W = 1280, H = 720;
   if (process.env.THREE_PATH) {
     await page.route(/three\.module\.js$/, r => r.fulfill({ path: process.env.THREE_PATH, contentType: 'text/javascript' }));
   }
-  const file = 'file://' + path.resolve(__dirname, '..', process.env.HTML || 'fps-nerede.html') + '?render=1';
+  const [htmlFile, query] = (process.env.HTML || 'fps-nerede.html').split('?');
+  const file = 'file://' + path.resolve(__dirname, '..', htmlFile) + '?' + (query ? query + '&' : '') + 'render=1';
   await page.goto(file);
   await page.waitForFunction(() => window.READY === true, null, { timeout: 60000 });
   const DUR = await page.evaluate(() => window.DUR);
