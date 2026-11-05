@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Trol Anlar</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+  #stage { position: relative; width: 1280px; height: 720px; overflow: hidden; }
+  canvas#gl { position: absolute; inset: 0; width: 1280px; height: 720px; }
+  .cap { position: absolute; left: 0; right: 0; text-align: center; font-family: "DejaVu Sans", sans-serif; font-weight: 900; color: #fff;
+    -webkit-text-stroke: 3px #000; paint-order: stroke fill; text-shadow: 4px 4px 0 #000; letter-spacing: 1px; white-space: pre-line; transform-origin: 50% 50%; }
+  #top { top: 28px; font-size: 60px; }
+  #bot { bottom: 34px; font-size: 48px; }
+  #bubble { position: absolute; background: #fff; color: #111; border: 5px solid #000; border-radius: 18px; padding: 14px 22px;
+    font: 800 34px "DejaVu Sans", sans-serif; white-space: pre-line; text-align: center; display: none; }
+  #bubble:after { content: ""; position: absolute; left: 50%; bottom: -26px; margin-left: -14px; border: 14px solid transparent; border-top-color: #000; }
+  #trollWrap { position: absolute; inset: 0; display: none; background: rgba(0,0,0,0.55); }
+  #troll { position: absolute; left: 50%; top: 50%; width: 460px; height: 460px; margin: -250px 0 0 -230px; image-rendering: pixelated; transform-origin: 50% 50%; }
+  #trollTxt { position: absolute; left: 0; right: 0; bottom: 40px; text-align: center; font: 900 76px "DejaVu Sans", sans-serif; color: #fff;
+    -webkit-text-stroke: 4px #000; paint-order: stroke fill; text-shadow: 6px 6px 0 #000; }
+  #corner { position: absolute; right: 18px; bottom: 18px; width: 96px; height: 96px; image-rendering: pixelated; display: none; }
+  .pat { position: absolute; font: 900 110px "DejaVu Sans", sans-serif; color: #ffe14d; -webkit-text-stroke: 5px #000; paint-order: stroke fill; text-shadow: 6px 6px 0 #000; display: none; }
+  #flash { position: absolute; inset: 0; pointer-events: none; }
+  #chap { position: absolute; left: 18px; top: 112px; padding: 6px 14px; border-radius: 8px; background: rgba(0,0,0,0.65); color: #ffe14d;
+    font: 800 24px "DejaVu Sans", sans-serif; display: none; border: 2px solid #ffe14d; }
+  #wm { position: absolute; right: 14px; top: 10px; font: 700 18px "DejaVu Sans Mono", monospace; color: rgba(255,255,255,0.7); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl" width="1280" height="720"></canvas>
+  <div id="bubble"></div>
+  <div class="pat" id="pat"></div>
+  <div id="chap"></div>
+  <div class="cap" id="top"></div>
+  <div class="cap" id="bot"></div>
+  <canvas id="corner" width="48" height="48"></canvas>
+  <div id="trollWrap"><canvas id="troll" width="48" height="48"></canvas><div id="trollTxt"></div></div>
+  <div id="flash"></div>
+  <div id="wm">MİNECRAFT TR ● TROL ANLAR</div>
+</div>
+<script src="three.min.js"></script>
+<script>
+function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const ease = k => { k = clamp(k, 0, 1); return k * k * (3 - 2 * k); };
+const seg = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+
+// ---------------------------------------------------------------------------------
+// The troll grin: drawn with vector strokes on a big canvas, then shrunk to a few
+// pixels so it turns blocky (Minecraft TR style) instead of copying the classic art.
+// ---------------------------------------------------------------------------------
+function drawTroll(g, s, bg) {
+  g.save(); g.scale(s, s); g.lineCap = 'round'; g.lineJoin = 'round';
+  g.fillStyle = bg; g.fillRect(0, 0, 1, 1);
+  g.strokeStyle = '#000'; g.lineWidth = 0.045;
+  // raised, cocky eyebrows
+  g.beginPath(); g.moveTo(0.12, 0.30); g.quadraticCurveTo(0.26, 0.14, 0.43, 0.24); g.stroke();
+  g.beginPath(); g.moveTo(0.57, 0.24); g.quadraticCurveTo(0.74, 0.14, 0.88, 0.30); g.stroke();
+  // squinting eyes with pupils looking sideways
+  g.lineWidth = 0.035;
+  g.beginPath(); g.moveTo(0.17, 0.36); g.quadraticCurveTo(0.29, 0.30, 0.41, 0.35); g.stroke();
+  g.beginPath(); g.moveTo(0.59, 0.35); g.quadraticCurveTo(0.71, 0.30, 0.83, 0.36); g.stroke();
+  g.fillStyle = '#000'; g.fillRect(0.32, 0.345, 0.06, 0.04); g.fillRect(0.74, 0.345, 0.06, 0.04);
+  // the enormous grin
+  g.beginPath(); g.moveTo(0.05, 0.47);
+  g.quadraticCurveTo(0.5, 0.66, 0.95, 0.47);
+  g.quadraticCurveTo(0.86, 1.02, 0.5, 0.98);
+  g.quadraticCurveTo(0.14, 1.02, 0.05, 0.47);
+  g.closePath(); g.fillStyle = '#fff'; g.fill(); g.lineWidth = 0.045; g.stroke();
+  // teeth
+  g.lineWidth = 0.022;
+  g.beginPath(); g.moveTo(0.1, 0.62); g.quadraticCurveTo(0.5, 0.86, 0.9, 0.62); g.stroke();
+  for (let x = 0.2; x < 0.85; x += 0.1) { const top = 0.47 + 0.19 * (1 - Math.pow((x - 0.5) / 0.45, 2)) * 0.55, bot = 0.84 + 0.1 * (1 - Math.abs(x - 0.5) * 2); g.beginPath(); g.moveTo(x, top); g.lineTo(x, Math.min(bot, 0.95)); g.stroke(); }
+  // cheek + chin wrinkles
+  g.lineWidth = 0.025;
+  g.beginPath(); g.moveTo(0.02, 0.40); g.quadraticCurveTo(0.0, 0.5, 0.06, 0.56); g.stroke();
+  g.beginPath(); g.moveTo(0.98, 0.40); g.quadraticCurveTo(1.0, 0.5, 0.94, 0.56); g.stroke();
+  g.beginPath(); g.moveTo(0.42, 0.53); g.lineTo(0.5, 0.5); g.lineTo(0.58, 0.53); g.stroke(); // nose
+  g.restore();
+}
+function trollCanvas(px, bg) {
+  const big = document.createElement('canvas'); big.width = big.height = 256; drawTroll(big.getContext('2d'), 256, bg);
+  const small = document.createElement('canvas'); small.width = small.height = px;
+  const sg = small.getContext('2d'); sg.imageSmoothingEnabled = true; sg.drawImage(big, 0, 0, px, px);
+  // hard threshold → crisp pixels
+  const id = sg.getImageData(0, 0, px, px), d = id.data;
+  for (let i = 0; i < d.length; i += 4) { const l = (d[i] + d[i + 1] + d[i + 2]) / 3; if (l < 110) { d[i] = d[i + 1] = d[i + 2] = 15; } else if (bg === '#ffffff') { d[i] = d[i + 1] = d[i + 2] = 255; } }
+  sg.putImageData(id, 0, 0); return small;
+}
+{ const big = trollCanvas(48, '#ffffff'); ['troll', 'corner'].forEach(id => document.getElementById(id).getContext('2d').drawImage(big, 0, 0)); }
+
+const glCanvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({ canvas: glCanvas, antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(1280, 720, false); renderer.setPixelRatio(1);
+const scene = new THREE.Scene();
+const SKY = new THREE.Color(0x7ec8ff);
+scene.background = SKY.clone(); scene.fog = new THREE.Fog(0x7ec8ff, 30, 70);
+const camera = new THREE.PerspectiveCamera(55, 1280 / 720, 0.1, 200);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x447733, 0.9));
+const sun = new THREE.DirectionalLight(0xffffff, 0.9); sun.position.set(10, 20, 8); scene.add(sun);
+
+function canvasTex(w, h, draw, nearest = true) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c); if (nearest) { t.magFilter = THREE.NearestFilter; t.minFilter = THREE.NearestFilter; }
+  t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function noiseFill(g, w, h, base, vary, seed) {
+  const r = rng(seed);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const v = (r() - 0.5) * vary; const c = base.map(ch => clamp(Math.round(ch + v), 0, 255)); g.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`; g.fillRect(x, y, 1, 1); }
+}
+const box1 = new THREE.BoxGeometry(1, 1, 1);
+function block(mat, sx, sy, sz, x, y, z, parent = scene) { const m = new THREE.Mesh(box1, mat); m.scale.set(sx, sy, sz); m.position.set(x, y, z); parent.add(m); return m; }
+const M = c => new THREE.MeshLambertMaterial({ color: c });
+const B = c => new THREE.MeshBasicMaterial({ color: c });
+
+// --- World -----------------------------------------------------------------------------
+const grassTop = canvasTex(16, 16, (g, w, h) => noiseFill(g, w, h, [96, 168, 64], 40, 1));
+const dirtT = canvasTex(16, 16, (g, w, h) => noiseFill(g, w, h, [134, 96, 67], 40, 2));
+const grassSide = canvasTex(16, 16, (g, w, h) => { noiseFill(g, w, h, [134, 96, 67], 40, 3); const r = rng(4); for (let x = 0; x < w; x++) { g.fillStyle = '#5fa63f'; g.fillRect(x, 0, 1, 3 + Math.floor(r() * 3)); } });
+const grassMat = [grassSide, grassSide, grassTop, dirtT, grassSide, grassSide].map(m => new THREE.MeshLambertMaterial({ map: m }));
+const dirtMat = new THREE.MeshLambertMaterial({ map: dirtT });
+const PIT = [2, 0];
+{ const N = 26, cells = [];
+  for (let x = -13; x < 13; x++) for (let z = -13; z < 13; z++) if (!(x === PIT[0] && z === PIT[1])) cells.push([x, z]);
+  const inst = new THREE.InstancedMesh(box1, grassMat, cells.length); const m = new THREE.Matrix4();
+  cells.forEach(([x, z], i) => { m.makeTranslation(x, -0.5, z); inst.setMatrixAt(i, m); }); scene.add(inst);
+  // pit walls (dirt) + a dark bottom
+  for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) for (let y = 1; y <= 4; y++) if (dx || dz) block(dirtMat, 1, 1, 1, PIT[0] + dx, -0.5 - y, PIT[1] + dz);
+  block(new THREE.MeshLambertMaterial({ color: 0x3a2a1c }), 1, 1, 1, PIT[0], -4.5, PIT[1]);
+}
+const logTex = canvasTex(16, 16, (g, w, h) => { noiseFill(g, w, h, [104, 82, 50], 30, 5); for (let x = 0; x < w; x += 4) { g.fillStyle = '#4e3b22'; g.fillRect(x, 0, 1, h); } });
+const leafTex = canvasTex(16, 16, (g, w, h) => noiseFill(g, w, h, [56, 130, 40], 70, 6));
+function tree(x, z, hgt) {
+  const logM = new THREE.MeshLambertMaterial({ map: logTex }), leafM = new THREE.MeshLambertMaterial({ map: leafTex });
+  for (let y = 0; y < hgt; y++) block(logM, 1, 1, 1, x, y + 0.5, z);
+  for (let dx = -2; dx <= 2; dx++) for (let dz = -2; dz <= 2; dz++) for (let dy = 0; dy < 2; dy++) { if (Math.abs(dx) === 2 && Math.abs(dz) === 2) continue; block(leafM, 1, 1, 1, x + dx, hgt - 0.5 + dy, z + dz); }
+  block(leafM, 3, 1, 3, x, hgt + 1.5, z);
+}
+tree(-9, -5, 5); tree(9, 6, 5); tree(-10, 7, 4); tree(10, -9, 6);
+{ const r = rng(77); for (let i = 0; i < 8; i++) block(B(0xffffff), 4 + r() * 5, 1, 2 + r() * 3, -30 + r() * 60, 18 + r() * 4, -30 + r() * 20); }
+
+// fake diamond block + the sign hidden behind it
+const diaTex = canvasTex(16, 16, (g, w, h) => { noiseFill(g, w, h, [125, 125, 125], 30, 8); const r = rng(9); for (let i = 0; i < 9; i++) { const x = Math.floor(r() * 13), y = Math.floor(r() * 13); g.fillStyle = '#4ff0ff'; g.fillRect(x, y, 3, 2); g.fillStyle = '#c8ffff'; g.fillRect(x, y, 1, 1); } });
+const DIA = [-6, -5];
+const diamond = block(new THREE.MeshLambertMaterial({ map: diaTex, emissive: 0x114444 }), 1, 1, 1, DIA[0], 0.5, DIA[1]);
+const signTex = canvasTex(256, 128, (g) => { g.fillStyle = '#a07a4a'; g.fillRect(0, 0, 256, 128); g.strokeStyle = '#5a3e20'; g.lineWidth = 8; g.strokeRect(0, 0, 256, 128); g.fillStyle = '#111'; g.font = 'bold 34px DejaVu Sans'; g.textAlign = 'center'; g.fillText('TROLLENDİN', 128, 58); g.fillText('😏', 128, 104); }, false);
+const sign = new THREE.Group(); scene.add(sign);
+block(M(0x6b4a2a), 0.12, 1.2, 0.12, 0, 0.6, 0, sign);
+const signBoard = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.7, 0.08), [M(0xa07a4a), M(0xa07a4a), M(0xa07a4a), M(0xa07a4a), new THREE.MeshLambertMaterial({ map: signTex }), M(0xa07a4a)]);
+signBoard.position.y = 1.35; sign.add(signBoard); sign.position.set(DIA[0], 0, DIA[1]);
+const debris = []; { const r = rng(40); for (let i = 0; i < 26; i++) { const d = block(i % 3 ? dirtMat : B(0x4ff0ff), 0.18, 0.18, 0.18, 0, 0, 0); d.userData.v = V((r() - 0.5) * 6, 2 + r() * 5, (r() - 0.5) * 6); d.visible = false; debris.push(d); } }
+
+// AFK house: 9 dirt blocks that pop in around the AFK friend
+const AFK = [7, -6];
+const HOUSE = [[1, 0], [-1, 0], [0, 1], [0, -1]].flatMap(([dx, dz]) => [[dx, 0.5, dz], [dx, 1.5, dz]]).concat([[0, 2.5, 0]]);
+const houseBlocks = HOUSE.map(([dx, y, dz]) => block(dirtMat, 1, 1, 1, AFK[0] + dx, y, AFK[1] + dz));
+
+// --- Characters ---------------------------------------------------------------------------
+function faceTex(o, mode) {
+  if (mode === 'troll') { const c = trollCanvas(16, o.skin); const t = new THREE.CanvasTexture(c); t.magFilter = t.minFilter = THREE.NearestFilter; t.colorSpace = THREE.SRGBColorSpace; return t; }
+  return canvasTex(8, 8, (g) => {
+    g.fillStyle = o.skin; g.fillRect(0, 0, 8, 8); g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(0, 0, 8, 2);
+    const eyes = () => { g.fillStyle = '#fff'; g.fillRect(1, 3, 2, 1); g.fillRect(5, 3, 2, 1); g.fillStyle = o.eye; g.fillRect(2, 3, 1, 1); g.fillRect(5, 3, 1, 1); };
+    if (mode === 'normal') { eyes(); g.fillStyle = '#5a2a1a'; g.fillRect(3, 6, 2, 1); }
+    else if (mode === 'happy') { g.fillStyle = '#000'; g.fillRect(1, 3, 2, 1); g.fillRect(5, 3, 2, 1); g.fillStyle = '#fff'; g.fillRect(2, 5, 4, 1); g.fillStyle = '#7a1010'; g.fillRect(3, 6, 2, 1); g.fillStyle = '#ff8a8a'; g.fillRect(0, 5, 1, 1); g.fillRect(7, 5, 1, 1); }
+    else if (mode === 'shock') { g.fillStyle = '#fff'; g.fillRect(1, 2, 2, 3); g.fillRect(5, 2, 2, 3); g.fillStyle = '#000'; g.fillRect(2, 3, 1, 1); g.fillRect(5, 3, 1, 1); g.fillStyle = '#300'; g.fillRect(3, 5, 2, 3); }
+    else if (mode === 'cry') { g.fillStyle = '#000'; g.fillRect(1, 3, 2, 1); g.fillRect(5, 3, 2, 1); g.fillRect(1, 2, 1, 1); g.fillRect(6, 2, 1, 1); g.fillStyle = '#3fa9ff'; g.fillRect(1, 4, 1, 4); g.fillRect(6, 4, 1, 4); g.fillStyle = '#300'; g.fillRect(3, 6, 2, 1); g.fillRect(2, 7, 1, 1); g.fillRect(5, 7, 1, 1); }
+    else if (mode === 'sleep') { g.fillStyle = '#000'; g.fillRect(1, 3, 2, 1); g.fillRect(5, 3, 2, 1); g.fillStyle = '#5a2a1a'; g.fillRect(3, 6, 2, 1); }
+  });
+}
+function makeChar(o) {
+  const root = new THREE.Group(); root.rotation.order = 'YXZ';
+  const skinM = M(o.skin), hairM = M(o.hair), shirtM = M(o.shirt), pantsM = M(o.pants);
+  const faces = {}; ['normal', 'happy', 'shock', 'cry', 'sleep', 'troll'].forEach(k => faces[k] = new THREE.MeshLambertMaterial({ map: faceTex(o, k) }));
+  const headMats = [hairM, hairM, hairM, skinM, faces.normal, hairM];
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), headMats);
+  const headPivot = new THREE.Group(); headPivot.position.y = 1.5; head.position.y = 0.4; headPivot.add(head);
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.9, 0.4), shirtM); body.position.y = 1.05;
+  function limb(mat, w, h, x, y, endMat) { const p = new THREE.Group(); p.position.set(x, y, 0); const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), mat); m.position.y = -h / 2; p.add(m);
+    if (endMat) { const e = new THREE.Mesh(new THREE.BoxGeometry(w + 0.02, 0.2, w + 0.02), endMat); e.position.y = -h + 0.1; p.add(e); } return p; }
+  const armL = limb(shirtM, 0.3, 0.85, -0.55, 1.48, skinM), armR = limb(shirtM, 0.3, 0.85, 0.55, 1.48, skinM);
+  const legL = limb(pantsM, 0.38, 0.6, -0.2, 0.6, M(0x222222)), legR = limb(pantsM, 0.38, 0.6, 0.2, 0.6, M(0x222222));
+  root.add(headPivot, body, armL, armR, legL, legR); scene.add(root);
+  return { root, head, headPivot, armL, armR, legL, legR, setFace(k) { headMats[4] = faces[k]; head.material = headMats; } };
+}
+const trol  = makeChar({ skin: '#f2e6d8', hair: '#222', shirt: '#7d3cff', pants: '#1a1a1a', eye: '#222' });
+const modcu = makeChar({ skin: '#f0c49a', hair: '#d9a520', shirt: '#38b34a', pants: '#5a4630', eye: '#1b8c3a' });
+const abd   = makeChar({ skin: '#e0ac7e', hair: '#2a1a0e', shirt: '#2f7de1', pants: '#f2f2f2', eye: '#3b2412' });
+const afk   = makeChar({ skin: '#c98d5e', hair: '#111', shirt: '#e23b3b', pants: '#333', eye: '#4a2a10' });
+const hat = new THREE.Mesh(new THREE.ConeGeometry(0.32, 0.75, 4), new THREE.MeshLambertMaterial({ map: canvasTex(8, 8, (g) => { for (let i = 0; i < 8; i++) { g.fillStyle = ['#ff4fa3', '#ffe14d', '#4fd1ff'][i % 3]; g.fillRect(0, i, 8, 1); } }) }));
+hat.position.y = 0.775; hat.rotation.y = Math.PI / 4; abd.head.add(hat);
+// tools
+const pick = new THREE.Group(); block(M(0x7a5230), 0.08, 0.9, 0.08, 0, -0.45, 0, pick); block(M(0x9aa0a6), 0.7, 0.12, 0.12, 0, -0.9, 0, pick);
+pick.position.set(0, -0.8, 0.1); pick.rotation.x = Math.PI / 2; abd.armR.add(pick);
+const stick = block(M(0x7a5230), 0.06, 0.06, 1.1, 0, -0.85, 0.5, trol.armR);
+// balloon for S4
+const balloon = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.85, 0.7), new THREE.MeshLambertMaterial({ color: 0xff3b6b, emissive: 0xff3b6b, emissiveIntensity: 0.15 })); scene.add(balloon);
+const bGeo = new THREE.BufferGeometry(); bGeo.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, 0, 0, 0], 3));
+const bLine = new THREE.Line(bGeo, new THREE.LineBasicMaterial({ color: 0xffffff })); scene.add(bLine);
+const shards = []; { const r = rng(5); for (let i = 0; i < 16; i++) { const s = block(B(0xff3b6b), 0.15, 0.15, 0.03, 0, 0, 0); s.userData.v = V((r() - 0.5) * 8, r() * 6, (r() - 0.5) * 8); s.visible = false; shards.push(s); } }
+
+// --- DOM helpers -------------------------------------------------------------------------------
+const $ = id => document.getElementById(id);
+function cap(id, text, scale = 1, rot = 0, color = '#fff') { const el = $(id); el.textContent = text || ''; el.style.transform = `scale(${scale}) rotate(${rot}deg)`; el.style.color = color; }
+function bubble(text, worldPos) {
+  const el = $('bubble'); if (!text) { el.style.display = 'none'; return; }
+  el.style.display = 'block'; el.textContent = text;
+  const p = worldPos.clone().project(camera); const x = (p.x * 0.5 + 0.5) * 1280, y = (-p.y * 0.5 + 0.5) * 720;
+  el.style.left = clamp(x - el.offsetWidth / 2, 10, 1270 - el.offsetWidth) + 'px'; el.style.top = clamp(y - el.offsetHeight - 30, 160, 560 - el.offsetHeight) + 'px';
+}
+function flash(color, a) { $('flash').style.background = color; $('flash').style.opacity = a; }
+// full-screen troll face sting: zooms in, wobbles, with a caption
+function trollSting(lt, text) {
+  $('trollWrap').style.display = 'block';
+  const s = lt < 0.15 ? lerp(0.2, 1.25, lt / 0.15) : 1.1 + Math.sin(lt * 18) * 0.06;
+  $('troll').style.transform = `scale(${s}) rotate(${Math.sin(lt * 11) * 6}deg)`;
+  $('trollTxt').textContent = text; $('trollTxt').style.transform = `scale(${1 + Math.sin(lt * 14) * 0.05})`;
+  flash('#fff', Math.max(0, 0.7 - lt * 4));
+}
+function chapter(n, text) { $('chap').style.display = 'block'; $('chap').textContent = `TROL #${n}: ${text}`; }
+
+// --- Poses -------------------------------------------------------------------------------------
+const ALL = [trol, modcu, abd, afk];
+function reset(c) { c.root.position.set(0, -50, 0); c.root.rotation.set(0, 0, 0); c.root.visible = true; c.headPivot.rotation.set(0, 0, 0); c.head.scale.setScalar(1);
+  [c.armL, c.armR, c.legL, c.legR].forEach(l => l.rotation.set(0, 0, 0)); c.setFace('normal'); }
+function place(c, x, z, ry, y = 0) { c.root.position.set(x, y, z); c.root.rotation.set(0, ry, 0); }
+function walk(c, t, sp = 10, a = 0.7) { const s = Math.sin(t * sp); c.legL.rotation.x = s * a; c.legR.rotation.x = -s * a; c.armL.rotation.x = -s * a; c.armR.rotation.x = s * a; }
+const face = (dx, dz) => Math.atan2(dx, dz);
+function laugh(c, t) { c.root.position.y = Math.abs(Math.sin(t * 14)) * 0.25; c.armL.rotation.x = -0.6; c.armR.rotation.x = -0.6; c.headPivot.rotation.x = -0.25 + Math.sin(t * 28) * 0.08; }
+
+// --- Timeline ------------------------------------------------------------------------------------
+const DURATION = 31.5;
+function renderAt(t) {
+  ALL.forEach(reset);
+  let shake = 0;
+  cap('top', ''); cap('bot', ''); bubble(null); flash('#fff', 0);
+  $('trollWrap').style.display = 'none'; $('chap').style.display = 'none'; $('pat').style.display = 'none';
+  $('corner').style.display = 'block'; $('corner').style.transform = `rotate(${Math.sin(t * 3) * 8}deg)`;
+  camera.fov = 55;
+  trol.setFace('troll'); stick.visible = false; pick.visible = false;
+  diamond.visible = t < 12; sign.visible = t >= 12 && t < 15.2; debris.forEach(d => d.visible = false);
+  houseBlocks.forEach(b => b.visible = false);
+  balloon.visible = false; bLine.visible = false; shards.forEach(s => s.visible = false);
+
+  // ---- 0–3 title ----
+  if (t < 3) {
+    place(trol, -1, -1, 0); trol.armR.rotation.z = -2.6 + Math.sin(t * 10) * 0.4; trol.root.position.y = Math.abs(Math.sin(t * 4)) * 0.2;
+    camera.position.set(-1 + Math.sin(t) * 0.8, 2.2, 3.3); camera.lookAt(-1, 1.7, -1);
+    cap('top', 'TROL ANLAR 😏', 1 + Math.sin(t * 7) * 0.04, 0, '#ffe14d');
+    cap('bot', t < 1.5 ? 'derleme' : '(kurbanlardan izin alınmadı)');
+  }
+  // ---- 3–9 TROL #1: "jump here" ----
+  else if (t < 9) {
+    chapter(1, 'buraya zıpla');
+    place(trol, 0.6, 1.3, face(0.5, 1)); trol.armR.rotation.x = -1.2; trol.armR.rotation.z = -0.9;
+    let mx = 5.5, my = 0, mface = 'normal';
+    if (t < 5) { mx = 5.5; }
+    else if (t < 5.6) { mx = lerp(5.5, 3.2, seg(t, 5, 5.6)); walk(modcu, t); }
+    else if (t < 6.2) { const k = seg(t, 5.6, 6.2); mx = lerp(3.2, PIT[0], k); my = Math.sin(k * Math.PI) * 1.2 - (k > 0.5 ? 0 : 0); mface = 'happy'; modcu.armL.rotation.z = 2.4; modcu.armR.rotation.z = -2.4; }
+    else { const k = seg(t, 6.2, 6.6); mx = PIT[0]; my = lerp(0, -3.9, k * k); mface = 'shock'; modcu.armL.rotation.z = 2.8; modcu.armR.rotation.z = -2.8; }
+    place(modcu, mx, 0, face(-1, 0), my); modcu.setFace(mface);
+    if (t < 7.0) {
+      camera.position.set(2.3, 2.6, 6.2); camera.lookAt(2.6, 0.8, 0.2);
+      if (t > 3.3 && t < 5.6) bubble('kanka buraya zıpla 👇\naltında elmas var', trol.root.position.clone().add(V(0, 2.4, 0)));
+      if (t > 3.3 && t < 5.6) cap('bot', 'modcu: tamam kanka 👍');
+      if (t > 6.2) cap('top', 'AAAAAAAA', 1.2 + Math.sin(t * 40) * 0.06, Math.sin(t * 30) * 5, '#ff6b6b');
+      if (t > 6.55 && t < 6.75) shake = 0.08;
+    } else if (t < 7.8) {
+      // looking down the pit: modcu at the bottom, troll peeking over the edge
+      place(trol, PIT[0] + 1.05, PIT[1], face(-1, 0)); trol.root.rotation.x = 0.5; trol.headPivot.rotation.x = 0.6;
+      // modcu's point of view from the bottom of the pit
+      camera.position.set(PIT[0] - 0.1, -3.0, PIT[1] + 0.15); camera.lookAt(PIT[0] + 0.45, 2.5, PIT[1]); camera.fov = 70;
+      modcu.root.visible = false;
+      cap('top', 'modcu\'nun gözünden:', 1); cap('bot', 'elmas yokmuş', 1);
+    } else trollSting(t - 7.8, 'PROBLEM? 😏');
+  }
+  // ---- 9–15 TROL #2: the fake diamond ----
+  else if (t < 15.2) {
+    chapter(2, 'sahte elmas');
+    place(abd, DIA[0] + 0.3, DIA[1] + 1.4, face(-0.3, -1)); pick.visible = true;
+    place(trol, -8.4, -6.3, face(1, 0.6)); // hiding at the tree, only peeking
+    trol.root.position.x += Math.sin(t * 2) * 0.1;
+    if (t < 10.4) { abd.setFace('happy'); abd.root.position.y = Math.abs(Math.sin(t * 7)) * 0.3; }
+    else if (t < 12) { const sw = (t - 10.4) % 0.5; abd.armR.rotation.x = sw < 0.25 ? lerp(-2.6, -0.4, sw / 0.25) : lerp(-0.4, -2.6, (sw - 0.25) / 0.25); abd.setFace('happy'); }
+    else { abd.setFace(t < 12.8 ? 'shock' : 'cry'); abd.head.scale.setScalar(t < 12.8 ? 1.15 : 1);
+      debris.forEach(d => { const lt = t - 12; d.visible = lt < 1.2; d.position.set(DIA[0] + d.userData.v.x * lt, Math.max(0.1, 0.5 + d.userData.v.y * lt - 7 * lt * lt), DIA[1] + d.userData.v.z * lt); }); }
+    if (t < 13.8) {
+      camera.position.set(DIA[0] + 3.0, 2.3, DIA[1] - 1.6); camera.lookAt(DIA[0] - 0.3, 1.1, DIA[1] + 0.9);
+      cap('top', t < 12 ? 'abdullah elmas buldu 💎' : (t < 12.8 ? '...' : 'TROLLENDİN yazıyor 😭'), 1, 0, '#bff7ff');
+      if (t > 10.4 && t < 12) cap('bot', '*tık tık tık*');
+      if (t > 12 && t < 12.15) flash('#fff', 0.5);
+      if (t > 12.8) cap('bot', 'elmas sahteymiş');
+    } else trollSting(t - 13.8, 'KIZDIN MI? 😏');
+  }
+  // ---- 15.2–21 TROL #3: the AFK friend ----
+  else if (t < 21) {
+    chapter(3, 'AFK kanka');
+    place(afk, AFK[0], AFK[1], face(-0.6, 1)); afk.setFace('sleep');
+    const nBlocks = Math.floor(seg(t, 16.6, 18.0) * HOUSE.length + 1e-6);
+    houseBlocks.forEach((b, i) => b.visible = i < nBlocks);
+    place(trol, AFK[0] - 2.2, AFK[1] + 1.2, face(0.4, 1));
+    if (t > 16.6 && t < 18.0) { trol.armR.rotation.x = -1.2 + Math.sin(t * 30) * 0.5; trol.root.position.y = Math.abs(Math.sin(t * 15)) * 0.15; }
+    if (t > 18.0) laugh(trol, t);
+    if (t < 19.6) {
+      camera.position.set(AFK[0] - 2.5, 2.8, AFK[1] + 5.5); camera.lookAt(AFK[0] - 0.8, 1.2, AFK[1]);
+      if (t < 16.6) { bubble('AFK 💤 yemek yiyorum', afk.root.position.clone().add(V(0, 2.4, 0))); cap('bot', '"5 dakkaya gelirim"'); }
+      else if (t < 18.0) { cap('top', '*trol inşaat başladı* 🧱', 1, 0, '#ffd28a'); cap('bot', `blok: ${nBlocks}/9`); }
+      else { cap('top', 'AFK\'dan döndü:', 1); bubble('kankalar neden her yer\nkaranlık?? 😨', V(AFK[0], 3.2, AFK[1])); }
+    } else trollSting(t - 19.6, 'HOŞGELDİN 😏');
+  }
+  // ---- 21–26 TROL #4: a new balloon for Abdullah ----
+  else if (t < 26) {
+    chapter(4, 'abdullah\'a yeni balon');
+    place(abd, -4, 5, face(1, 0.9)); place(trol, -2.4, 5.1, face(-1, 0.9));
+    const hand = V(-3.75, 1.0, 5.35);
+    const bp = V(-3.75 + Math.sin(t * 2) * 0.15, 2.3, 5.2);
+    if (t < 23.4) {
+      balloon.visible = true; bLine.visible = true; balloon.position.copy(bp); balloon.rotation.z = Math.sin(t * 2) * 0.15;
+      const a = bLine.geometry.attributes.position.array; a.set([hand.x, hand.y, hand.z, bp.x, bp.y - 0.45, bp.z]); bLine.geometry.attributes.position.needsUpdate = true;
+      abd.setFace(t < 21.6 ? 'normal' : 'happy'); abd.armR.rotation.x = -0.6;
+      if (t > 22.6) { stick.visible = true; trol.armR.rotation.x = lerp(-0.4, -2.3, seg(t, 22.6, 23.35)); }
+    } else {
+      stick.visible = t < 24; trol.armR.rotation.x = -2.3;
+      const lt = t - 23.4; shards.forEach(s => { s.visible = lt < 1.2; s.position.set(bp.x + s.userData.v.x * lt, bp.y + s.userData.v.y * lt - 6 * lt * lt, bp.z + s.userData.v.z * lt); });
+      abd.setFace(lt < 0.35 ? 'shock' : 'cry');
+      if (lt < 0.6) { const e = $('pat'); e.style.display = 'block'; e.textContent = 'PAT!'; e.style.left = '480px'; e.style.top = '160px'; e.style.transform = `scale(${1.4 - lt}) rotate(-8deg)`; }
+      flash('#fff', Math.max(0, 0.6 - lt * 4)); shake = Math.max(0, 0.1 - lt * 0.3);
+    }
+    if (t < 24.6) {
+      camera.position.set(-3.1, 2.3, 9.2); camera.lookAt(-3.2, 1.8, 5);
+      if (t < 22.6) bubble('al kanka yeni balon 🎈', trol.root.position.clone().add(V(0, 2.4, 0)));
+      if (t > 21.6 && t < 23.4) cap('bot', 'abdullah: 🥹');
+      if (t > 23.8) { cap('top', 'YİNE Mİ 😭', 1.1, 0, '#8ac8ff'); laugh(trol, t); }
+    } else trollSting(t - 24.6, 'BALON? YOK. 😏');
+  }
+  // ---- 26–31.5 TROL #5: karma ----
+  else {
+    chapter(5, 'karma');
+    const lt = t - 26;
+    if (t < 27.6) { place(trol, PIT[0] + 1.6, PIT[1], face(-0.3, 1)); laugh(trol, t); cap('top', 'trol kendi şakalarına gülüyor', 1); }
+    else if (t < 28.2) { const k = seg(t, 27.6, 28.2); place(trol, lerp(PIT[0] + 1.6, PIT[0], k), PIT[1], face(-1, 0.3)); walk(trol, t, 14); trol.root.rotation.y = face(1, 0); cap('top', '*geri geri yürür*'); }
+    else { const k = seg(t, 28.2, 28.7); place(trol, PIT[0], PIT[1], face(1, 0), lerp(0, -3.9, k * k)); trol.armL.rotation.z = 2.8; trol.armR.rotation.z = -2.8; trol.setFace(t < 29.3 ? 'shock' : 'troll'); }
+    place(modcu, PIT[0] - 2.5, PIT[1] + 1.4, face(1, -0.5)); modcu.setFace('normal');
+    if (t < 29.3) {
+      camera.position.set(2.2, 2.6, 6.4); camera.lookAt(2.2, 0.6, 0.2);
+      if (t > 28.2) { cap('top', 'KARMA ⚡', 1.2, 0, '#ffe14d'); if (t < 28.7) flash('#fff', 0.3); }
+      if (t > 28.65 && t < 28.85) shake = 0.08;
+    } else if (t < 30.2) {
+      // now modcu is the troll, peering down the pit
+      place(modcu, PIT[0] - 1.05, PIT[1], face(1, 0)); modcu.root.rotation.x = 0.5; modcu.headPivot.rotation.x = 0.6; modcu.setFace('troll');
+      camera.position.set(PIT[0] + 0.1, -3.0, PIT[1] + 0.15); camera.lookAt(PIT[0] - 0.45, 2.5, PIT[1]); camera.fov = 70;
+      trol.root.visible = false; cap('top', 'trolün gözünden:', 1);
+      cap('bot', 'modcu: 😏');
+    } else trollSting(t - 30.2, 'SENEYE GÖRÜŞÜRÜZ 😏');
+  }
+
+  if (shake > 0) { const r = rng(Math.floor(t * 60) + 1); camera.position.x += (r() - 0.5) * shake * 2; camera.position.y += (r() - 0.5) * shake * 2; }
+  camera.updateProjectionMatrix();
+  renderer.render(scene, camera);
+}
+window.renderAt = renderAt; window.DURATION = DURATION;
+const still = new URLSearchParams(location.search).get('still');
+if (!navigator.webdriver) {
+  if (still !== null) renderAt(parseFloat(still));
+  else { const t0 = performance.now(); (function loop() { renderAt(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); })(); }
+}
+</script>
+</body>
+</html>
