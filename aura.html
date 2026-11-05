@@ -380,6 +380,7 @@ function renderCard(t) {
   const k = seg(t, .25, .55), out = CARD === 6 ? 1 : 1 - seg(t, DUR - .3, DUR);
   const T = CARD === 0 ? ['AURA MOMENTS', '+1000 aura mı, -1000 aura mı?'] : CARD === 6 ? ['TOPLAM AURA: ∞', 'aura moments · senaryo 1-5'] : ['SENARYO ' + CARD, NAMES[CARD - 1]];
   setHTML(el.title, T[0]); setHTML(el.small, T[1]);
+  el.title.style.fontSize = CARD === 6 ? '7.5cqw' : '';
   el.title.style.opacity = k * out; el.title.style.transform = `translateY(-50%) scale(${1 + .3 * (1 - easeOutBack(k))})`;
   el.small.style.opacity = seg(t, .6, .9) * out;
   el.aura.style.opacity = CARD >= 1 && CARD <= 5 ? .9 * out : 0; setHTML(el.auraV, CARD >= 1 && CARD <= 5 ? fmt(TOT[CARD - 1]) : '');
