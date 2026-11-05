@@ -469,7 +469,7 @@ function renderAt(t) {
     dir.target.position.set(FX, 0, 0); dir.position.set(FX + 4, 10, 8);
     scene.background = new THREE.Color('#86b8ff'); scene.fog = new THREE.Fog('#86b8ff', 20, 45);
     sen.root.position.set(FX, 0, 0); sen.root.rotation.y = 0; sen.face('sneaky');
-    const cz = lerp(-7, -1.9, seg(t, 0, 2.8)); creeper.visible = t < 4.6; creeper.position.set(FX, 0, cz);
+    const cz = lerp(-7, -1.9, seg(t, 0, 2.8)); creeper.visible = t < 4.6; creeper.position.set(0, 0, cz);
     crLegs.forEach((g, i) => g.rotation.x = t < 2.8 ? Math.sin(t * 10 + (i % 2) * Math.PI) * .5 : 0);
     const hiss = t > 2.8 && t < 4.6; crMat.emissive = new THREE.Color(hiss && Math.floor(t * 8) % 2 ? '#888888' : '#000000');
     creeper.scale.setScalar(hiss ? 1 + seg(t, 3.8, 4.6) * .25 : 1);
