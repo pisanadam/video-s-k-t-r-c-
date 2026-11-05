@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Derslerde Havalı Anlar</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+  #stage { position: relative; width: 1280px; height: 720px; overflow: hidden; }
+  canvas#gl { position: absolute; inset: 0; width: 1280px; height: 720px; }
+  .cap {
+    position: absolute; left: 0; right: 0; text-align: center;
+    font-family: "DejaVu Sans", sans-serif; font-weight: 900; color: #fff;
+    -webkit-text-stroke: 3px #000; paint-order: stroke fill;
+    text-shadow: 4px 4px 0 #000; letter-spacing: 1px; white-space: pre-line;
+    transform-origin: 50% 50%;
+  }
+  #top { top: 28px; font-size: 62px; }
+  #bot { bottom: 34px; font-size: 50px; }
+  #bubble {
+    position: absolute; background: #fff; color: #111; border: 5px solid #000;
+    border-radius: 18px; padding: 14px 22px; font: 800 36px "DejaVu Sans", sans-serif;
+    white-space: pre-line; text-align: center; display: none;
+  }
+  #bubble:after {
+    content: ""; position: absolute; left: 50%; bottom: -26px; margin-left: -14px;
+    border: 14px solid transparent; border-top-color: #000;
+  }
+  #flash { position: absolute; inset: 0; pointer-events: none; }
+  #vig { position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0) 45%, rgba(120,0,0,0.85) 100%); opacity: 0; }
+  #bars { position: absolute; inset: 0; pointer-events: none; opacity: 0;
+    border-top: 80px solid #000; border-bottom: 80px solid #000; box-sizing: border-box; }
+  #emoji { position: absolute; font: 900 120px "DejaVu Sans", sans-serif; display: none; }
+  #wm { position: absolute; right: 14px; top: 10px; font: 700 18px "DejaVu Sans Mono", monospace; color: rgba(255,255,255,0.6); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl" width="1280" height="720"></canvas>
+  <div id="vig"></div>
+  <div id="bars"></div>
+  <div id="bubble"></div>
+  <div id="emoji"></div>
+  <div class="cap" id="top"></div>
+  <div class="cap" id="bot"></div>
+  <div id="flash"></div>
+  <div id="wm">REC ● 3. DERS</div>
+</div>
+<script src="three.min.js"></script>
+<script>
+function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const ease = k => { k = clamp(k, 0, 1); return k * k * (3 - 2 * k); };
+const seg = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
+
+const glCanvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({ canvas: glCanvas, antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(1280, 720, false); renderer.setPixelRatio(1);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x2a2a2a);
+const camera = new THREE.PerspectiveCamera(55, 1280 / 720, 0.1, 200);
+scene.add(new THREE.HemisphereLight(0xfff6e0, 0x6b5a45, 1.0));
+const lamp = new THREE.DirectionalLight(0xffffff, 0.7); lamp.position.set(-8, 12, 4); scene.add(lamp);
+
+function canvasTex(w, h, draw, nearest = true) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c);
+  if (nearest) { t.magFilter = THREE.NearestFilter; t.minFilter = THREE.NearestFilter; }
+  t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function noiseFill(g, w, h, base, vary, seed) {
+  const r = rng(seed);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const v = (r() - 0.5) * vary; const c = base.map(ch => clamp(Math.round(ch + v), 0, 255));
+    g.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`; g.fillRect(x, y, 1, 1);
+  }
+}
+const plank = canvasTex(16, 16, (g, w, h) => { noiseFill(g, w, h, [168, 128, 84], 26, 1); g.fillStyle = '#6e4f2e'; for (let y = 3; y < 16; y += 4) g.fillRect(0, y, 16, 1); g.fillRect(7, 0, 1, 4); g.fillRect(3, 4, 1, 4); g.fillRect(11, 8, 1, 4); g.fillRect(5, 12, 1, 4); });
+plank.wrapS = plank.wrapT = THREE.RepeatWrapping; plank.repeat.set(16, 14);
+const wallTex = canvasTex(16, 16, (g, w, h) => noiseFill(g, w, h, [222, 214, 186], 14, 2));
+wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping; wallTex.repeat.set(10, 4);
+const wood = new THREE.MeshLambertMaterial({ map: canvasTex(16, 16, (g, w, h) => noiseFill(g, w, h, [150, 104, 62], 24, 3)) });
+const metal = new THREE.MeshLambertMaterial({ color: 0x555a60 });
+const box1 = new THREE.BoxGeometry(1, 1, 1);
+function block(mat, sx, sy, sz, x, y, z, parent = scene) { const m = new THREE.Mesh(box1, mat); m.scale.set(sx, sy, sz); m.position.set(x, y, z); parent.add(m); return m; }
+
+// --- Classroom: board at z=-6, door on the right wall (x=7) -----------------
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(16, 14), new THREE.MeshLambertMaterial({ map: plank }));
+floor.rotation.x = -Math.PI / 2; scene.add(floor);
+const wallM = new THREE.MeshLambertMaterial({ map: wallTex });
+block(wallM, 16, 5, 0.3, 0, 2.5, -6.5);              // front wall
+block(wallM, 16, 5, 0.3, 0, 2.5, 7);                 // back wall
+block(wallM, 0.3, 5, 14, -7.5, 2.5, 0);              // window wall
+// right wall with a door gap between z=-1.5 and z=0.5
+block(wallM, 0.3, 5, 8, 7.5, 2.5, 3.0);
+block(wallM, 0.3, 5, 5, 7.5, 2.5, -4.0);
+block(wallM, 0.3, 1.6, 2, 7.5, 4.2, -0.5);
+block(new THREE.MeshBasicMaterial({ color: 0x0c0c10 }), 0.1, 3.4, 2, 7.8, 1.7, -0.5); // dark hallway
+block(wood, 0.35, 3.6, 0.15, 7.45, 1.8, -1.55); block(wood, 0.35, 3.6, 0.15, 7.45, 1.8, 0.55);
+// "MÜDÜR ODASI →" sign above the door
+const signTex = canvasTex(256, 64, (g) => { g.fillStyle = '#1d3f8a'; g.fillRect(0, 0, 256, 64); g.fillStyle = '#fff'; g.font = 'bold 30px DejaVu Sans'; g.fillText('MÜDÜR ODASI →', 14, 43); }, false);
+const sign = new THREE.Mesh(new THREE.PlaneGeometry(2, 0.5), new THREE.MeshBasicMaterial({ map: signTex }));
+sign.position.set(7.33, 3.75, -0.5); sign.rotation.y = -Math.PI / 2; scene.add(sign);
+// windows with sky
+const skyM = new THREE.MeshBasicMaterial({ color: 0x8fd0ff });
+[-4, 0, 4].forEach(z => { block(skyM, 0.05, 1.8, 2.4, -7.33, 2.6, z); block(new THREE.MeshLambertMaterial({ color: 0xf2f2f2 }), 0.08, 0.12, 2.4, -7.3, 2.6, z); });
+// ceiling lamps
+[-3, 1, 5].forEach(z => block(new THREE.MeshBasicMaterial({ color: 0xfffbe8 }), 3, 0.1, 0.4, 0, 4.9, z));
+// blackboard
+const boardTex = canvasTex(512, 200, (g) => {
+  g.fillStyle = '#244a32'; g.fillRect(0, 0, 512, 200);
+  g.strokeStyle = '#6b4a2a'; g.lineWidth = 12; g.strokeRect(0, 0, 512, 200);
+  g.fillStyle = 'rgba(255,255,255,0.85)'; g.font = 'bold 30px DejaVu Sans';
+  g.fillText('MATEMATİK — TÜREV', 30, 48);
+  g.font = '28px DejaVu Sans'; g.fillText("f(x) = x²   →   f'(x) = 2x", 30, 100);
+  g.fillText("f(x) = 3x³ →   f'(x) = ?", 30, 148);
+  g.fillText('sınav: CUMA !!!', 300, 186);
+}, false);
+const board = new THREE.Mesh(new THREE.PlaneGeometry(8, 3.1), new THREE.MeshLambertMaterial({ map: boardTex }));
+board.position.set(0, 2.6, -6.33); scene.add(board);
+// teacher desk
+block(wood, 2.4, 0.12, 1.1, -3.5, 1.0, -4.6); block(wood, 2.3, 0.9, 1.0, -3.5, 0.48, -4.6);
+
+// student desks: rows at z = -2.2, 0.6, 3.4 ; columns x = -3, 0.2, 3.4
+function desk(x, z) {
+  const g = new THREE.Group(); g.position.set(x, 0, z);
+  block(wood, 1.6, 0.1, 0.8, 0, 0.95, 0, g);
+  [[-0.7, -0.33], [0.7, -0.33], [-0.7, 0.33], [0.7, 0.33]].forEach(([a, b]) => block(metal, 0.08, 0.9, 0.08, a, 0.45, b, g));
+  block(wood, 0.6, 0.08, 0.55, 0, 0.52, 0.85, g); block(metal, 0.06, 0.5, 0.06, 0, 0.26, 0.85, g);
+  block(wood, 0.6, 0.6, 0.08, 0, 0.85, 1.12, g);
+  scene.add(g); return g;
+}
+const ROWS = [-2.2, 0.6, 3.4], COLS = [-3, 0.2, 3.4];
+ROWS.forEach(z => COLS.forEach(x => desk(x, z)));
+
+// --- Laptop on the back-row middle desk ---------------------------------------
+function screenTex(kind) {
+  return canvasTex(320, 200, (g) => {
+    if (kind === 'load') {
+      const gr = g.createLinearGradient(0, 0, 320, 200); gr.addColorStop(0, '#ff5fae'); gr.addColorStop(1, '#7a2cff');
+      g.fillStyle = gr; g.fillRect(0, 0, 320, 200);
+      g.fillStyle = '#fff'; g.font = 'bold 30px DejaVu Sans'; g.fillText('JENNY MOD', 70, 70);
+      g.font = '18px DejaVu Sans'; g.fillText('yükleniyor... %69', 90, 110);
+      g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(40, 130, 240, 22); g.fillStyle = '#fff'; g.fillRect(40, 130, 166, 22);
+      g.fillStyle = '#fff'; g.font = '14px DejaVu Sans'; g.fillText('sesi kapat!!!', 115, 182);
+    } else if (kind === 'censor') {
+      g.fillStyle = '#000'; g.fillRect(0, 0, 320, 200);
+      g.fillStyle = '#e01b1b'; g.fillRect(0, 70, 320, 60);
+      g.fillStyle = '#fff'; g.font = 'bold 34px DejaVu Sans'; g.fillText('SANSÜRLENDİ', 40, 113);
+    } else if (kind === 'doc') {
+      g.fillStyle = '#fff'; g.fillRect(0, 0, 320, 200);
+      g.fillStyle = '#2b579a'; g.fillRect(0, 0, 320, 28);
+      g.fillStyle = '#fff'; g.font = 'bold 15px DejaVu Sans'; g.fillText('BİYOLOJİ_ÖDEVİ_final_SON(3).docx', 8, 19);
+      g.fillStyle = '#222'; g.font = 'bold 22px DejaVu Sans'; g.fillText('Hücre Bölünmesi', 20, 70);
+      g.fillStyle = '#999'; for (let y = 90; y < 190; y += 16) g.fillRect(20, y, 180 + ((y * 37) % 90), 6);
+    }
+  }, false);
+}
+const screens = { load: screenTex('load'), censor: screenTex('censor'), doc: screenTex('doc') };
+const laptop = new THREE.Group();
+block(new THREE.MeshLambertMaterial({ color: 0x2b2b2e }), 0.9, 0.04, 0.6, 0, 0, 0, laptop);
+const lid = new THREE.Group(); lid.position.set(0, 0, -0.3); laptop.add(lid);
+block(new THREE.MeshLambertMaterial({ color: 0x2b2b2e }), 0.9, 0.6, 0.03, 0, 0.3, 0, lid);
+const screenMat = new THREE.MeshBasicMaterial({ map: screens.load });
+const screenMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.84, 0.54), screenMat);
+screenMesh.position.set(0, 0.3, 0.02); lid.add(screenMesh); lid.rotation.x = -0.25;
+scene.add(laptop);
+const LAPTOP_HOME = new THREE.Vector3(0.2, 1.02, 3.3);
+const glow = new THREE.PointLight(0xff4fb0, 0, 4); scene.add(glow);
+
+// --- Characters ----------------------------------------------------------------
+function faceTex(o, mode) {
+  return canvasTex(8, 8, (g) => {
+    g.fillStyle = o.skin; g.fillRect(0, 0, 8, 8);
+    g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(0, 0, 8, 2);
+    if (mode === 'normal') { g.fillStyle = '#fff'; g.fillRect(1, 3, 2, 1); g.fillRect(5, 3, 2, 1); g.fillStyle = o.eye; g.fillRect(2, 3, 1, 1); g.fillRect(5, 3, 1, 1); g.fillStyle = '#5a2a1a'; g.fillRect(3, 6, 2, 1); }
+    else if (mode === 'shock') { g.fillStyle = '#fff'; g.fillRect(1, 2, 2, 3); g.fillRect(5, 2, 2, 3); g.fillStyle = '#000'; g.fillRect(2, 3, 1, 1); g.fillRect(5, 3, 1, 1); g.fillStyle = '#300'; g.fillRect(3, 5, 2, 3); }
+    else if (mode === 'smirk') { g.fillStyle = '#fff'; g.fillRect(1, 3, 2, 1); g.fillRect(5, 3, 2, 1); g.fillStyle = o.eye; g.fillRect(2, 3, 1, 1); g.fillRect(6, 3, 1, 1); g.fillStyle = '#000'; g.fillRect(1, 2, 2, 1); g.fillStyle = '#5a2a1a'; g.fillRect(4, 6, 3, 1); g.fillRect(6, 5, 1, 1); }
+    else if (mode === 'stone') { g.fillStyle = '#000'; g.fillRect(1, 2, 6, 1); g.fillStyle = '#222'; g.fillRect(1, 3, 2, 1); g.fillRect(5, 3, 2, 1); g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(3, 3, 2, 3); g.fillStyle = '#3a1a10'; g.fillRect(2, 6, 4, 1); }
+    else if (mode === 'angry') { g.fillStyle = '#fff'; g.fillRect(1, 3, 2, 1); g.fillRect(5, 3, 2, 1); g.fillStyle = '#c00'; g.fillRect(2, 3, 1, 1); g.fillRect(5, 3, 1, 1); g.fillStyle = '#000'; g.fillRect(1, 2, 1, 1); g.fillRect(2, 2, 1, 1); g.fillRect(5, 2, 1, 1); g.fillRect(6, 2, 1, 1); g.fillRect(2, 1, 1, 1); g.fillRect(5, 1, 1, 1); g.fillStyle = '#300'; g.fillRect(2, 6, 4, 1); g.fillRect(2, 7, 1, 1); g.fillRect(5, 7, 1, 1); }
+    if (o.mustache) { g.fillStyle = '#555'; g.fillRect(2, 5, 4, 1); }
+    if (o.specs) { g.fillStyle = '#111'; g.fillRect(1, 2, 2, 1); g.fillRect(5, 2, 2, 1); g.fillRect(3, 3, 2, 1); }
+  });
+}
+function makeChar(o) {
+  const root = new THREE.Group();
+  const skinM = new THREE.MeshLambertMaterial({ color: o.skin }), hairM = new THREE.MeshLambertMaterial({ color: o.hair });
+  const shirtM = new THREE.MeshLambertMaterial({ color: o.shirt }), pantsM = new THREE.MeshLambertMaterial({ color: o.pants });
+  const faces = {}; ['normal', 'shock', 'smirk', 'stone', 'angry'].forEach(k => faces[k] = new THREE.MeshLambertMaterial({ map: faceTex(o, k) }));
+  const headMats = [hairM, hairM, hairM, skinM, faces.normal, hairM];
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), headMats);
+  const headPivot = new THREE.Group(); headPivot.position.y = 1.5; head.position.y = 0.4; headPivot.add(head);
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.9, 0.4), shirtM); body.position.y = 1.05;
+  if (o.tie) block(new THREE.MeshLambertMaterial({ color: o.tie }), 0.14, 0.7, 0.04, 0, 0.0, 0.21, body);
+  function limb(mat, w, h, x, y) { const p = new THREE.Group(); p.position.set(x, y, 0); const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), mat); m.position.y = -h / 2; p.add(m); return p; }
+  const armL = limb(shirtM, 0.3, 0.85, -0.55, 1.48), armR = limb(shirtM, 0.3, 0.85, 0.55, 1.48);
+  [armL, armR].forEach(a => { const h = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 0.3), skinM); h.position.y = -0.85; a.add(h); });
+  const legL = limb(pantsM, 0.38, 0.6, -0.2, 0.6), legR = limb(pantsM, 0.38, 0.6, 0.2, 0.6);
+  const glasses = new THREE.Group(); const gm = new THREE.MeshBasicMaterial({ color: 0x050505 });
+  const l1 = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.14, 0.05), gm); l1.position.x = -0.2; const l2 = l1.clone(); l2.position.x = 0.2;
+  const br = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.05, 0.05), gm); br.position.y = 0.05;
+  glasses.add(l1, l2, br); glasses.position.set(0, 0.03, 0.43); head.add(glasses); glasses.visible = false;
+  root.add(headPivot, body, armL, armR, legL, legR); root.scale.setScalar(o.scale || 1); scene.add(root);
+  return { root, head, headPivot, armL, armR, legL, legR, glasses, base: o.scale || 1,
+    setFace(k) { headMats[4] = faces[k]; head.material = headMats; } };
+}
+const hoca  = makeChar({ skin: '#d9a37a', hair: '#8a8a8a', shirt: '#f1f1f1', pants: '#4a4a52', eye: '#333', tie: '#b3121b', mustache: true, specs: true, scale: 1.18 });
+const ali   = makeChar({ skin: '#e0ac7e', hair: '#3b2412', shirt: '#2f7de1', pants: '#2b2b6b', eye: '#2b5bd7' });
+const veli  = makeChar({ skin: '#c98d5e', hair: '#111111', shirt: '#e23b3b', pants: '#333333', eye: '#4a2a10' });
+const modcu = makeChar({ skin: '#f0c49a', hair: '#d9a520', shirt: '#38b34a', pants: '#5a4630', eye: '#1b8c3a' });
+const sigma = makeChar({ skin: '#d29a6b', hair: '#1b1b1b', shirt: '#151515', pants: '#101010', eye: '#222' });
+const extras = [
+  makeChar({ skin: '#e8b88f', hair: '#5a3a1a', shirt: '#f2c84b', pants: '#334', eye: '#333' }),
+  makeChar({ skin: '#b67b52', hair: '#222', shirt: '#9b59b6', pants: '#333', eye: '#333' }),
+  makeChar({ skin: '#f1cfa8', hair: '#b5651d', shirt: '#1abc9c', pants: '#2c3e50', eye: '#333' }),
+];
+// Seat layout (students face the board = rotation.y = PI, chairs sit at desk.z + 0.85)
+const SEATS = {
+  ali: [-3, ROWS[2]], modcu: [0.2, ROWS[2]], veli: [3.4, ROWS[2]],
+  sigma: [0.2, ROWS[0]], e0: [-3, ROWS[0]], e1: [3.4, ROWS[1]], e2: [-3, ROWS[1]],
+};
+const kids = { ali, modcu, veli, sigma, e0: extras[0], e1: extras[1], e2: extras[2] };
+
+// Sigma's notebook + pen
+const notebook = block(new THREE.MeshLambertMaterial({ color: 0xf8f8f0 }), 0.6, 0.03, 0.4, 0.2, 1.02, ROWS[0] + 0.1);
+const pen = block(new THREE.MeshBasicMaterial({ color: 0x1144cc }), 0.04, 0.04, 0.3, 0.2, 1.1, ROWS[0] + 0.1);
+
+// --- DOM helpers ------------------------------------------------------------------
+const $ = id => document.getElementById(id);
+function cap(id, text, scale = 1, rot = 0, color = '#fff') { const el = $(id); el.textContent = text || ''; el.style.transform = `scale(${scale}) rotate(${rot}deg)`; el.style.color = color; }
+function bubble(text, worldPos) {
+  const el = $('bubble'); if (!text) { el.style.display = 'none'; return; }
+  el.style.display = 'block'; el.textContent = text;
+  const p = worldPos.clone().project(camera); const x = (p.x * 0.5 + 0.5) * 1280, y = (-p.y * 0.5 + 0.5) * 720;
+  el.style.left = clamp(x - el.offsetWidth / 2, 10, 1270 - el.offsetWidth) + 'px'; el.style.top = Math.max(110, y - el.offsetHeight - 30) + 'px';
+}
+function flash(color, a) { $('flash').style.background = color; $('flash').style.opacity = a; }
+function emoji(ch, x, y, s = 1) { const e = $('emoji'); e.style.display = 'block'; e.textContent = ch; e.style.left = x + 'px'; e.style.top = y + 'px'; e.style.transform = `scale(${s})`; }
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+
+// --- Poses ------------------------------------------------------------------------
+function reset() {
+  for (const k in kids) {
+    const c = kids[k], [x, z] = SEATS[k];
+    c.root.position.set(x, 0, z + 0.85); c.root.rotation.set(0, Math.PI, 0); c.root.scale.setScalar(c.base);
+    c.headPivot.rotation.set(0, 0, 0); c.head.scale.setScalar(1); c.glasses.visible = false; c.setFace('normal');
+    c.legL.rotation.set(-Math.PI / 2, 0, 0); c.legR.rotation.set(-Math.PI / 2, 0, 0);   // sitting
+    c.armL.rotation.set(-0.9, 0, 0); c.armR.rotation.set(-0.9, 0, 0);                   // hands on desk
+  }
+  hoca.root.position.set(-1.5, 0, -5.2); hoca.root.rotation.set(0, Math.PI, 0); hoca.root.scale.setScalar(hoca.base);
+  hoca.headPivot.rotation.set(0, 0, 0); hoca.head.scale.setScalar(1); hoca.setFace('normal');
+  hoca.armL.rotation.set(0, 0, 0); hoca.armR.rotation.set(0, 0, 0); hoca.legL.rotation.set(0, 0, 0); hoca.legR.rotation.set(0, 0, 0);
+  laptop.position.copy(LAPTOP_HOME); laptop.rotation.set(0, 0, 0); lid.rotation.x = -0.25; laptop.visible = true;
+  screenMat.map = screens.load;
+}
+// The three back-row kids lean in over the laptop
+function huddle(t, amt) {
+  [ali, veli].forEach((c, i) => {
+    const sx = SEATS[i ? 'veli' : 'ali'][0];
+    c.root.position.x = lerp(sx, i ? 1.3 : -0.9, amt);
+    c.root.rotation.y = Math.PI + (i ? -0.5 : 0.5) * amt;
+    c.root.rotation.x = 0.0;
+    c.headPivot.rotation.x = 0.35 * amt;
+  });
+  modcu.headPivot.rotation.x = 0.4 * amt;
+  modcu.armL.rotation.x = -1.2 + Math.sin(t * 25) * 0.08 * amt; modcu.armR.rotation.x = -1.2 + Math.cos(t * 23) * 0.08 * amt;
+}
+function walk(c, t, sp = 9, a = 0.7) { const s = Math.sin(t * sp); c.legL.rotation.x = s * a; c.legR.rotation.x = -s * a; c.armL.rotation.x = -s * a; c.armR.rotation.x = s * a; }
+function writeOnBoard(t) { hoca.root.rotation.y = Math.PI; hoca.armR.rotation.x = Math.PI - 0.3 + Math.sin(t * 14) * 0.15; hoca.armR.rotation.z = Math.sin(t * 7) * 0.2; }
+
+// --- Timeline ---------------------------------------------------------------------
+const DURATION = 26;
+function renderAt(t) {
+  reset();
+  let filter = 'none', shake = 0;
+  cap('top', ''); cap('bot', ''); bubble(null); flash('#fff', 0);
+  $('vig').style.opacity = 0; $('bars').style.opacity = 0; $('emoji').style.display = 'none';
+  camera.fov = 55; glow.intensity = 0;
+  pen.position.set(0.2 + Math.sin(t * 9) * 0.12, 1.1, ROWS[0] + 0.1 + Math.cos(t * 13) * 0.05);
+  sigma.armR.rotation.x = -1.0 + Math.sin(t * 9) * 0.1;   // always writing notes
+  sigma.headPivot.rotation.x = 0.3;
+
+  // A. 0–3.6 intro: normal math class
+  if (t < 3.6) {
+    writeOnBoard(t);
+    const k = t / 3.6;
+    camera.position.set(lerp(5.5, 3.5, k), 4.2, lerp(6.5, 5.8, k)); camera.lookAt(-0.5, 1.4, -2.5);
+    extras.forEach((c, i) => c.headPivot.rotation.x = 0.2 + Math.sin(t * 2 + i) * 0.05);
+    huddle(t, 0);
+    cap('top', 'DERSLERDE HAVALI ANLAR', 1 + Math.sin(t * 8) * 0.03);
+    cap('bot', t < 1.8 ? 'matematik, 3. ders' : 'herkes çok çalışkan... 🤓');
+  }
+  // B. 3.6–7.6 the back row is up to something
+  else if (t < 7.6) {
+    writeOnBoard(t);
+    huddle(t, ease(seg(t, 3.6, 4.4)));
+    glow.intensity = 2.2; glow.position.set(0.2, 1.6, 3.6);
+    const k = ease(seg(t, 3.6, 5));
+    camera.position.set(lerp(3.5, 2.2, k), lerp(3.2, 2.4, k), lerp(0.2, 1.4, k)); camera.lookAt(0.2, 1.7, 3.8);
+    modcu.setFace('smirk'); ali.setFace('smirk'); veli.setFace('smirk');
+    cap('top', 'bu sırada arka sıra:');
+    if (t > 4.8) cap('bot', 'gizli gizli JENNY MOD 💀');
+    if (t > 5.9) bubble('KANKA SESİ KIS!!', modcu.root.position.clone().add(V(0, 2.3, 0)));
+  }
+  // C. 7.6–8.5 record scratch: teacher freezes, head turns all the way around
+  else if (t < 8.5) {
+    huddle(t, 1); glow.intensity = 2.2; glow.position.set(0.2, 1.6, 3.6);
+    hoca.armR.rotation.x = Math.PI - 0.3;
+    hoca.headPivot.rotation.y = lerp(0, Math.PI, ease(seg(t, 7.8, 8.4)));
+    hoca.setFace('angry');
+    camera.position.set(-1.5, 2.6, -1.8); camera.lookAt(-1.5, 2.4, -5.2); camera.fov = lerp(55, 35, ease(seg(t, 7.6, 8.5)));
+    filter = 'saturate(0.3)';
+    cap('top', t < 8.0 ? '*kayıt cızırtısı*' : '...', 1);
+  }
+  // D. 8.5–10.3 teacher marches to the back row
+  else if (t < 10.3) {
+    huddle(t, 1); glow.intensity = 2.2; glow.position.set(0.2, 1.6, 3.6);
+    const k = ease(seg(t, 8.5, 10.1));
+    hoca.root.position.set(lerp(-1.5, 1.7, k), 0, lerp(-5.2, 1.9, k));
+    hoca.root.rotation.y = 0.15;
+    walk(hoca, t, 14, 0.8); hoca.setFace('angry');
+    hoca.root.position.y = Math.abs(Math.sin(t * 14)) * 0.12;
+    // kids haven't noticed — still giggling
+    modcu.setFace('smirk'); ali.setFace('smirk'); veli.setFace('smirk');
+    camera.position.set(-4.2, 2.0, 5.2); camera.lookAt(hoca.root.position.x * 0.7, 1.9, hoca.root.position.z * 0.7 + 1.0);
+    shake = 0.03; $('vig').style.opacity = 0.4 + 0.3 * k;
+    cap('top', '*hoca geliyor*', 1 + Math.sin(t * 20) * 0.05, 0, '#ffdd33');
+    cap('bot', 'arka sıra: 😂😂😂');
+  }
+  // E. 10.3–12.4 OĞLUM SEN NE YAPIYORSUN + censored screen
+  else if (t < 12.4) {
+    huddle(t, 1);
+    hoca.root.position.set(1.7, 0, 1.9); hoca.root.rotation.y = 0.3; hoca.setFace('angry');
+    hoca.armR.rotation.x = -1.6; hoca.armR.rotation.z = 0.4;   // pointing
+    [modcu, ali, veli].forEach(c => { c.setFace('shock'); c.headPivot.rotation.y = 0.9; c.head.scale.setScalar(1.15); });
+    if (t < 11.4) {
+      const lt = t - 10.3;
+      camera.position.set(1.1, 2.3, 4.6); camera.lookAt(1.75, 2.3, 1.9);
+      camera.fov = lerp(75, 42, ease(lt / 0.2));
+      hoca.head.scale.setScalar(1 + Math.min(lt * 3, 0.45));
+      shake = 0.14 * (1 - lt);
+      $('vig').style.opacity = 0.95; filter = 'contrast(1.7) saturate(2.4)';
+      flash('#f00', lt < 0.1 ? 0.6 : 0);
+      cap('top', 'OĞLUM SEN NE\nYAPIYORSUN', 1.05 + Math.sin(t * 45) * 0.06, Math.sin(t * 27) * 4, '#ff2b2b');
+    } else {
+      screenMat.map = screens.censor;
+      camera.position.set(0.2, 1.75, 4.25); camera.lookAt(0.2, 1.25, 3.0); camera.fov = 45;
+      cap('top', 'ekranda bu vardı:', 1);
+      cap('bot', '(gösteremiyoruz 💀)');
+      flash('#fff', Math.max(0, 0.6 - (t - 11.4) * 3));
+    }
+  }
+  // F. 12.4–15.4 alt-tab excuse → BOHOHOHYT
+  else if (t < 15.4) {
+    huddle(t, 1);
+    hoca.root.position.set(1.7, 0, 1.9); hoca.root.rotation.y = 0.3;
+    screenMat.map = t < 12.7 ? screens.censor : screens.doc;
+    modcu.setFace(t < 13.6 ? 'smirk' : 'shock');
+    [ali, veli].forEach(c => { c.setFace('shock'); c.headPivot.rotation.y = 0.9; });
+    modcu.headPivot.rotation.y = 0.7;
+    hoca.setFace('stone');
+    if (t < 13.8) {
+      camera.position.set(-1.6, 2.4, 6.0); camera.lookAt(0.6, 1.6, 2.6);
+      cap('top', t < 12.7 ? '*Alt+Tab*' : '*ALT+TAB*', 1.1, 0, '#7fd3ff');
+      if (t > 12.8) bubble('hocam biyoloji\nödevi yapıyoduk 🥺', modcu.root.position.clone().add(V(0, 2.3, 0)));
+    } else {
+      const lt = t - 13.8;
+      camera.position.set(2.7, 2.6, 5.4); camera.lookAt(1.5, 2.2, 2.4); camera.fov = lerp(55, 38, ease(lt / 0.4));
+      cap('top', 'hoca:', 1);
+      bubble('ödevin adı JENNY mi?', hoca.root.position.clone().add(V(0, 2.9, 0)));
+      cap('bot', 'BOHOHOHYT 😭😭', 1.1 + Math.sin(t * 30) * 0.08, Math.sin(t * 17) * 5, '#ffe14d');
+      shake = 0.04;
+    }
+  }
+  // G. 15.4–20.4 meanwhile, the sigma
+  else if (t < 20.4) {
+    const k = seg(t, 15.4, 20.4);
+    filter = 'grayscale(1) contrast(1.35)'; $('bars').style.opacity = 1;
+    hoca.root.position.set(1.7, 0, 1.9); hoca.root.rotation.y = 0.3; hoca.setFace('angry');
+    [modcu, ali, veli].forEach(c => c.setFace('shock')); huddle(t, 1); screenMat.map = screens.doc;
+    sigma.setFace('stone');
+    const turn = ease(seg(t, 17.6, 18.4));
+    sigma.headPivot.rotation.y = turn * 0.25; sigma.headPivot.rotation.x = lerp(0.3, -0.2, turn);
+    sigma.glasses.visible = t > 18.0;
+    if (t > 17.6) { sigma.armR.rotation.x = -0.9; pen.position.set(0.2, 1.1, ROWS[0] + 0.1); }
+    const ang = lerp(-0.4, 0.5, k);
+    const tgt = V(0.2, 2.1, ROWS[0] + 0.85);
+    camera.position.set(tgt.x + Math.sin(ang) * 2.4, 1.3, tgt.z - Math.cos(ang) * 2.4 + 0.2);
+    camera.lookAt(tgt); camera.fov = 50;
+    // the camera sits in front of sigma; turn him to face it when he looks over
+    sigma.root.rotation.y = Math.PI;
+    cap('top', t < 17.6 ? 'bu sırada ön sırada sigma:' : 'SIGMA 🗿', 1);
+    cap('bot', t < 17.6 ? 'türev çözüyor ✍️' : (t < 19 ? "f'(x) = 9x²  (doğru)" : '+1000 AURA'), 1, 0, t > 19 ? '#7dffb0' : '#fff');
+    if (t > 18.0 && t < 18.3) shake = 0.05;
+  }
+  // H. 20.4–23.4 MÜDÜR ODASINA! — the back row gets yeeted out the door
+  else if (t < 23.4) {
+    hoca.root.position.set(4.6, 0, -0.5); hoca.root.rotation.y = Math.PI / 2; hoca.setFace('angry');
+    hoca.armR.rotation.x = -1.6;   // points at the door
+    laptop.position.set(4.6 + 0.6, 1.4, -0.1); laptop.rotation.set(0, Math.PI / 2, 0); lid.rotation.x = -1.5; // confiscated, under the arm
+    const order = [modcu, ali, veli];
+    order.forEach((c, i) => {
+      const t0 = 20.9 + i * 0.6, lt = t - t0;
+      c.setFace('shock');
+      if (lt < 0) { c.root.position.set(3.4 - i * 0.9, 0, 1.4 + i * 0.4); c.root.rotation.set(0, Math.PI / 2, 0); c.legL.rotation.x = 0; c.legR.rotation.x = 0; c.armL.rotation.x = 0; c.armR.rotation.x = 0; return; }
+      const p = Math.min(1, lt / 0.55);
+      c.root.position.set(lerp(3.4 - i * 0.9, 9, p), 0.3 + Math.sin(p * Math.PI) * 1.4, lerp(1.4 + i * 0.4, -0.5, p));
+      c.root.rotation.set(lt * 10, Math.PI / 2, lt * 6);
+      c.armL.rotation.z = 2.4; c.armR.rotation.z = -2.4;
+      c.root.visible = p < 1;
+    });
+    camera.position.set(1.8, 2.7, -4.4); camera.lookAt(5.4, 1.5, 0.2);
+    cap('top', 'MÜDÜR ODASINA!!!', 1.05 + Math.sin(t * 25) * 0.05, Math.sin(t * 13) * 3, '#ff4040');
+    const yeets = order.filter((c, i) => t > 20.9 + i * 0.6).length;
+    cap('bot', ['', 'YEET', 'YEET YEET', 'YEET YEET YEET'][yeets], 1.1);
+    shake = yeets ? 0.03 : 0;
+  }
+  // I. 23.4–26 outro
+  else {
+    writeOnBoard(t);
+    ['modcu', 'ali', 'veli'].forEach(k => kids[k].root.visible = false);
+    laptop.position.set(-3.5, 1.08, -4.6); laptop.rotation.set(0, 0, 0); lid.rotation.x = 0.2; screenMat.map = screens.censor;
+    sigma.glasses.visible = true; sigma.setFace('stone');
+    const lt = t - 23.4;
+    camera.position.set(0.2 + Math.sin(lt * 0.5) * 2, 3.8, 7.5 - lt * 0.5); camera.lookAt(0, 1.5, -1);
+    cap('top', 'DERSLERDE HAVALI ANLAR #2', 1 + Math.sin(t * 8) * 0.03);
+    cap('bot', lt < 1.3 ? 'arka sıra: boş 🪑🪑🪑' : 'veli toplantısı: yarın 💀', 1);
+    if (lt > 1.3) emoji('🗿', 1110, 470, 0.8);
+  }
+
+  if (shake > 0) { const r = rng(Math.floor(t * 60) + 1); camera.position.x += (r() - 0.5) * shake * 2; camera.position.y += (r() - 0.5) * shake * 2; }
+  camera.updateProjectionMatrix();
+  glCanvas.style.filter = filter;
+  renderer.render(scene, camera);
+}
+window.renderAt = renderAt; window.DURATION = DURATION;
+const still = new URLSearchParams(location.search).get('still');
+if (!navigator.webdriver) {
+  if (still !== null) renderAt(parseFloat(still));
+  else { const t0 = performance.now(); (function loop() { renderAt(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); })(); }
+}
+</script>
+</body>
+</html>
