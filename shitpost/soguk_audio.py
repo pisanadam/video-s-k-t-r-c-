@@ -40,7 +40,56 @@ def ho(f0, d=0.2):
     return np.tanh(1.5 * v) * env(d, 0.01, 0.07)
 
 # 0–3 title: sad trombone over chalk taps
-sad_trombone(0.2, 0.28)
+
+# ---------------------------------------------------------------------------
+# "Haydi Döndür" — an original party song (darbuka groove, hicaz lead, synth vocal).
+# It is rendered as one continuous track and then gated: it plays on the title,
+# during each joke setup, and on the final yeet, and cuts dead at every punchline.
+# ---------------------------------------------------------------------------
+def resonate(x, f, bw):
+    r = np.exp(-np.pi * bw / SR); c = 2 * r * np.cos(2 * np.pi * f / SR); y = np.zeros_like(x); y1 = y2 = 0.0
+    g = 1 - r
+    for i in range(len(x)):
+        y0 = g * x[i] + c * y1 - r * r * y2; y[i] = y0; y2 = y1; y1 = y0
+    return y
+VOWELS = {'a': (800, 1250), 'i': (320, 2300), 'ö': (460, 1500), 'ü': (310, 1750), 'e': (530, 1850)}
+def sing(vowel, n, d):
+    t = tt(d); f = note(n) * (1 + 0.015 * np.sin(2 * np.pi * 5.8 * t) * np.minimum(1, t * 4))
+    src = 2 * ((np.cumsum(f) / SR) % 1) - 1
+    f1, f2 = VOWELS[vowel]
+    v = resonate(src, f1, 90) * 1.0 + resonate(src, f2, 120) * 0.6
+    return np.tanh(3 * v / (np.max(np.abs(v)) + 1e-9)) * env(d, 0.02, 0.06)
+SONG = np.zeros(len(out)); BPM = 128; BT = 60 / BPM
+def sadd(sig, t0, g=1.0):
+    i = int(t0 * SR); j = min(len(SONG), i + len(sig)); SONG[i:j] += sig[:j - i] * g
+dum = lambda: np.sin(2 * np.pi * (110 * np.exp(-tt(0.3) * 18) + 70) * tt(0.3)) * np.exp(-tt(0.3) * 9)
+tek = lambda: (rs.randn(int(0.08 * SR)) * 0.6 + np.sin(2 * np.pi * 700 * tt(0.08))) * np.exp(-tt(0.08) * 45)
+# hicaz on D: D Eb F# G A Bb C
+hook = [62, 63, 66, 67, 69, 67, 66, 63, 62, 63, 66, 67, 69, 70, 69, 67]
+bassline = [38, 38, 45, 38, 43, 43, 45, 42]
+lyric = [('a', 74, 0.5), ('i', 74, 0.5), ('ö', 78, 1.0), ('ü', 76, 1.0), (None, 0, 1.0),     # hay-di dön-dür
+         ('ö', 78, 0.5), ('ü', 76, 0.5), ('ö', 75, 0.5), ('ü', 74, 0.5), (None, 0, 2.0)]    # dön-dür dön-dür
+n16 = int(DUR / (BT / 4))
+for i in range(n16):
+    t0 = i * BT / 4
+    if i % 16 in (0, 6, 8): sadd(dum(), t0, 0.7)
+    if i % 16 in (4, 10, 12, 14): sadd(tek(), t0, 0.3)
+    if i % 2 == 1: sadd(rs.randn(int(0.03 * SR)) * np.exp(-tt(0.03) * 120), t0, 0.12)
+    if i % 2 == 0: sadd(square(note(hook[(i // 2) % 16] + 12), BT / 2 * 0.8, 0.25), t0, 0.07)
+    if i % 4 == 0: sadd(np.tanh(2 * np.sin(2 * np.pi * note(bassline[(i // 4) % 8]) * tt(BT * 0.9))) * env(BT * 0.9, 0.005, 0.05), t0, 0.16)
+# vocal: the hook repeats every 2 bars, but only where the song is audible
+WINDOWS = [(0, 3.0)] + [(3.0 + k * 4.8, 3.0 + k * 4.8 + 2.6) for k in range(4)] + [(27.6, DUR)]
+tv = 0.0
+while tv < DUR:
+    for vw, n, beats in lyric:
+        d = beats * BT
+        if vw and any(a - 0.05 <= tv < b for a, b in WINDOWS): sadd(sing(vw, n, d * 0.92), tv, 0.22)
+        tv += d
+gate = np.zeros(len(SONG))
+for a, b in WINDOWS:
+    i, j = int(a * SR), min(len(SONG), int(b * SR)); gate[i:j] = 1
+    fi = int(0.02 * SR); gate[i:i + fi] *= np.linspace(0, 1, fi)
+out += SONG * gate
 for i in range(10): add(rs.randn(int(0.03 * SR)) * np.exp(-tt(0.03) * 120), 0.1 + i * 0.28, 0.2)
 
 J0, JLEN = 3.0, 4.8
@@ -77,7 +126,6 @@ for k, f0 in enumerate([260, 250, 270, 240, 260, 230, 250]): add(ho(f0, 0.18), 2
 add(boom(), 27.6, 0.7)
 w = tt(0.6); add(rs.randn(len(w)) * np.sin(np.pi * w / 0.6) * 0.5, 27.6, 0.5)
 add(np.sin(2 * np.pi * np.cumsum(300 + 500 * np.sin(2 * np.pi * 6 * w) * np.exp(-w * 3)) / SR) * np.exp(-w * 4), 28.0, 0.3)
-sad_trombone(28.2, 0.22)
 
 out = out / np.max(np.abs(out)) * 0.9
 f = int(0.4 * SR); out[-f:] *= np.linspace(1, 0, f)

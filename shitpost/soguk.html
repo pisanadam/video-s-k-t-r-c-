@@ -31,6 +31,8 @@
   #bars { position: absolute; inset: 0; pointer-events: none; opacity: 0;
     border-top: 80px solid #000; border-bottom: 80px solid #000; box-sizing: border-box; }
   #emoji { position: absolute; font: 900 120px "DejaVu Sans", sans-serif; display: none; }
+  #np { position: absolute; left: 16px; top: 112px; padding: 8px 14px; border-radius: 10px; background: rgba(0,0,0,0.65);
+    color: #fff; font: 800 22px "DejaVu Sans", sans-serif; display: none; border: 2px solid #ff4fa3; }
   #wm { position: absolute; right: 14px; top: 10px; font: 700 18px "DejaVu Sans Mono", monospace; color: rgba(255,255,255,0.6); }
 </style>
 </head>
@@ -45,6 +47,7 @@
   <div class="cap" id="bot"></div>
   <div id="flash"></div>
   <div id="wm">REC ● SOĞUK ESPRİ</div>
+  <div id="np"></div>
 </div>
 <script src="three.min.js"></script>
 <script>
@@ -285,9 +288,9 @@ function gesture(c, t) { c.armR.rotation.x = -1.3 + Math.sin(t * 6) * 0.35; c.ar
 const BACK = ROWS[2] + 0.85;
 // Each joke: who tells it, where they stand, setup / punchline, the deadpan verdict
 const JOKES = [
-  { who: 'modcu', x: 0.2,  z: BACK, a: 'Türev almışlar...', b: '...geri vermemişler.', verdict: 'gülen: 0 kişi' },
+  { who: 'modcu', x: 0.2,  z: BACK, a: 'Ben çıkıyorum\nbeyler...', b: 'SENEYE GÖRÜŞÜRÜZ 😎', verdict: '(5 dakika sonra geri geldi)' },
   { who: 'ali',   x: -3,   z: BACK, a: 'Adamın biri güneşte\nyanmış...', b: '...ay da düz.', verdict: 'sınıfın sıcaklığı: -40°C 🥶' },
-  { who: 'veli',  x: 3.4,  z: BACK, a: 'Sinüs ile kosinüs\nkavga etmiş...', b: '...tanjant araya girmiş.', verdict: 'tahta bile utandı' },
+  { who: 'veli',  x: 3.4,  z: BACK, a: 'Dün kırmızı ışıkta\ndurdum...', b: '...yeşil yanınca\nda gittim.', verdict: 'hikâye bu kadar.' },
   { who: 'hoca',  x: -1.5, z: -5.2, a: "Bilgisayar Jenny mod'u\nneden açmamış?", b: "\"hiç MOD'umda\ndeğilim\" demiş.", verdict: 'hoca kendi şakasına güldü (yalnız)' },
 ];
 const J0 = 3.0, JLEN = 4.8;
@@ -301,6 +304,10 @@ function renderAt(t) {
   $('vig').style.opacity = 0; $('bars').style.opacity = 0; $('emoji').style.display = 'none';
   camera.fov = 55; glow.intensity = 0; tumble.visible = false;
   screenMat.map = screens.doc;
+  // 'Haydi Döndür' plays on the title, during every joke setup, and on the final yeet
+  const jl = (t - J0) % JLEN, songOn = t < J0 || (t < J0 + JLEN * 4 && jl < 2.6) || t >= 27.6;
+  const eq = ['▁▃▅▇', '▃▇▂▅', '▇▂▆▃', '▂▅▇▁'][Math.floor(t * 8) % 4];
+  $('np').style.display = songOn ? 'block' : 'none'; $('np').textContent = `🎵 Şimdi çalıyor: Haydi Döndür ${eq}`;
   pen.position.set(0.2 + Math.sin(t * 9) * 0.12, 1.1, ROWS[0] + 0.1 + Math.cos(t * 13) * 0.05);
   sigma.armR.rotation.x = -1.0 + Math.sin(t * 9) * 0.1; sigma.headPivot.rotation.x = 0.3;
   sigma.glasses.visible = true; sigma.setFace('stone');
@@ -309,6 +316,7 @@ function renderAt(t) {
   if (t < J0) {
     writeOnBoard(t);
     camera.position.set(lerp(-4, 4, t / J0), 4.0, 6.4); camera.lookAt(0, 1.4, -2);
+    Object.values(kids).forEach((o, i) => o.headPivot.rotation.y = Math.sin(t * 6 + i) * 0.6);
     cap('top', 'KOMİK OLMAYAN ŞAKALAR', 1 + Math.sin(t * 6) * 0.03, 0, '#9fe7ff');
     cap('bot', t < 1.5 ? 'sınıf versiyonu' : '(gülersen kaybedersin... ama gülemezsin)');
   }
@@ -379,7 +387,7 @@ function renderAt(t) {
       modcu.setFace('smirk'); modcu.root.position.y = Math.abs(Math.sin(t * 14)) * 0.3;
       modcu.armL.rotation.x = -0.6; modcu.armR.rotation.x = -0.6; modcu.headPivot.rotation.x = -0.35;
       camera.position.set(0.8, 2.4, 0.9); camera.lookAt(0.2, 1.9, BACK);
-      bubble('HAHAHA TÜREV\nGERİ VERMEMİŞLER', modcu.root.position.clone().add(V(0, 2.3, 0)));
+      bubble('HAHAHA SENEYE\nGÖRÜŞÜRÜZ', modcu.root.position.clone().add(V(0, 2.3, 0)));
       cap('top', '*4 saniye sonra*', 1);
       Object.values(kids).forEach(o => { if (o !== modcu) o.setFace('stone'); });
     } else {
