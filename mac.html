@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Maça Gittik</title>
+<title>Maça Gittik 2</title>
 <style>
   :root{ --meme: Impact, "Anton", "Arial Black", "DejaVu Sans", sans-serif; --sig:"DejaVu Sans", sans-serif; --red:#d4141c; }
   html,body{margin:0;height:100%;background:#000;overflow:hidden;color:#fff}
@@ -23,6 +23,17 @@
   #card .a b{color:var(--red)}
   #card .b{font:700 2cqw/1.3 var(--sig);letter-spacing:.3em}
   #card .c{font:400 1.3cqw/1.4 var(--sig);color:#aaa}
+  #var{left:50%;top:9cqw;transform:translateX(-50%);padding:1cqw 2.4cqw;background:#0d1b3d;border:.3cqw solid #5cc8ff;font:900 3cqw/1 var(--meme);letter-spacing:.15em;color:#fff;opacity:0;white-space:nowrap}
+  #var.ok{background:#0a6b2e;border-color:#7cff6b}
+  #news{left:50%;top:50%;width:52cqw;padding:2cqw 2.6cqw;background:#f4efe2;color:#111;font-family:"DejaVu Serif",serif;box-shadow:0 2cqw 4cqw rgba(0,0,0,.6);opacity:0}
+  #news .t{display:flex;justify-content:space-between;border-bottom:.3cqw double #111;font:900 1.3cqw/1.4 var(--sig);letter-spacing:.2em;padding-bottom:.4cqw}
+  #news .n{font:900 4cqw/1 "DejaVu Serif",serif;text-align:center;margin:.6cqw 0;letter-spacing:.04em}
+  #news .h{font:900 3.3cqw/1.05 var(--meme);text-transform:uppercase;margin:.8cqw 0 .6cqw;color:#b30d14}
+  #news .s{font:italic 700 1.6cqw/1.3 "DejaVu Serif",serif;margin-bottom:.8cqw}
+  #news .row{display:flex;gap:1.6cqw;align-items:flex-start}
+  #news .pic{flex:0 0 13cqw;height:10cqw;background:#cfd8e0;border:.2cqw solid #111;position:relative;overflow:hidden}
+  #news .pic i{position:absolute;left:3cqw;top:1cqw;width:6cqw;height:7cqw;border-radius:50%;background:linear-gradient(#d4141c 0 50%,#151515 50% 100%)}
+  #news ul{margin:0;padding-left:1.6cqw;font:1.45cqw/1.5 "DejaVu Serif",serif}
   #flash{inset:0;background:#fff;opacity:0}
   #ui{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.4cqw;background:rgba(0,0,0,.7);z-index:10;font-family:var(--sig)}
   #ui button{font:900 3cqw/1 var(--meme);padding:1.4cqw 3cqw;border:.3cqw solid var(--red);cursor:pointer;background:#111;color:#fff;letter-spacing:.1em}
@@ -40,6 +51,10 @@
   <div id="cap" class="ov meme"></div>
   <div id="card" class="ov"><div class="a"><b>GENÇLERBİRLİĞİ</b><br>MAÇINA GİTTİK</div><div class="b">ABDULLAH · ALİ · MEHMET</div>
     <div class="c">* Maç hayal ürünüdür. "Rakip FK" diye bir takım yoktur. Abdullah'ın balonu sahadan alınmıştır (alınmamıştır).</div></div>
+  <div id="var" class="ov">VAR KONTROLÜ</div>
+  <div id="news" class="ov"><div class="t"><span>7 KASIM 2026</span><span>FİYATI: 1 ÇEKİRDEK</span></div><div class="n">7-C SPOR</div>
+    <div class="h">7-C'den Abdullah tarihe geçti!</div><div class="s">90+3'te balonla gelen gol VAR'dan döndü. Gençlerbirliği 1 - 0 Rakip FK.</div>
+    <div class="row"><div class="pic"><i></i></div><ul><li><b>Asist:</b> Balon</li><li><b>Mehmet:</b> 5 kg çekirdek (stadyum rekoru)</li><li><b>Ali:</b> maçı uyuyarak izledi</li><li><b>Hoca:</b> güvenlik + VAR + matematik</li></ul></div></div>
   <div id="flash" class="ov"></div>
   <div id="bar"></div>
   <div id="ui"><button id="play">▶ OYNAT</button><div class="hint">GENÇLERBİRLİĞİ MAÇINA GİTTİK</div></div>
@@ -52,7 +67,7 @@
 import * as THREE from 'three';
 
 const QS = new URLSearchParams(location.search);
-const DUR = 58, CARD = null, VID = 0;
+const DUR = 72, CARD = null, VID = 0;
 const RENDER_MODE = QS.has('render');
 if (RENDER_MODE) document.body.classList.add('render');
 
@@ -484,115 +499,173 @@ GBH.forEach((p, i) => gb.push(makeChar({ skin: ['#d7a07a', '#c58c63', '#e8bf9c',
 RKH.forEach((p, i) => rk.push(makeChar({ skin: ['#e8bf9c', '#b97f58', '#d7a07a', '#c58c63', '#e3b08c', '#cf9a76'][i], hair: '#3a2a1a', shirt: i === 0 ? '#2ecc71' : '#f0f0f0', sleeve: i === 0 ? '#2ecc71' : '#2747a0', pants: '#2747a0', shoe: '#111', eye: '#222' })));
 const ballT = pixTex(32, 16, (g) => { g.fillStyle = '#fff'; g.fillRect(0, 0, 32, 16); g.fillStyle = '#111'; [[4, 4], [14, 9], [24, 3], [28, 11], [8, 12], [19, 1]].forEach(([x, y]) => g.fillRect(x, y, 3, 3)); });
 const ball = new THREE.Mesh(new THREE.SphereGeometry(.2, 16, 12), L(ballT)); scene.add(ball);
-function ballAt(t) {
-  if (t < 18) { const a = t * .7; return new THREE.Vector3(Math.sin(a) * 12 + Math.sin(a * 2.3) * 4, .2, Math.sin(a * .8 + 1) * 18); }
-  if (t < 19.4) { const k = seg(t, 18, 19.4); return new THREE.Vector3(lerp(Math.sin(18 * .7) * 12 + Math.sin(18 * .7 * 2.3) * 4, 2.0, k), .2 + Math.sin(k * Math.PI) * 1.4, lerp(Math.sin(18 * .7 * .8 + 1) * 18, -30.3, k)); }
-  if (t < 21) return new THREE.Vector3(2.0 - seg(t, 19.4, 19.6) * .6, 1.0, -30.2);
-  if (t < 31.6) { const a = (t - 21) * .8; return new THREE.Vector3(Math.sin(a) * 10, .2, 8 + Math.sin(a * .7) * 10); }
-  if (t < 32.4) { const k = seg(t, 31.6, 32.4); return new THREE.Vector3(lerp(2.5, -1.8, k), .2 + Math.sin(k * Math.PI) * 1.2 + k * 1.0, lerp(19.5, 33.4, k)); }
-  if (t < 38) return new THREE.Vector3(-1.8, .25, 33.6);
+/* ================= MAÇ 2 (daha komik) ================= */
+function setVis2(name) { setVisSets(name === 'gate' || name === 'var' ? 'none' : name); gGate.visible = name === 'gate'; room.visible = name === 'var'; }
+// telefon + uçan telefon
+const phone = new THREE.Mesh(new THREE.BoxGeometry(.1, .2, .03), C('#111')); phone.position.set(0, -.62, .12); ali.armR.add(phone);
+const flyPhone = new THREE.Mesh(new THREE.BoxGeometry(.1, .2, .03), C('#111')); scene.add(flyPhone);
+// 5 kg çuval
+const sackT = pixTex(64, 64, (g) => { g.fillStyle = '#d9c79a'; g.fillRect(0, 0, 64, 64); g.fillStyle = '#7a1b10'; g.font = '900 15px "DejaVu Sans",sans-serif'; g.textAlign = 'center'; g.fillText('5 KG', 32, 26); g.font = '900 9px "DejaVu Sans",sans-serif'; g.fillText('ÇEKİRDEK', 32, 42); }, true);
+bag.geometry = new THREE.BoxGeometry(.45, .55, .3); bag.material = L(sackT); bag.position.set(0, -.85, .2);
+// güvenlik yeleği
+const vest = new THREE.Group(); hoca.body.add(vest); block(vest, C('#f5e10a'), .54, .6, .29, 0, 1.1, 0); block(vest, C('#dddddd'), .55, .06, .3, 0, 1.0, 0);
+// KAPI 7
+const gGate = new THREE.Group(); gGate.position.x = 500; gGate.visible = false; scene.add(gGate);
+block(gGate, L(rep(pixTex(16, 16, (g, w, h) => noisy(g, w, h, [120, 120, 125], 14)), 20, 20)), 60, .1, 60, 0, -.05, 0);
+const gwT = rep(pixTex(16, 16, (g) => { for (let y = 0; y < 16; y++) { g.fillStyle = (y >> 2) % 2 ? RED : BLK; g.fillRect(0, y, 16, 1); } }), 6, 2);
+block(gGate, L(gwT), 14, 5, .8, -7.6, 2.5, 0); block(gGate, L(gwT), 14, 5, .8, 7.6, 2.5, 0); block(gGate, L(gwT), 1.2, 1.6, .8, 0, 4.2, 0);
+const kapiT = pixTex(256, 64, (g) => { g.fillStyle = '#111'; g.fillRect(0, 0, 256, 64); g.fillStyle = '#fff'; g.font = '900 30px Impact,"DejaVu Sans",sans-serif'; g.textAlign = 'center'; g.fillText('KAPI 7 · GİRİŞ', 128, 44); }, true);
+const kapi = new THREE.Mesh(new THREE.PlaneGeometry(4, 1), new THREE.MeshBasicMaterial({ map: kapiT })); kapi.position.set(0, 5.6, .45); gGate.add(kapi);
+block(gGate, C('#999'), .15, 1.0, .5, -.6, .5, 0); block(gGate, C('#999'), .15, 1.0, .5, .6, .5, 0);
+const turn = new THREE.Group(); turn.position.set(-.5, .9, 0); gGate.add(turn); [0, 1, 2].forEach(i => { const a = block(turn, C('#ccc'), .06, .06, .9, 0, 0, .45); const p = new THREE.Group(); p.rotation.x = i * 2.09; turn.add(p); p.add(a); });
+// kabuk dağı
+const pileT = pixTex(32, 32, (g, w, h) => { const r = rng(4); for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { g.fillStyle = r() > .5 ? '#2a2018' : (r() > .5 ? '#e8e0c8' : '#5a4630'); g.fillRect(x, y, 1, 1); } });
+const pile = new THREE.Mesh(new THREE.ConeGeometry(1, 1, 18), L(pileT)); scene.add(pile);
+// değişiklik tabelası
+const subT = pixTex(256, 96, (g) => { g.fillStyle = '#111'; g.fillRect(0, 0, 256, 96); g.font = '900 30px "DejaVu Sans Mono",monospace'; g.textAlign = 'center'; g.fillStyle = '#5cff5c'; g.fillText('▲ 7-C', 70, 42); g.fillStyle = '#ff4040'; g.fillText('▼ 10', 190, 42);
+  g.fillStyle = '#ffe066'; g.font = '900 22px "DejaVu Sans",sans-serif'; g.fillText('GİREN: ABDULLAH', 128, 80); }, true);
+const subBoard = new THREE.Mesh(new THREE.PlaneGeometry(1.2, .45), new THREE.MeshBasicMaterial({ map: subT, side: THREE.DoubleSide })); scene.add(subBoard);
+function drawGol(s) { if (s.key === 'gol') return; s.key = 'gol'; const g = s.g; g.fillStyle = '#0a6b2e'; g.fillRect(0, 0, 256, 160); g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '900 64px Impact,"DejaVu Sans",sans-serif'; g.fillText('GOL ✓', 128, 70); g.font = '700 16px "DejaVu Sans",sans-serif'; g.fillText('(balon ofsayt değil)', 128, 124); s.tex.needsUpdate = true; }
+function ball2(t) {
+  if (t < 30) { const a = t * 1.6; return new THREE.Vector3(Math.sin(a) * 12 + Math.sin(a * 2.3) * 4, .2, Math.sin(a * .8 + 1) * 18); }
+  if (t < 36) { const a = t * .9; return new THREE.Vector3(Math.sin(a) * 6, .2, Math.sin(a * .7) * 8); }
+  if (t < 38.8) return new THREE.Vector3(2.2, .2, 20);
+  if (t < 42.5) { const k = seg(t, 38.8, 42.5); return new THREE.Vector3(lerp(2.2, 1.0, k), .2 + Math.abs(Math.sin(k * 9)) * .3 * (1 - k), lerp(20, 32.45, 1 - Math.pow(1 - k, 2))); }
+  if (t < 43.4) return new THREE.Vector3(1.0, .2, 32.45);
+  if (t < 44) return new THREE.Vector3(1.0, .2, lerp(32.45, 33.4, seg(t, 43.4, 43.9)));
+  if (t < 49) return new THREE.Vector3(1.0, .2, 33.4);
   return new THREE.Vector3(0, .2, 0);
 }
 
 /* ---------- DOM ---------- */
 const $ = id => document.getElementById(id);
-const el = { chap: $('chap'), score: $('score'), sc: $('sc'), mn: $('mn'), word: $('word'), cap: $('cap'), card: $('card'), flash: $('flash'), bar: $('bar') };
+const el = { chap: $('chap'), score: $('score'), sc: $('sc'), mn: $('mn'), word: $('word'), cap: $('cap'), card: $('card'), flash: $('flash'), bar: $('bar'), vr: $('var'), news: $('news') };
 const stageRect = () => $('stage').getBoundingClientRect();
 const cache = {};
 const setHTML = (e, s) => { if (cache[e.id] !== s) { e.innerHTML = s; cache[e.id] = s; } };
 function shake(t, amt) { const f = Math.floor(t * 30); return new THREE.Vector3((hash(f) - .5) * amt, (hash(f + 50) - .5) * amt, (hash(f + 99) - .5) * amt); }
 function timed(list, t) { for (const [a, b, s] of list) if (t >= a && t < b) return s; return ''; }
-const CHAPS = [[0, 6, 'MAÇ GÜNÜ'], [6, 14, 'TRİBÜN'], [14, 28, 'MAÇ'], [28, 38, '90+3'], [38, 46, 'MAÇ SONU'], [46, 54, 'ERTESİ GÜN OKULDA']];
-const CAPS = [[.4, 3, 'ABDULLAH, ALİ VE MEHMET GENÇLERBİRLİĞİ MAÇINA GİDİYOR.'], [3.2, 5.8, 'MEHMET 2 KİLO ÇEKİRDEK ALMIŞ.'], [9.3, 11.6, 'ABDULLAH BALONUNU BURAYA DA GETİRMİŞ.'],
-  [11.8, 14, 'TRİBÜN: "HAYDİ GENÇLER!"'], [18, 21, 'RAKİP ŞUT ÇEKTİ... KALECİMİZ KURTARDI!'], [22, 25, 'MEHMET: "ÇEKİRDEK BİTTİ."'], [25.2, 28, '89. DAKİKA. HÂLÂ 0-0.'],
-  [28.3, 30.5, "ABDULLAH'IN BALONU ELİNDEN KAÇTI..."], [30.6, 32.3, 'RAKİP KALECİ BALONA BAKARKEN...'], [34.5, 38, 'TRİBÜN YIKILIYOR!'], [39, 42, 'MAÇ BİTTİ: GENÇLERBİRLİĞİ 1 - 0 RAKİP FK'],
-  [42.2, 45.8, "GOLÜN ASİSTİ: ABDULLAH'IN BALONU."], [46.4, 49, 'HOCA: "ALİ, TAHTAYA KALK."'], [49.2, 51.5, 'ALİ: "..."'], [51.7, 53.9, 'ÜÇÜNÜN DE SESİ KISILMIŞTI.']];
-function matchMin(t) { if (t < 14) return "1'"; if (t < 28) return Math.min(89, 1 + Math.floor((t - 14) / 14 * 88)) + "'"; if (t < 32.4) return '90+' + (1 + Math.floor(seg(t, 28, 32.4) * 2.99)) + "'"; if (t < 38) return "90+3'"; return 'MAÇ SONU'; }
+const CHAPS = [[0, 6, 'MAÇ GÜNÜ'], [6, 14, 'KAPI 7'], [14, 20, 'TRİBÜN'], [20, 30, 'MAÇ (HIZLANDIRILMIŞ)'], [30, 37.5, "88'"], [37.5, 45, '90+3'], [45, 49, 'VAR'], [49, 62, 'GOOOL'], [62, 68, 'ERTESİ GÜN']];
+const CAPS = [[.3, 2.4, 'ALİ: "ANNE MAÇA GİDİYORUZ."'], [2.4, 3.6, 'ANNE: "ÖDEVİNİ YAPTIN MI?"'], [3.6, 4.6, '*TELEFON KAPANDI*'], [4.7, 6, 'ABDULLAH "KÜÇÜK BİR BALON" GETİRMİŞ.'],
+  [6.2, 8, 'GİRİŞTE GÜVENLİK VAR...'], [8, 9.6, 'ÇOCUKLAR: "HOCAM?!"'], [9.6, 11, 'HOCA: "HAFTA SONU EK İŞ."'], [11, 12.5, 'BALON TURNİKEDEN GEÇMİYOR...'], [12.7, 14, 'GEÇTİ.'],
+  [14.3, 17, 'TRİBÜN: "HAYDİ GENÇLER!"'], [17, 20, 'MEHMET 5 KİLO ÇEKİRDEĞE BAŞLADI.'],
+  [20, 24, '1. YARI: 0 ŞUT · 0 GOL · 2 KG ÇEKİRDEK'], [24, 27, 'ALİ 30. DAKİKADA UYUDU.'], [27, 30, 'KABUK DAĞI 3 METREYİ GEÇTİ.'], [30, 32.8, '88. DAKİKA. HÂLÂ 0-0.'],
+  [35, 37.5, 'OYUNCU DEĞİŞİKLİĞİ: GİREN ABDULLAH (7-C)'], [37.6, 38.6, 'ABDULLAH ŞUT ÇEKİYOR...'], [38.6, 39.7, 'ISKA.'], [39.8, 42.4, '...AMA TOP BALONA ÇARPTI. RAKİPLER DEVRİLDİ.'],
+  [42.5, 43.6, 'ÇİZGİDE DURDU...'], [45, 47.4, 'VAR KONTROLÜ. HOCA YİNE ORADA.'], [47.4, 49, '...'], [51.5, 54, 'ALİ (TÜM MAÇ UYUDU): "NE OLDU?"'], [54, 58, 'ABDULLAH BALONUYLA STADA TUR ATTI.'], [58, 62, "MEHMET'İN KABUK DAĞI KONFETİ OLDU."]];
+const WORDS = [[4.6, 5.0, ''], [32.8, 35, "HOCAM ABDULLAH'I<br>OYUNA AL!!"], [44, 45, 'GOL?'], [49, 51.3, 'GOL GEÇERLİ!']];
+function min2(t) { if (t < 20) return "1'"; if (t < 30) return (1 + Math.floor((t - 20) / 10 * 84)) + "'"; if (t < 37.5) return (85 + Math.floor(seg(t, 30, 37.5) * 4.99)) + "'"; if (t < 58) return "90+" + (t < 49 ? 3 : 3 + Math.floor(seg(t, 49, 58) * 2.99)) + "'"; return 'MAÇ SONU'; }
 
 /* ---------- ANA ÇİZİM ---------- */
 function renderAt(t) {
   t = clamp(t, 0, DUR - 1e-4);
-  const name = t < 6 ? 'street' : t < 46 ? 'stad' : t < 54 ? 'class' : 'stad';
-  setVisSets(name);
+  const name = t < 6 ? 'street' : t < 14 ? 'gate' : (t >= 45 && t < 49) ? 'var' : 'stad';
+  setVis2(name);
   all.forEach(c => c.reset()); abd.reset(); trio.forEach(c => c.reset()); [...gb, ...rk].forEach(c => c.reset()); parts.forEach(m => m.visible = false);
   balloon.visible = false; stringL.visible = false; marker.visible = false; pinM.visible = false; shades.visible = false; kbal.visible = false; kStr.visible = false; ball.visible = false;
-  bag.visible = true; scarfUp.visible = false;
+  bag.visible = true; scarfUp.visible = false; phone.visible = false; flyPhone.visible = false; vest.visible = false; pile.visible = false; subBoard.visible = false; kbal.scale.setScalar(1); kbal.rotation.set(0, 0, 0);
   scene.fog = null; pink.intensity = 0; if (!dir.target.parent) scene.add(dir.target);
   hemi.intensity = 1.0; hemi.color.set('#ffffff'); hemi.groundColor.set('#555'); dir.intensity = 1.2; dir.color.set('#fff4e0');
   const cam = new THREE.Vector3(), look = new THREE.Vector3();
-  let fov = 50, shk = 0, word = '', fl = 0, fc = '#fff', filt = 'saturate(1.15) contrast(1.06)';
-  const goal = t >= 32.4;
+  let fov = 50, shk = 0, fl = 0, fc = '#fff', filt = 'saturate(1.15) contrast(1.06)';
+  const goal = t >= 49;
+  const tether = (hand, bpos, r) => { kStr.visible = true; kStrG.setFromPoints([hand, bpos.clone().add(new THREE.Vector3(0, -r * 1.15, 0))]); };
+  const handOf = (c, arm = 'armL') => { const v = new THREE.Vector3(); c.root.updateMatrixWorld(true); c[arm].localToWorld(v.set(0, -.75, 0)); return v; };
 
   if (name === 'street') {
-    dir.target.position.set(RX, 0, 0); dir.position.set(RX - 20, 10, -30); dir.color.set('#ffc890'); scene.background = new THREE.Color('#f2a65a'); scene.fog = new THREE.Fog('#f2a65a', 12, 50);
-    hemi.color.set('#ffd9b0'); bus.position.set(RX + 3.2, 0, 80);
-    const z = lerp(-12, -3.2, t / 6);
-    trio.forEach((c, i) => { c.root.visible = true; c.root.position.set(RX + .2 + i * .75, .15, z - (i === 1 ? .5 : 0)); c.walk(t + i * .3, 8, .5); c.face('happy'); });
-    ali.armR.rotation.x = -2.9; scarfUp.visible = true; ali.face(Math.floor(t * 3) % 2 ? 'talk' : 'happy');
-    mehmet.armR.rotation.x = -1.0; abd.armL.rotation.x = -.6;
-    kbal.visible = true; const hp = new THREE.Vector3(); abd.armL.updateMatrixWorld(true); abd.armL.localToWorld(hp.set(0, -.75, 0)); kbal.position.copy(hp).add(new THREE.Vector3(Math.sin(t * 2) * .1, 1.1, 0));
-    kStr.visible = true; kStrG.setFromPoints([hp, kbal.position.clone().add(new THREE.Vector3(0, -.35, 0))]);
-    cam.set(RX - .6, 1.4, z + 3.4); look.set(RX + 1, 1.3, z - .4); fov = 52;
-  } else if (name === 'stad') {
-    const X = SX0; dir.target.position.set(X, 0, 0); dir.position.set(X + 10, 40, 20); scene.background = new THREE.Color('#0b1430'); hemi.intensity = 1.0; hemi.color.set('#e6ecff'); dir.intensity = 1.0;
-    const mode = t >= 32.4 && t < 46 ? 'party' : (t >= 18.6 && t < 19.8) ? 'ooh' : (t >= 11.5 && t < 14) || (t > 40 && t < 46) ? 'chant' : 'idle';
-    updateCrowd(t, t >= 54 ? 'idle' : mode);
-    drawSB(goal ? '1 - 0' : '0 - 0', matchMin(t), goal && t < 38 && Math.floor(t * 4) % 2 === 0);
-    // çocuklar ön sırada
-    const seatX = X - 22.2, seatY = .6;
-    trio.forEach((c, i) => { c.root.visible = true; c.root.position.set(seatX, seatY, .8 + i * .8); c.root.rotation.y = Math.PI / 2; c.face('happy'); });
-    if (t < 46) {
-      if (t < 25) mehmet.face(t > 22 && t < 25 ? 'scared' : 'happy'); 
-      if (t >= 22 && t < 25) { mehmet.armR.rotation.x = -1.6; mehmet.head.rotation.x = .4; }
-      else if (t < 22) { mehmet.armR.rotation.x = -1.2 - Math.abs(Math.sin(t * 5)) * .6; if (t > 9 && t < 22) burst(t, Math.floor(t * 1.3) / 1.3, new THREE.Vector3(seatX + .4, seatY + 1.5, 2.4), { n: 6, spd: .8, up: 1, col: '#3b2a1a', size: .05, grav: 4, life: .7 }); }
-      if (t >= 25 && t < 32.4) trio.forEach(c => c.face('scared'));
-      if ((t >= 11.5 && t < 14) || (t > 40)) { trio.forEach((c, i) => { c.armL.rotation.z = -2.6 - Math.sin(t * 7 + i) * .3; c.armR.rotation.z = 2.6 + Math.sin(t * 7 + i) * .3; }); ali.armR.rotation.z = 0; ali.armR.rotation.x = -2.9; scarfUp.visible = true; }
-      if (goal && t < 46) { trio.forEach((c, i) => { c.face('happy'); c.root.position.y = seatY + Math.abs(Math.sin(t * 9 + i)) * .5; c.armL.rotation.z = -2.8; c.armR.rotation.z = 2.8; }); ali.face('talk');
-        burst(t, 32.5, new THREE.Vector3(seatX + .3, seatY + 2, 1.6), { n: 60, spd: 3, up: 4, col: ['#3b2a1a', '#e8d9b0', RED, '#ffffff', BLK], size: .07, grav: 4, life: 3 }); }
-      // balon
-      const relT = t - 28.3; const hp = new THREE.Vector3(); abd.root.updateMatrixWorld(true); abd.armL.localToWorld(hp.set(0, -.75, 0));
-      if (t < 28.3) { kbal.visible = t > 9; kbal.position.copy(hp).add(new THREE.Vector3(.2, 1.2 + Math.sin(t * 2) * .05, 0)); kStr.visible = kbal.visible; kStrG.setFromPoints([hp, kbal.position.clone().add(new THREE.Vector3(0, -.35, 0))]); abd.armL.rotation.x = -.7; }
-      else { kbal.visible = true; const k = seg(t, 28.3, 32.0); const p0 = hp.clone().add(new THREE.Vector3(.2, 1.2, 0)); const p1 = new THREE.Vector3(X - 1.5, 3.6, 29.5);
-        kbal.position.set(lerp(p0.x, p1.x, easeIO(k)), lerp(p0.y, p1.y, k) + Math.sin(k * Math.PI) * 6 + Math.sin(t * 3) * .2, lerp(p0.z, p1.z, easeIO(k))); kbal.rotation.z = Math.sin(t * 2) * .2;
-        if (t < 32.4) { abd.face('shock'); abd.armL.rotation.x = -2.6; } }
-    }
-    // futbolcular
-    const B = ballAt(t).add(new THREE.Vector3(X, 0, 0)); ball.visible = t < 46; ball.position.copy(B); ball.rotation.set(t * 8, t * 5, 0);
-    const playersOn = t >= 6 && t < 46;
-    [[gb, GBH], [rk, RKH]].forEach(([team, H], ti) => team.forEach((c, i) => { if (!playersOn) return; c.root.visible = true; const h = new THREE.Vector3(X + H[i][0], 0, H[i][1]);
-      let p = i === 0 ? h.clone().add(new THREE.Vector3(clamp((B.x - X) * .3, -2.5, 2.5), 0, 0)) : h.clone().lerp(new THREE.Vector3(B.x, 0, B.z), .35).add(new THREE.Vector3(Math.sin(t * 1.3 + i * 2) * 1.5, 0, Math.cos(t + i) * 1.2));
-      if (t >= 31.2 && t < 32.4 && ti === 0 && i === 5) p = new THREE.Vector3(X + 2.8, 0, 18.6);
-      c.root.position.copy(p); const d = new THREE.Vector3(B.x - p.x, 0, B.z - p.z); c.root.rotation.y = Math.atan2(d.x, d.z); if (t < 32.4 || t > 38) c.walk(t + i, 9, .6); c.face(ti === 0 ? 'happy' : 'sneaky');
-      if (goal && t < 46) { if (ti === 0) { c.face('happy'); c.root.position.set(X + 2.5 + Math.cos(i * 1.2) * 1.6, Math.abs(Math.sin(t * 8 + i)) * .4, 24 + Math.sin(i * 1.2) * 1.6); c.armL.rotation.z = -2.8; c.armR.rotation.z = 2.8; c.root.rotation.y = Math.PI * .8; }
-        else { c.face('scared'); c.head.rotation.x = .5; } } }));
-    // kurtarış ve gol
-    if (t >= 18.8 && t < 21) { const gk = gb[0]; const dk = seg(t, 18.9, 19.4); gk.root.position.set(X + dk * 1.8, Math.sin(dk * Math.PI) * .6, -30.5); gk.root.rotation.z = -dk * 1.3; gk.armL.rotation.z = gk.armR.rotation.z = 2.8; }
-    if (t >= 28 && t < 46) { const gk = rk[0]; gk.root.position.set(X + .4, 0, 30.4); gk.root.rotation.y = Math.PI + .5; gk.head.rotation.x = -.7; gk.head.rotation.y = -.6; gk.face('happy'); if (goal) gk.face('shock'); }
-    if (goal && t < 33.3) { nets[1].position.z = 34.2 + Math.sin(seg(t, 32.4, 33.3) * Math.PI) * .6; } else nets[1].position.z = 34.2;
-    // kameralar
-    if (t < 9) { const k = easeIO(seg(t, 6, 9)); cam.set(X + lerp(30, -8, k), lerp(42, 16, k), lerp(70, 34, k)); look.set(X, 0, 0); fov = 55; if (t < 6.2) fl = .5; }
-    else if (t < 14) { cam.set(seatX + 3.2, 2.4, 2.4); look.set(seatX, 1.7, 1.4); fov = 55; }
-    else if (t < 18.6) { cam.set(X - 34, 18, B.z * .4); look.set(X, 0, B.z * .6); fov = 45; }
-    else if (t < 21.5) { cam.set(X + 4, 3.5, -40); look.set(X + 1, 1, -28); fov = 48; }
-    else if (t < 25) { cam.set(seatX + 2.6, 2.2, 3.6); look.set(seatX, 1.7, 2.0); fov = 50; }
-    else if (t < 28.3) { cam.set(seatX + 2.6, 2.1, 1.6); look.set(seatX, 1.7, 1.6); fov = lerp(55, 40, seg(t, 25, 28.3)); shk = .02; }
-    else if (t < 30.6) { cam.set(seatX + 8, 2.8, 5.5); look.copy(kbal.position).lerp(new THREE.Vector3(seatX, 1.8, 1.6), .5 * (1 - seg(t, 28.3, 30.6))); fov = 55; }
-    else if (t < 32.4) { cam.set(X + 4.5, 2.2, 13); look.set(X - .5, 2, 31); fov = 50; filt = 'saturate(1.2) contrast(1.15)'; }
-    else if (t < 34.4) { cam.set(X + 6.5, 2.0, 29.5); look.set(X - 1.2, 1.3, 33.2); fov = 55; shk = .15; word = 'GOOOOOL!'; if (t < 32.7) { fl = .9; } }
-    else if (t < 38.5) { cam.set(seatX + 4.2, 3.2, 1.6); look.set(seatX - 2, 2.5, 1.6); fov = 62; shk = .06;
-      burst(t, 34.4, new THREE.Vector3(seatX - 3, 4, 1.6), { n: 50, spd: 5, up: 5, col: [RED, BLK, '#ff6a6a', '#ffffff'], size: .5, grav: -.5, life: 4 }); }
-    else if (t < 42) { cam.set(X, 7, -27); look.set(X, 8.5, -41); fov = 45; }
-    else if (t < 46) { const a = (t - 42) * .3; cam.set(seatX + 5 + Math.sin(a) * 2, 2.6, 1.6 + Math.cos(a) * 3); look.set(seatX, 1.8, 1.6); fov = 55; }
-    else { cam.set(X + 40, 30, 60); look.set(X, 0, 0); fov = 50; trio.forEach(c => c.root.visible = false); }
+    dir.target.position.set(RX, 0, 0); dir.position.set(RX - 20, 10, -30); dir.color.set('#ffc890'); scene.background = new THREE.Color('#f2a65a'); scene.fog = new THREE.Fog('#f2a65a', 14, 60); hemi.color.set('#ffd9b0'); bus.position.set(RX + 3.2, 0, 80);
+    const z = lerp(-11, -4.5, t / 6);
+    trio.forEach((c, i) => { c.root.visible = true; c.root.position.set(RX - .2 + i * .9, .15, z - (i === 0 ? 1.2 : 0)); c.walk(t + i * .3, 8, .5); c.face('happy'); });
+    if (t < 3.6) { phone.visible = true; ali.armR.rotation.x = -2.6; ali.armR.rotation.z = .5; ali.face(t < 2.4 ? 'talk' : 'shock'); }
+    else { const k = seg(t, 3.6, 4.6); if (k < 1) { flyPhone.visible = true; const h = handOf(ali, 'armR'); flyPhone.position.set(h.x + k * 4, h.y + k * 5 - k * k * 3, h.z - k * 3); flyPhone.rotation.set(t * 20, t * 13, 0); } ali.armR.rotation.x = -2.8 * (1 - k * .6); ali.face('sneaky'); }
+    mehmet.armR.rotation.x = -.6; mehmet.body.rotation.z = -.15;
+    kbal.visible = true; kbal.scale.setScalar(5); const h = handOf(abd); abd.armL.rotation.x = -.8; const bp = h.clone().add(new THREE.Vector3(.4, 2.4 + Math.sin(t * 2) * .1, -.6)); kbal.position.copy(bp); tether(h, bp, 1.5);
+    if (t < 4.6) { cam.set(RX + .5, 1.5, z + 2.6); look.set(RX + .7, 1.3, z - .5); fov = 50; }
+    else { const k = easeIO(seg(t, 4.6, 5.4)); cam.set(RX + 1.2, 1.2, z + 3.8); look.set(RX, lerp(1.3, 3.0, k), z - 1.4); fov = lerp(50, 60, k); if (t < 4.8) { shk = .2; fl = .3; } }
+  } else if (name === 'gate') {
+    const X = 500; dir.target.position.set(X, 0, 0); dir.position.set(X + 10, 20, 20); scene.background = new THREE.Color('#2b3550'); hemi.intensity = 1.0; hemi.color.set('#e0e6ff');
+    hoca.root.visible = true; vest.visible = true; let hp = new THREE.Vector3(X + 1.7, 0, 1.0); hoca.root.rotation.y = 0; hoca.face(t < 9.6 ? 'angry' : 'happy');
+    const kAp = seg(t, 6, 8.5); const bz = t < 11 ? lerp(5.6, 1.3, kAp) : t < 12.5 ? lerp(1.3, .2, seg(t, 11, 12.5)) : lerp(.2, -4.5, easeOutBack(seg(t, 12.5, 13.1)));
+    let sx = 5, sy = 5; if (t >= 11 && t < 12.5) { const k = seg(t, 11, 12.5); sx = 5 * lerp(1, .38, k) * (1 + .04 * Math.sin(t * 30)); sy = 5 * lerp(1, 1.5, k); } else if (t >= 12.5) { const k = seg(t, 12.5, 13.2); sx = lerp(1.9, 5, easeOutBack(k)); sy = lerp(7.5, 5, easeOutBack(k)); }
+    kbal.visible = true; kbal.scale.set(sx, sy, sx); kbal.position.set(X + .1, .3 * sy + .05, bz);
+    if (t > 12.5) { const k = seg(t, 12.5, 13.6); hp = new THREE.Vector3(X + 1.7 + k * 4, Math.sin(k * Math.PI) * 3.2, 1.0 + k * 2.5); hoca.root.rotation.z = -k * 5; hoca.face('shock'); shk = t < 12.9 ? .25 : 0; }
+    hoca.root.position.copy(hp); if (t > 8 && t < 9.6) { hoca.face('shock'); }
+    turn.rotation.x = t > 12.5 ? (t - 12.5) * 20 : 0;
+    trio.forEach((c, i) => { c.root.visible = true; c.root.rotation.y = Math.PI; c.root.position.set(X - 1.4 + i * .9 + (i === 0 ? 1.3 : 0), 0, lerp(7.6, 2.8 + (i === 0 ? .6 : 0), kAp)); if (kAp < 1) c.walk(t + i, 8, .5); c.face(t > 8 && t < 9.6 ? 'shock' : 'happy'); });
+    if (t >= 11 && t < 12.5) { abd.armL.rotation.x = abd.armR.rotation.x = -1.5; abd.root.position.z = lerp(3.4, 2.0, seg(t, 11, 12.5)); abd.face('scared'); }
+    bag.visible = true; mehmet.armR.rotation.x = -.6;
+    if (t < 11) { cam.set(X + 4.2, 2.2, 8.5); look.set(X + .2, 1.8, 0); fov = 55; } else { cam.set(X + 5.5, 1.8, 3.4); look.set(X, 1.6, 0); fov = 55; }
+    if (t > 12.5 && t < 12.7) fl = .6;
+  } else if (name === 'var') {
+    dir.target.position.set(0, 0, 0); dir.position.set(-3, 6, -8); scene.background = new THREE.Color('#05070f'); hemi.intensity = .8; hemi.color.set('#9aaeff');
+    hoca.root.visible = true; hoca.root.position.set(0, 0, -1.75); hoca.root.rotation.y = Math.PI; hoca.sit(); hoca.type(t);
+    if (t < 47.4) { drawScreen(roomMon, 'jenny', 0, t, 3); pink.color.set('#ff4fa8'); pink.position.set(0, 1.3, -2.4); pink.distance = 6; pink.intensity = 3; cam.set(1.5, 2.0, .3); look.set(-.1, 1.2, -2.9); }
+    else { drawGol(roomMon); pink.color.set('#5cff5c'); pink.position.set(0, 1.3, -2.4); pink.intensity = 3; hoca.root.rotation.y = Math.PI - 2.2 * seg(t, 47.4, 47.9); hoca.armR.rotation.x = -2.8; hoca.face('happy'); cam.set(2.0, 1.7, -2.8); look.set(0, 1.3, -1.75); }
   } else {
-    dir.target.position.set(CX, 0, 0); dir.position.set(CX + 3, 8, 5); scene.background = new THREE.Color('#bcd'); drawProj('desk', t);
-    hoca.root.visible = true; hoca.root.position.set(CX - .6, 0, -3.8); hoca.root.rotation.y = .3; hoca.face(t > 51.5 ? 'shock' : 'happy'); hoca.armR.rotation.x = t < 49 ? -1.5 : -.3;
-    const seats = [[0, -1.2], [1, -1.2], [1, 1.2]].map(([i, z], k) => [SEATS[k][0], SEATS[k][1]]);
-    [mehmet, ali, abd].forEach((c, i) => { c.root.visible = true; c.root.position.set(CX + SEATS[i][0], 0, SEATS[i][1] + .55); c.root.rotation.y = Math.PI; c.sit(); c.face('happy'); });
-    extras[3].root.visible = true; extras[3].root.position.set(CX + SEATS[3][0], 0, SEATS[3][1] + .55); extras[3].root.rotation.y = Math.PI; extras[3].sit();
-    if (t > 49) { ali.root.position.y = 0; ali.legL.rotation.x = ali.legR.rotation.x = 0; ali.face(Math.floor(t * 6) % 2 ? 'talk' : 'shock'); ali.armR.rotation.x = -1.2 + Math.sin(t * 9) * .3; ali.armL.rotation.x = -.6; }
-    if (t > 51.7) { [mehmet, abd].forEach(c => c.face('talk')); }
-    cam.set(CX - 3.2, 2.2, -2.8); look.set(CX + .6, 1.3, .2); fov = 55;
+    const X = SX0; dir.target.position.set(X, 0, 0); dir.position.set(X + 10, 40, 20); scene.background = new THREE.Color('#0b1430'); hemi.intensity = 1.0; hemi.color.set('#e6ecff');
+    const mode = goal && t < 62 ? 'party' : (t >= 39.8 && t < 44) ? 'ooh' : (t >= 14.3 && t < 17) ? 'chant' : 'idle';
+    updateCrowd(t, mode); drawSB(goal ? '1 - 0' : '0 - 0', min2(t), goal && t < 56 && Math.floor(t * 4) % 2 === 0);
+    const seatX = X - 22.2, seatY = .6;
+    const onPitch = t >= 35 && t < 49;
+    trio.forEach((c, i) => { if (c === abd && (onPitch || (goal && t >= 54 && t < 62))) return; c.root.visible = true; c.root.position.set(seatX, seatY, .8 + i * .8); c.root.rotation.y = Math.PI / 2; c.face('happy'); });
+    // Mehmet ve kabuk dağı
+    const ph = seg(t, 17, 30), pk = goal ? (t < 58 ? 1 : 0) : ph; if (pk > 0 && t < 58) { pile.visible = true; const h = .1 + pk * 3.1; pile.scale.set(h * .75, h, h * .75); pile.position.set(seatX + 1.3, seatY + h / 2 - .3, 3.5); }
+    if (t >= 17 && t < 49) { mehmet.armR.rotation.x = -1.2 - Math.abs(Math.sin(t * 6)) * .6; mehmet.face('sneaky'); burst(t, Math.floor(t * 1.5) / 1.5, new THREE.Vector3(seatX + .4, seatY + 1.5, 2.4), { n: 6, spd: 1, up: 1, col: '#3b2a1a', size: .05, grav: 4, life: .7 }); }
+    if (t >= 58 && t < 62) burst(t, 58, new THREE.Vector3(seatX + 1.3, seatY + 2, 3.5), { n: 60, spd: 5, up: 6, col: ['#2a2018', '#e8e0c8', '#5a4630', RED], size: .12, grav: 4, life: 4 });
+    // Ali uyuyor
+    const asleep = (t >= 24 && t < 32.8) || (t >= 35 && t < 51.5);
+    if (t >= 24 && t < 27) mehmet.armR.rotation.x = -.2;
+    if (asleep) { ali.face('relaxed'); ali.head.rotation.x = .55; ali.head.rotation.z = .25; } 
+    if (t >= 32.8 && t < 35) { ali.face('talk'); ali.armL.rotation.z = -2.6; ali.armR.rotation.z = 2.6; ali.root.position.y = seatY + .15; }
+    if (t >= 51.5 && t < 54) { ali.face('shock'); ali.head.rotation.y = Math.sin(t * 5) * .5; }
+    if (t >= 14.3 && t < 17) { trio.forEach((c, i) => { c.armL.rotation.z = -2.6 - Math.sin(t * 7 + i) * .3; c.armR.rotation.z = 2.6 + Math.sin(t * 7 + i) * .3; }); scarfUp.visible = true; ali.armR.rotation.z = 0; ali.armR.rotation.x = -2.9; }
+    if (goal && t < 62) { trio.forEach((c, i) => { if (c === ali && t < 54) return; c.root.position.y = seatY + Math.abs(Math.sin(t * 9 + i)) * .5; c.armL.rotation.z = -2.8; c.armR.rotation.z = 2.8; c.face('happy'); }); }
+    if (t >= 30 && t < 32.8) trio.forEach(c => { if (c !== ali) c.face('scared'); });
+    // balon tribünde
+    if (t < 35) { kbal.visible = t > 14; kbal.scale.setScalar(2); const h = handOf(abd); abd.armL.rotation.x = -.7; const bp = h.clone().add(new THREE.Vector3(-.3, 2.0 + Math.sin(t * 2) * .05, -1.0)); kbal.position.copy(bp); if (kbal.visible) tether(h, bp, .6); }
+    // futbolcular
+    const B = ball2(t).add(new THREE.Vector3(X, 0, 0)); ball.visible = t >= 14 && t < 49; ball.position.copy(B); ball.rotation.set(t * 8, t * 5, 0);
+    const playersOn = t >= 14 && t < 62;
+    [[gb, GBH], [rk, RKH]].forEach(([team, H], ti) => team.forEach((c, i) => { if (!playersOn) return; c.root.visible = true; const h = new THREE.Vector3(X + H[i][0], 0, H[i][1]);
+      let p = i === 0 ? h.clone().add(new THREE.Vector3(clamp((B.x - X) * .3, -2.5, 2.5), 0, 0)) : h.clone().lerp(new THREE.Vector3(B.x, 0, B.z), .3).add(new THREE.Vector3(Math.sin(t * 1.3 + i * 2) * 1.5, 0, Math.cos(t + i) * 1.2));
+      if (ti === 0 && i === 5 && onPitch) { c.root.visible = false; }
+      c.root.position.copy(p); const d = new THREE.Vector3(B.x - p.x, 0, B.z - p.z); c.root.rotation.y = Math.atan2(d.x, d.z); if (!(t >= 37.5 && t < 49)) c.walk(t * (t < 30 ? 2 : 1) + i, 9, .6); c.face(ti === 0 ? 'happy' : 'sneaky');
+      if (goal && t < 62) { if (ti === 0) { c.face('happy'); c.root.position.set(X + 2.5 + Math.cos(i * 1.2) * 1.6, Math.abs(Math.sin(t * 8 + i)) * .4, 24 + Math.sin(i * 1.2) * 1.6); c.armL.rotation.z = -2.8; c.armR.rotation.z = 2.8; } else { c.face('scared'); c.head.rotation.x = .5; } } }));
+    // domino
+    if (t >= 37.5 && t < 49) { [[rk[1], 1.8, 24, 39.9], [rk[2], .6, 27.8, 41.0], [rk[0], .9, 30.6, 41.9]].forEach(([c, x, z, tf]) => { c.root.position.set(X + x, 0, z); c.root.rotation.y = Math.PI; const k = seg(t, tf, tf + .35); c.root.rotation.x = -k * 1.5; c.root.position.y = k * .15; c.face(k > 0 ? 'shock' : 'sneaky'); c.armL.rotation.z = -1.5 * k; c.armR.rotation.z = 1.5 * k; }); }
+    // teknik direktör (sigma) + tabela
+    if (t >= 14 && t < 62) { sen.root.visible = true; sen.root.position.set(X - 20.6, 0, -6); sen.root.rotation.y = Math.PI / 2 + .3; shades.visible = true; sen.face('sneaky'); if (t >= 34.8 && t < 35.4) sen.head.rotation.x = .35 * Math.sin(seg(t, 34.8, 35.4) * Math.PI * 2); }
+    if (t >= 35 && t < 37.5) { const o = extras[0]; o.root.visible = true; o.root.position.set(X - 20.4, 0, -4.2); o.root.rotation.y = Math.PI / 2; o.armL.rotation.x = o.armR.rotation.x = -2.6; subBoard.visible = true; subBoard.position.set(X - 20.1, 2.55, -4.2); subBoard.rotation.y = Math.PI / 2; }
+    // Abdullah sahada
+    if (onPitch) { abd.root.visible = true; let p;
+      if (t < 38.0) { const k = seg(t, 35.3, 38.0); p = new THREE.Vector3(lerp(X - 20.5, X + 2.4, k), 0, lerp(-5, 19.3, k)); abd.walk(t, 12, .9); abd.root.rotation.y = Math.atan2(22.9, 24.3); abd.face('happy'); }
+      else { p = new THREE.Vector3(X + 2.4, 0, 19.3); abd.root.rotation.y = 0; const wk = seg(t, 38.1, 38.4); abd.legR.rotation.x = -1.8 * Math.sin(wk * Math.PI); abd.root.rotation.y = wk * 3.5; const fk = seg(t, 38.4, 38.7); abd.root.rotation.x = -1.45 * fk; p.y = .15 * fk; abd.face(fk > 0 ? 'scared' : 'happy'); }
+      abd.root.position.copy(p); const h = handOf(abd);
+      let bp; if (t < 38.6) bp = h.clone().add(new THREE.Vector3(-.6, 2.4, -.6)); else { const k = seg(t, 38.6, 43); bp = new THREE.Vector3(X + lerp(2.4, 1.0, k), lerp(1.6, 2.4, k), lerp(19.6, 32.2, k));
+        if (t > 43.0) { const dk = seg(t, 43.0, 43.5); bp = new THREE.Vector3(X + 1.0, lerp(2.4, .6, Math.sin(dk * Math.PI)), 32.0 + dk * .3); } }
+      kbal.visible = true; kbal.scale.setScalar(2); kbal.position.copy(bp); tether(h, bp, .6); }
+    // kutlama: Abdullah uçuyor
+    if (goal && t >= 54 && t < 62) { const k = seg(t, 54, 62); const a = k * Math.PI * 2; const p = new THREE.Vector3(X + Math.cos(a) * 18, 6 + Math.sin(k * Math.PI) * 6, Math.sin(a) * 26);
+      kbal.visible = true; kbal.scale.setScalar(7); kbal.position.copy(p).add(new THREE.Vector3(0, 3.6, 0)); abd.root.visible = true; abd.root.position.copy(p); abd.armL.rotation.x = -3.0; abd.armR.rotation.z = 2.5; abd.face('happy'); abd.legL.rotation.x = Math.sin(t * 6) * .6; abd.legR.rotation.x = -Math.sin(t * 6) * .6; tether(handOf(abd), kbal.position, 2.1); }
+    if (goal && t < 62) burst(t, Math.floor((t - 49) / 2.2) * 2.2 + 49, new THREE.Vector3(X, 6, 0), { n: 60, spd: 9, up: 6, col: [RED, BLK, '#ffffff', '#ffe066'], size: .35, grav: 5, life: 2.2 });
+    // kameralar
+    if (t < 16) { const k = easeIO(seg(t, 14, 16)); cam.set(X + lerp(30, -6, k), lerp(40, 14, k), lerp(70, 30, k)); look.set(X, 0, 0); fov = 55; if (t < 14.2) fl = .5; }
+    else if (t < 20) { cam.set(seatX + 3.4, 2.6, 2.4); look.set(seatX, 1.8, 1.6); fov = 58; }
+    else if (t < 24) { cam.set(X - 34, 18, B.z * .4); look.set(X, 0, B.z * .6); fov = 45; }
+    else if (t < 27) { cam.set(seatX + 1.9, 2.5, 1.6); look.set(seatX, 1.6, 1.6); fov = 52; }
+    else if (t < 30) { cam.set(seatX + 6, 1.6, 4.5); look.set(seatX + .8, 2.4, 2.0); fov = 58; }
+    else if (t < 32.8) { cam.set(seatX + 3, 2.2, 1.6); look.set(seatX, 1.8, 1.6); fov = lerp(55, 42, seg(t, 30, 32.8)); shk = .02; }
+    else if (t < 35) { const hp = ali.headPos(); cam.set(hp.x + 1.1, hp.y - .3, hp.z); look.set(hp.x, hp.y - .35, hp.z); fov = lerp(45, 30, seg(t, 32.8, 35)); shk = .12; filt = `saturate(3) contrast(1.6) hue-rotate(${Math.sin(t * 30) * 10}deg)`; }
+    else if (t < 37.5) { cam.set(X - 16.5, 2.2, -1.5); look.set(X - 20.3, 1.6, -4.6); fov = 55; }
+    else if (t < 38.8) { cam.set(X + 3.6, 1.9, 15.2); look.set(X + 2.2, .8, 21); fov = 55; }
+    else if (t < 42.5) { cam.set(X + 7.5, 2.0, B.z - 2.5); look.set(X + 1.5, .7, B.z + 2); fov = 52; filt = 'saturate(.8) contrast(1.2) sepia(.15)'; }
+    else if (t < 44) { cam.set(X + 3.4, .55, 31.6); look.set(X + 1.0, .35, 32.5); fov = 58; }
+    else if (t < 45) { cam.set(X + 8, 5, 24); look.set(X + 1, 1, 32); fov = 55; }
+    else if (t < 51.5) { cam.set(seatX + 4.2, 3.0, 1.6); look.set(seatX - 2, 2.4, 1.6); fov = 62; shk = .07; }
+    else if (t < 54) { const hp = ali.headPos(); cam.set(hp.x + 1.6, hp.y - .2, hp.z + .4); look.set(hp.x, hp.y - .3, hp.z); fov = 45; }
+    else if (t < 58) { cam.set(X - 30, 12, -30); look.copy(abd.root.position); fov = 55; }
+    else if (t < 62) { cam.set(seatX + 7, 3, 4); look.set(seatX + 1, 2.4, 2.0); fov = 58; shk = .05; }
+    else { const a = (t - 62) * .12; cam.set(X + Math.sin(a) * 60, 30, Math.cos(a) * 60); look.set(X, 0, 0); fov = 50; filt = t < 68 ? `blur(${(seg(t, 62, 62.5) * 3).toFixed(2)}px) brightness(.75)` : 'brightness(.7)'; }
+    if (Math.abs(t - 43.45) < .1) shk = .1;
   }
 
   camera.fov = fov; camera.near = .05; camera.far = 2000; camera.updateProjectionMatrix();
@@ -600,14 +673,21 @@ function renderAt(t) {
   canvas.style.filter = filt; renderer.render(scene, camera);
 
   const ch = CHAPS.find(c => t >= c[0] && t < c[1]); setHTML(el.chap, ch ? ch[2] : ''); el.chap.style.opacity = ch ? 1 : 0;
-  el.score.style.opacity = t >= 6 && t < 46 ? 1 : 0; setHTML(el.sc, goal ? '1 - 0' : '0 - 0'); setHTML(el.mn, matchMin(t));
-  el.score.style.transform = goal && t < 34 ? `scale(${1 + .2 * Math.abs(Math.sin(t * 10))})` : ''; el.score.style.transformOrigin = 'top right';
+  el.score.style.opacity = t >= 14 && t < 62 ? 1 : 0; setHTML(el.sc, goal ? '1 - 0' : '0 - 0'); setHTML(el.mn, min2(t));
+  el.score.style.transform = goal && t < 51 ? `scale(${1 + .2 * Math.abs(Math.sin(t * 10))})` : ''; el.score.style.transformOrigin = 'top right';
+  const w = WORDS.find(x => t >= x[0] && t < x[1]); const word = w ? w[2] : '';
   const cap = timed(CAPS, t); setHTML(el.cap, cap); el.cap.style.opacity = cap && !word ? 1 : 0;
-  setHTML(el.word, word); el.word.style.opacity = word ? 1 : 0; const wk = seg(t, 32.4, 32.7);
-  el.word.style.transform = `translateY(-50%) scale(${1 + .5 * (1 - easeOutBack(wk)) + .05 * Math.sin(t * 20)}) rotate(-3deg)`; el.word.style.color = Math.floor(t * 8) % 2 ? '#ffe066' : RED;
-  for (const s of [6, 14, 28, 38, 46]) if (t > s && t < s + .15) fl = Math.max(fl, .4);
+  setHTML(el.word, word); el.word.style.opacity = word ? 1 : 0; const wk = w ? seg(t, w[0], w[0] + .3) : 0;
+  el.word.style.fontSize = word.length > 12 ? '8cqw' : '14cqw';
+  el.word.style.transform = `translateY(-50%) scale(${1 + .5 * (1 - easeOutBack(wk)) + .04 * Math.sin(t * 20)}) rotate(${word.startsWith('HOCAM') ? 2 : -3}deg)`; el.word.style.color = Math.floor(t * 8) % 2 ? '#ffe066' : RED;
+  const vOn = t >= 44.8 && t < 49; el.vr.style.opacity = vOn ? 1 : 0; el.vr.className = 'ov' + (t >= 47.4 ? ' ok' : '');
+  setHTML(el.vr, t >= 47.4 ? 'VAR: GOL GEÇERLİ ✓' : 'VAR KONTROLÜ' + '.'.repeat(1 + Math.floor(t * 3) % 3));
+  const nk = seg(t, 62.3, 63.1), nOut = 1 - seg(t, 67.6, 68); el.news.style.opacity = Math.min(nk * 3, 1) * nOut;
+  el.news.style.transform = `translate(-50%,-50%) rotate(${(1 - easeIO(nk)) * 720 - 3}deg) scale(${.1 + .9 * easeIO(nk)})`;
+  for (const s of [6, 14, 20, 30, 37.5, 45, 49, 62]) if (t > s && t < s + .15) fl = Math.max(fl, .4);
+  if (t >= 49 && t < 49.3) { fl = 1; fc = '#ffe066'; }
   el.flash.style.opacity = fl; el.flash.style.background = fc;
-  el.card.style.opacity = seg(t, 54.2, 54.8);
+  el.card.style.opacity = seg(t, 68.2, 68.8);
   el.bar.style.width = (t / DUR * 100) + '%';
 }
 
@@ -668,34 +748,49 @@ function buildAudio(ac, T) {
   const plus = s => { boom(s, false); choir([60, 64, 67, 72], s, 2.2, .05); tone('sine', mtof(96), s, 1.2, .08); tone('sine', mtof(103), s + .08, 1.2, .06); };
   const minus = s => { boom(s, true); tone('sawtooth', 600, s, 1.4, .18, { fEnd: 60, lp: 1800 }); };
   const steps = (a, b, gap, v = .12) => { for (let x = a; x < b; x += gap) noise(x, .05, v, 650, 'bandpass'); };
-  // ===== MAÇ =====
-  const crowd = (s, d, v, f = 900) => { noise(s, d, v, f, 'bandpass'); noise(s, d, v * .6, 400); };
+  // ===== MAÇ 2 =====
+  const crowdN = (s, d, v, f = 900) => { noise(s, d, v, f, 'bandpass'); noise(s, d, v * .6, 400); };
   const hclap = s => { noise(s, .06, .3, 1800, 'bandpass'); noise(s + .01, .05, .2, 2500, 'bandpass'); };
   const drum = (s, v = .5) => { tone('sine', 110, s, .35, v, { fEnd: 55 }); noise(s, .08, .15, 300); };
   const shout = (s, d = .35, v = .18) => { noise(s, d, v, 700, 'bandpass'); tone('sawtooth', 170, s, d, v * .4, { lp: 900 }); tone('sawtooth', 210, s, d, v * .3, { lp: 900 }); };
   const whistle = (s, d = .3) => tone('sine', 2900, s, d, .12, { vib: 60 });
   const chant = (a, b) => { for (let s = a; s < b; s += 2.4) { [0, .3, .6, 1.2, 1.5].forEach(o => { drum(s + o); hclap(s + o); }); shout(s + 1.8, .5, .2); } };
   const brass = (a, notes, bt = .3, v = .07) => notes.forEach((m, i) => { if (m == null) return; tone('sawtooth', mtof(m), a + i * bt, bt * .9, v, { lp: 2200 }); tone('square', mtof(m - 12), a + i * bt, bt * .9, v * .4); });
+  const vine = s => { tone('sine', 90, s, 1.1, .9, { fEnd: 40 }); noise(s, .25, .4, 300); tone('sine', 90, s, .9, .5, { fEnd: 40, dest: dist }); };
+  const boing = (s, f = 180) => tone('sine', f, s, .5, .3, { fEnd: f * 4, vib: 30 });
+  const bonk = s => { tone('square', 520, s, .08, .15, { fEnd: 300 }); noise(s, .05, .3, 1200, 'bandpass'); };
+  const pizz = (a, notes, bt = .18) => notes.forEach((m, i) => m != null && tone('triangle', mtof(m), a + i * bt, .12, .14));
   // sokak
-  steps(.1, 6, .3, .08); brass(.2, [67, 67, 72, 72, 71, 72, 74, 72, 67, 64, 67, 72, null, 72, 74, 76, 74, 72], .3, .05); chant(2.4, 6);
+  steps(.1, 6, .3, .07); for (let i = 0; i < 2; i++) { tone('sine', 440, .1 + i * .6, .25, .06); tone('sine', 480, .1 + i * .6, .25, .05); }
+  mumble(.3, 2, 300); mumble(2.4, 1.1, 190); noise(3.6, .05, .4, 2000, 'bandpass'); tone('sine', 900, 3.6, .9, .05, { fEnd: 200 });
+  vine(4.6); pizz(.2, [72, 76, 79, 76, 72, null, 67, null, 72, 76, 79, 84, null, 79, null, null, 72, 74, 76, 72, null, 67]);
+  // kapı
+  pizz(6.2, [60, 63, 67, 63, 60, null, 58, null, 60, 63, 67, 72], .2); mumble(8, 1.4, 330); mumble(9.6, 1.3, 150);
+  for (let x = 11; x < 12.5; x += .12) tone('sine', 300 + (x - 11) * 400, x, .14, .06, { vib: 40 });
+  boing(12.5, 140); noise(12.5, .2, .5, 800); tone('sine', 600, 12.6, .8, .08, { fEnd: 2000 }); bonk(13.3); bonk(13.45);
   // stadyum
-  crowd(5.8, 40.5, .07); boom(6, false); brass(6.1, [60, 64, 67, 72, 67, 72, 76, 79], .25, .06);
-  chant(11.5, 14); whistle(14, .6);
-  crowd(18.5, 1.5, .3, 600); tone('sawtooth', 140, 18.6, 1.3, .1, { fEnd: 90, lp: 700 }); noise(19.4, .1, .4, 900, 'bandpass'); crowd(19.5, 1.3, .25, 1400);
-  for (let x = 25; x < 28.3; x += .5) tone('sine', 60, x, .3, .3);
-  tone('sine', 400, 28.3, 2, .04, { fEnd: 900 }); noise(31.6, .08, .5, 1200, 'bandpass');
-  riser(30.6, 1.8); noise(32.4, .15, .6, 600);
-  boom(32.4, true); crowd(32.4, 6, .55, 1000); crowd(32.4, 6, .3, 2200); brass(32.5, [72, 76, 79, 84, 79, 84, 88, 84, 79, 84], .22, .08);
-  for (let s = 34.5; s < 38; s += .6) { drum(s, .6); drum(s + .3, .4); }
-  whistle(38.5, .25); whistle(38.85, .25); whistle(39.2, .9);
-  crowd(40, 6, .2); chant(40, 46); brass(40, [67, 67, 72, 72, 71, 72, 74, 72, 67, 64, 67, 72], .3, .05);
-  // okul
-  for (let i = 0; i < 10; i++) tone('square', 1200, 46 + i * .07, .05, .04);
-  mumble(46.4, 2.2, 150);
-  for (let x = 49.3; x < 51.4; x += .25) noise(x, .12, .06, 4000, 'highpass');
-  noise(51.7, .5, .05, 4000, 'highpass'); tone('sine', 80, 52.2, .8, .15, { fEnd: 60 });
-  // son kart
-  boom(54.2, false); brass(54.4, [67, 72, 76, 79, 76, 79, 84], .3, .07); crowd(54.2, 3.8, .12);
+  crowdN(13.9, 48.2, .06); boom(14, false); brass(14.1, [60, 64, 67, 72, 67, 72, 76, 79], .25, .06); chant(14.3, 17);
+  for (let x = 20; x < 30; x += .09) tone('square', 300 + hash(x * 7) * 500, x, .06, .025, { lp: 2000 });
+  for (let x = 24; x < 30; x += 1.6) { noise(x, .7, .07, 300); noise(x + .8, .6, .05, 500); }
+  for (let x = 30; x < 32.8; x += .5) tone('sine', 60, x, .3, .3);
+  vine(32.8); shout(32.8, 1.6, .3); noise(32.8, 1.6, .25, 1400, 'bandpass', dist);
+  whistle(35, .3); whistle(35.4, .3); pizz(35.3, [67, 71, 74, 79, 74, 71, 67, 71, 74, 79, 83, 79, 74], .2);
+  tone('sine', 300, 38.1, .3, .12, { fEnd: 90 }); noise(38.1, .3, .2, 2000, 'bandpass'); tone('sawtooth', 200, 38.6, .5, .1, { fEnd: 80, lp: 800 });
+  boing(39.0, 160); bonk(39.9); bonk(41.0); bonk(41.9); crowdN(39.8, 4.2, .2, 600);
+  tone('sawtooth', 55, 38.8, 4.6, .07, { lp: 300 }); for (let x = 42.5; x < 44; x += .25) tone('sine', 1200, x, .05, .05);
+  boing(43.1, 200); noise(43.5, .1, .4, 900, 'bandpass'); vine(44);
+  // VAR
+  for (let x = 45; x < 47.4; x += .5) { noise(x, .03, .3, 4000, 'highpass'); tone('sine', 50, x, .4, .25); } tone('sine', 1800, 45, 2.4, .02, { vib: 8 });
+  tone('sine', mtof(84), 47.4, .2, .15); tone('sine', mtof(91), 47.55, .4, .15);
+  // GOL (gol müziği sonradan miksleniyor)
+  boom(49, true); crowdN(49, 13, .35, 1000); crowdN(49, 13, .2, 2200);
+  for (let s = 51; s < 62; s += .6) drum(s, .4);
+  mumble(51.5, 1.4, 260); tone('sine', 300, 54, 4, .04, { fEnd: 900 });
+  noise(58, .5, .5, 800); boom(58, false);
+  whistle(58.6, .25); whistle(58.95, .25); whistle(59.3, .9);
+  // gazete
+  for (let i = 0; i < 6; i++) noise(62.3 + i * .12, .1, .2, 3000, 'bandpass'); boom(63.1, false); brass(63.3, [67, 72, 76, 79], .3, .06);
+  boom(68.2, false); crowdN(68.2, 3.8, .1);
 }
 
 
