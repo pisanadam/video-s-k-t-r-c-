@@ -15,7 +15,7 @@
   #chap{left:2cqw;top:2cqw;padding:.6cqw 1.4cqw;background:linear-gradient(90deg,var(--red) 0 50%,#111 50% 100%);border:.2cqw solid #fff;font:900 2.4cqw/1 var(--meme);letter-spacing:.12em;opacity:0}
   #score{right:2cqw;top:2cqw;display:flex;align-items:stretch;font:900 2cqw/1 var(--meme);letter-spacing:.06em;opacity:0;border:.2cqw solid #fff}
   #score span{padding:.6cqw 1cqw}
-  #score .h{background:var(--red)} #score .s{background:#111;min-width:5.5cqw;text-align:center} #score .a{background:#e8e8e8;color:#111} #score .m{background:#0a6b2e}
+  #score .h{background:var(--red)} #score .s{background:#111;min-width:5.5cqw;text-align:center} #score .a{background:#fdb912;color:#a90432} #score .m{background:#0a6b2e}
   #cap{left:4cqw;right:4cqw;bottom:4cqw;font-size:3.5cqw;opacity:0}
   #word{left:0;right:0;top:44%;transform:translateY(-50%);font-size:14cqw;opacity:0;white-space:nowrap;color:#ffe066}
   #card{inset:0;background:rgba(5,5,5,.86);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2cqw;opacity:0}
@@ -46,14 +46,14 @@
 <div id="stage">
   <canvas id="c"></canvas>
   <div id="chap" class="ov"></div>
-  <div id="score" class="ov"><span class="h">GENÇLERBİRLİĞİ</span><span class="s" id="sc">0 - 0</span><span class="a">RAKİP FK</span><span class="m" id="mn">1'</span></div>
+  <div id="score" class="ov"><span class="h">GENÇLERBİRLİĞİ</span><span class="s" id="sc">0 - 0</span><span class="a">GALATASARAY</span><span class="m" id="mn">1'</span></div>
   <div id="word" class="ov meme"></div>
   <div id="cap" class="ov meme"></div>
   <div id="card" class="ov"><div class="a"><b>GENÇLERBİRLİĞİ</b><br>MAÇINA GİTTİK</div><div class="b">ABDULLAH · ALİ · MEHMET</div>
-    <div class="c">* Maç hayal ürünüdür. "Rakip FK" diye bir takım yoktur. Abdullah'ın balonu sahadan alınmıştır (alınmamıştır).</div></div>
+    <div class="c">* Bu maç tamamen hayal ürünüdür, gerçek bir maçı anlatmaz. Abdullah'ın balonu sahadan alınmıştır (alınmamıştır).</div></div>
   <div id="var" class="ov">VAR KONTROLÜ</div>
   <div id="news" class="ov"><div class="t"><span>7 KASIM 2026</span><span>FİYATI: 1 ÇEKİRDEK</span></div><div class="n">7-C SPOR</div>
-    <div class="h">7-C'den Abdullah tarihe geçti!</div><div class="s">90+3'te balonla gelen gol VAR'dan döndü. Gençlerbirliği 1 - 0 Rakip FK.</div>
+    <div class="h">7-C'den Abdullah tarihe geçti!</div><div class="s">90+3'te balonla gelen gol VAR'dan döndü. Gençlerbirliği 1 - 0 Galatasaray.</div>
     <div class="row"><div class="pic"><i></i></div><ul><li><b>Asist:</b> Balon</li><li><b>Mehmet:</b> 5 kg çekirdek (stadyum rekoru)</li><li><b>Ali:</b> maçı uyuyarak izledi</li><li><b>Hoca:</b> güvenlik + VAR + matematik</li></ul></div></div>
   <div id="flash" class="ov"></div>
   <div id="bar"></div>
@@ -470,7 +470,7 @@ const crowd = []; const ROWS = 11;
 for (let r = 0; r < 8; r++) { block(gStad, standM, 44, .6 * (r + 1), .95, 0, .3 * (r + 1), 36.6 + r * .95); for (let x = -21; x <= 21; x += .8) crowd.push([x, .6 * (r + 1), 36.6 + r * .95, 2, r]); }
 const crowdBody = new THREE.InstancedMesh(BOX, new THREE.MeshLambertMaterial({ color: '#ffffff' }), crowd.length);
 const crowdHead = new THREE.InstancedMesh(BOX, C('#d6a27c'), crowd.length);
-{ const col = new THREE.Color(); crowd.forEach((c, i) => { col.set(hash(i * 1.7) > .45 ? RED : BLK); crowdBody.setColorAt(i, col); }); }
+{ const col = new THREE.Color(); crowd.forEach((c, i) => { col.set(c[3] === 2 && c[0] > 6 ? (hash(i * 1.7) > .5 ? '#fdb912' : '#a90432') : (hash(i * 1.7) > .45 ? RED : BLK)); crowdBody.setColorAt(i, col); }); }
 gStad.add(crowdBody, crowdHead);
 const _o = new THREE.Object3D();
 function updateCrowd(t, mode) {
@@ -486,8 +486,8 @@ function updateCrowd(t, mode) {
 const sbC = document.createElement('canvas'); sbC.width = 512; sbC.height = 160; const sbG = sbC.getContext('2d'); const sbT = new THREE.CanvasTexture(sbC); sbT.colorSpace = THREE.SRGBColorSpace; let sbKey = '';
 const sb = new THREE.Mesh(new THREE.PlaneGeometry(16, 5), new THREE.MeshBasicMaterial({ map: sbT })); sb.position.set(0, 9, -41); gStad.add(sb); block(gStad, C('#222'), 16.8, 5.8, .4, 0, 9, -41.3); block(gStad, C('#555'), .5, 7, .5, -6, 3.5, -41.3); block(gStad, C('#555'), .5, 7, .5, 6, 3.5, -41.3);
 function drawSB(score, min, flashOn) { const key = score + min + flashOn; if (key === sbKey) return; sbKey = key; const g = sbG;
-  g.fillStyle = '#050505'; g.fillRect(0, 0, 512, 160); g.fillStyle = RED; g.fillRect(0, 0, 192, 110); g.fillStyle = '#e8e8e8'; g.fillRect(320, 0, 192, 110);
-  g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '900 18px Impact,"DejaVu Sans",sans-serif'; g.fillStyle = '#fff'; g.fillText('GENÇLERBİRLİĞİ', 96, 56); g.fillStyle = '#111'; g.fillText('RAKİP FK', 416, 56);
+  g.fillStyle = '#050505'; g.fillRect(0, 0, 512, 160); g.fillStyle = RED; g.fillRect(0, 0, 192, 110); g.fillStyle = '#fdb912'; g.fillRect(320, 0, 192, 110);
+  g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '900 18px Impact,"DejaVu Sans",sans-serif'; g.fillStyle = '#fff'; g.fillText('GENÇLERBİRLİĞİ', 96, 56); g.fillStyle = '#a90432'; g.fillText('GALATASARAY', 416, 56);
   g.fillStyle = flashOn ? '#ffe066' : '#fff'; g.font = '900 54px Impact,"DejaVu Sans",sans-serif'; g.fillText(score, 256, 58); g.fillStyle = '#5cff5c'; g.font = '700 34px "DejaVu Sans Mono",monospace'; g.fillText(min, 256, 136); sbT.needsUpdate = true; }
 // pankart
 const banT = pixTex(512, 64, (g) => { g.fillStyle = BLK; g.fillRect(0, 0, 512, 64); g.fillStyle = RED; g.fillRect(0, 0, 512, 10); g.fillRect(0, 54, 512, 10); g.fillStyle = '#fff'; g.font = '900 36px Impact,"DejaVu Sans",sans-serif'; g.textAlign = 'center'; g.fillText('HAYDİ GENÇLER!', 256, 45); }, true);
@@ -496,7 +496,7 @@ const ban = new THREE.Mesh(new THREE.PlaneGeometry(14, 1.75), new THREE.MeshBasi
 const gb = [], rk = [];
 const GBH = [[0, -30.5], [-8, -18], [8, -18], [-6, -4], [6, -4], [0, 10]], RKH = [[0, 30.5], [-8, 18], [8, 18], [-6, 4], [6, 4], [0, -10]];
 GBH.forEach((p, i) => gb.push(makeChar({ skin: ['#d7a07a', '#c58c63', '#e8bf9c', '#b97f58', '#d9a47e', '#c98e6a'][i], hair: '#1a1a1a', shirt: i === 0 ? '#f1c40f' : RED, sleeve: i === 0 ? '#f1c40f' : BLK, pants: BLK, shoe: '#111', eye: '#222' })));
-RKH.forEach((p, i) => rk.push(makeChar({ skin: ['#e8bf9c', '#b97f58', '#d7a07a', '#c58c63', '#e3b08c', '#cf9a76'][i], hair: '#3a2a1a', shirt: i === 0 ? '#2ecc71' : '#f0f0f0', sleeve: i === 0 ? '#2ecc71' : '#2747a0', pants: '#2747a0', shoe: '#111', eye: '#222' })));
+RKH.forEach((p, i) => rk.push(makeChar({ skin: ['#e8bf9c', '#b97f58', '#d7a07a', '#c58c63', '#e3b08c', '#cf9a76'][i], hair: '#3a2a1a', shirt: i === 0 ? '#2ecc71' : '#fdb912', sleeve: i === 0 ? '#2ecc71' : '#a90432', pants: '#a90432', shoe: '#111', eye: '#222' })));
 const ballT = pixTex(32, 16, (g) => { g.fillStyle = '#fff'; g.fillRect(0, 0, 32, 16); g.fillStyle = '#111'; [[4, 4], [14, 9], [24, 3], [28, 11], [8, 12], [19, 1]].forEach(([x, y]) => g.fillRect(x, y, 3, 3)); });
 const ball = new THREE.Mesh(new THREE.SphereGeometry(.2, 16, 12), L(ballT)); scene.add(ball);
 /* ================= MAÇ 2 (daha komik) ================= */
@@ -550,7 +550,7 @@ const CAPS = [[.3, 2.4, 'ALİ: "ANNE MAÇA GİDİYORUZ."'], [2.4, 3.6, 'ANNE: "�
   [6.2, 8, 'GİRİŞTE GÜVENLİK VAR...'], [8, 9.6, 'ÇOCUKLAR: "HOCAM?!"'], [9.6, 11, 'HOCA: "HAFTA SONU EK İŞ."'], [11, 12.5, 'BALON TURNİKEDEN GEÇMİYOR...'], [12.7, 14, 'GEÇTİ.'],
   [14.3, 17, 'TRİBÜN: "HAYDİ GENÇLER!"'], [17, 20, 'MEHMET 5 KİLO ÇEKİRDEĞE BAŞLADI.'],
   [20, 24, '1. YARI: 0 ŞUT · 0 GOL · 2 KG ÇEKİRDEK'], [24, 27, 'ALİ 30. DAKİKADA UYUDU.'], [27, 30, 'KABUK DAĞI 3 METREYİ GEÇTİ.'], [30, 32.8, '88. DAKİKA. HÂLÂ 0-0.'],
-  [35, 37.5, 'OYUNCU DEĞİŞİKLİĞİ: GİREN ABDULLAH (7-C)'], [37.6, 38.6, 'ABDULLAH ŞUT ÇEKİYOR...'], [38.6, 39.7, 'ISKA.'], [39.8, 42.4, '...AMA TOP BALONA ÇARPTI. RAKİPLER DEVRİLDİ.'],
+  [35, 37.5, 'OYUNCU DEĞİŞİKLİĞİ: GİREN ABDULLAH (7-C)'], [37.6, 38.6, 'ABDULLAH ŞUT ÇEKİYOR...'], [38.6, 39.7, 'ISKA.'], [39.8, 42.4, '...AMA TOP BALONA ÇARPTI. GALATASARAY DEFANSI DEVRİLDİ.'],
   [42.5, 43.6, 'ÇİZGİDE DURDU...'], [45, 47.4, 'VAR KONTROLÜ. HOCA YİNE ORADA.'], [47.4, 49, '...'], [51.5, 54, 'ALİ (TÜM MAÇ UYUDU): "NE OLDU?"'], [54, 58, 'ABDULLAH BALONUYLA STADA TUR ATTI.'], [58, 62, "MEHMET'İN KABUK DAĞI KONFETİ OLDU."]];
 const WORDS = [[4.6, 5.0, ''], [32.8, 35, "HOCAM ABDULLAH'I<br>OYUNA AL!!"], [44, 45, 'GOL?'], [49, 51.3, 'GOL GEÇERLİ!']];
 function min2(t) { if (t < 20) return "1'"; if (t < 30) return (1 + Math.floor((t - 20) / 10 * 84)) + "'"; if (t < 37.5) return (85 + Math.floor(seg(t, 30, 37.5) * 4.99)) + "'"; if (t < 58) return "90+" + (t < 49 ? 3 : 3 + Math.floor(seg(t, 49, 58) * 2.99)) + "'"; return 'MAÇ SONU'; }
