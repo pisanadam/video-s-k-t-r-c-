@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Minecraft vs Roblox</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+  #stage { position: relative; width: 1280px; height: 720px; overflow: hidden; font-family: "DejaVu Sans", sans-serif; }
+  canvas#gl { position: absolute; inset: 0; width: 1280px; height: 720px; }
+  .o { position: absolute; display: none; }
+  .stroke { -webkit-text-stroke: 3px #000; paint-order: stroke fill; text-shadow: 4px 4px 0 #000; font-weight: 900; }
+  .cap { position: absolute; left: 0; right: 0; text-align: center; color: #fff; white-space: pre-line; transform-origin: 50% 50%; }
+  #top { top: 22px; font-size: 56px; }
+  #bot { bottom: 28px; font-size: 46px; }
+  #title { left: 0; right: 0; top: 18px; text-align: center; }
+  #title .l1 { font-size: 74px; } #title .l2 { font-size: 92px; color: #fff; display: block; margin-top: -6px; }
+  .g { color: #3ee05a; } .r { color: #ff3b3b; } .y { color: #ffd23f; }
+  #vs { left: 560px; top: 290px; width: 160px; text-align: center; font-size: 120px; color: #ffb000; font-style: italic;
+    -webkit-text-stroke: 5px #7a1000; paint-order: stroke fill; text-shadow: 0 0 30px #ff5a00, 6px 6px 0 #000; }
+  #divider { left: 638px; top: 0; width: 4px; height: 720px; background: linear-gradient(#ffe14d, #ff7a00); box-shadow: 0 0 18px #ffb000; }
+  .list { width: 560px; font-size: 31px; line-height: 1.45; }
+  .list div { opacity: 0; transform: translateX(-30px); }
+  #listL { left: 34px; top: 360px; color: #7dff8e; } #listR { left: 674px; top: 360px; color: #fff; }
+  .verdict { font-size: 70px; top: 610px; width: 560px; text-align: center; }
+  #verL { left: 40px; color: #3ee05a; } #verR { left: 680px; color: #ff3b3b; }
+  /* comment card */
+  #comment { left: 90px; top: 150px; width: 760px; background: #f4f4f4; border-radius: 14px; border: 4px solid #c21; padding: 22px 26px 18px 120px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6); color: #111; }
+  #comment .av { position: absolute; left: 24px; top: 24px; width: 72px; height: 72px; border-radius: 50%; background: #d23; overflow: hidden; }
+  #comment .av:after { content: ""; position: absolute; left: 18px; top: 14px; width: 36px; height: 36px; background: #ffd400; border-radius: 6px; }
+  #comment .nm { font-weight: 800; font-size: 26px; } #comment .tx { font-size: 32px; margin: 8px 0 10px; } #comment .mt { color: #777; font-size: 22px; }
+  /* tweet cards */
+  .tw { left: 190px; width: 900px; background: #000; color: #e7e9ea; border: 1px solid #2f3336; border-radius: 16px; padding: 20px 24px 14px 96px; box-sizing: border-box; }
+  .tw .av { position: absolute; left: 22px; top: 20px; width: 58px; height: 58px; border-radius: 50%; }
+  .tw .nm { font-weight: 800; font-size: 26px; color: #fff; } .tw .badge { color: #1d9bf0; }
+  .tw .hd { color: #71767b; font-size: 24px; font-weight: 400; }
+  .tw .tx { font-size: 28px; margin: 6px 0 12px; line-height: 1.35; }
+  .tw .st { display: flex; justify-content: space-between; color: #71767b; font-size: 22px; width: 620px; }
+  #tw1 { top: 40px; } #tw1 .av { background: radial-gradient(circle at 50% 40%, #ffd400 0 34%, #2f7de1 35%); }
+  #tw2 { top: 270px; } #tw2 .av { background: #3a7d44; border-radius: 50%; }
+  #tw2 .av:after { content: ""; position: absolute; left: 14px; top: 12px; width: 30px; height: 30px; background: #8a5a3a; }
+  #tw2 .rep { color: #71767b; font-size: 22px; } #tw2 .rep b { color: #1d9bf0; font-weight: 400; }
+  #babaKaka { display: flex; margin: 8px 0 8px; border-radius: 12px; overflow: hidden; height: 410px; }
+  #babaKaka > div { flex: 1; padding: 8px 16px; font-size: 18px; line-height: 1.2; }
+  #bkL { background: linear-gradient(#2d6a2d, #133a13); } #bkR { background: linear-gradient(#5a0d0d, #1c0303); }
+  #babaKaka h2 { margin: 0 0 6px; font-size: 38px; text-align: center; color: #fff; -webkit-text-stroke: 2px #000; paint-order: stroke fill; }
+  #bkR h2 { color: #ff3030; }
+  #babaKaka .it { opacity: 0; margin-bottom: 4px; } #babaKaka .it b { display: block; font-size: 20px; }
+  #bkL .it b { color: #7dff8e; } #bkR .it b { color: #ff6060; }
+  #bigBK { left: 0; right: 0; top: 600px; text-align: center; font-size: 46px; }
+  /* misc */
+  #bubble { position: absolute; background: #fff; color: #111; border: 5px solid #000; border-radius: 18px; padding: 12px 20px; font: 900 32px "DejaVu Sans", sans-serif;
+    white-space: pre-line; text-align: center; display: none; }
+  #bubble:after { content: ""; position: absolute; left: 50%; bottom: -26px; margin-left: -14px; border: 14px solid transparent; border-top-color: #000; }
+  #crash { left: 760px; top: 250px; width: 400px; background: #fff; border-radius: 10px; color: #222; text-align: center; padding: 18px; font-size: 24px; box-shadow: 0 6px 30px #000; }
+  #crash b { display: block; font-size: 28px; margin-bottom: 8px; } #crash span { display: inline-block; margin-top: 12px; background: #1d6ff2; color: #fff; padding: 8px 20px; border-radius: 6px; }
+  #crowns { left: 930px; top: 140px; font-size: 40px; line-height: 1.5; color: #fff; }
+  #crowns div { opacity: 0; }
+  .emo { position: absolute; font-size: 90px; display: none; font-family: 'Noto Color Emoji'; }
+  .e { font-family: 'Noto Color Emoji'; -webkit-text-stroke: 0; }
+  .eq { -webkit-text-stroke: 1px #000; }
+  .half { display: inline-block; width: 640px; }
+  #end { inset: 0; background: radial-gradient(circle, #1b1b1b, #000); text-align: center; }
+  #end .row { position: absolute; left: 0; right: 0; font-size: 56px; color: #fff; }
+  #vig { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 45%, rgba(140,0,0,0.85) 100%); opacity: 0; }
+  #flash { position: absolute; inset: 0; pointer-events: none; }
+  #wm { position: absolute; right: 14px; top: 8px; font: 700 18px "DejaVu Sans Mono", monospace; color: rgba(255,255,255,0.7); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl" width="1280" height="720"></canvas>
+  <div id="vig"></div>
+  <div class="o" id="divider"></div>
+  <div class="o stroke" id="vs">VS</div>
+  <div class="o stroke" id="title"><span class="l1"><span class="g">MİNECRAFT,</span> <span class="r">ROBLOX'TAN</span></span><span class="l2">Daha İyi!</span></div>
+  <div class="o list stroke" id="listL"></div>
+  <div class="o list stroke" id="listR"></div>
+  <div class="o verdict stroke" id="verL">EFSANE! 😎</div>
+  <div class="o verdict stroke" id="verR">ÇÖP! 🤮</div>
+  <div class="o" id="crash"><b>⚠️ Bağlantı koptu</b>Oyun çöktü. Yine.<br>(Hata 💀)<br><span>Yeniden bağlan</span></div>
+  <div class="o" id="comment"><div class="av"></div><div class="nm">RobloxFan123</div><div class="tx">Roblox daha iyi çünkü<br>Minecraft eski ve sıkıcı! 😡🤡</div><div class="mt">1s önce &nbsp;&nbsp; Yanıtla</div></div>
+  <div class="o tw" id="tw1"><div class="av"></div><div class="nm">Roblox Kralı <span class="badge">✔</span> <span class="hd">@robloxkraliTR · 2 sa</span></div>
+    <div class="tx">Minecraft çok boş, grafikleri berbat, modları yok,<br>Roblox bin kat daha iyi. Gerçek oyun Roblox'tur. 😎</div>
+    <div class="st"><span>💬 342</span><span>🔁 128</span><span>🤍 1,8B</span><span>📊 109B</span></div></div>
+  <div class="o tw" id="tw2"><div class="av"></div><div class="nm">Steve Gerçekten Baba <span class="badge">✔</span> <span class="hd">@blockadam_</span></div>
+    <div class="rep">Yanıt olarak <b>@robloxkraliTR</b></div>
+    <div id="babaKaka"><div id="bkL"><h2>MİNECRAFT<br>BABADIR</h2></div><div id="bkR"><h2>ROBLOX<br>KAKADIR</h2></div></div>
+    <div class="st"><span>💬 87</span><span>🔁 235</span><span id="likes">🤍 0</span><span>📊 76B</span></div></div>
+  <div class="o stroke" id="bigBK"><span class="y">MİNECRAFT BABADIR,</span> <span class="r">ROBLOX KAKADIR!</span></div>
+  <div class="o stroke" id="crowns"></div>
+  <div class="emo" id="poop">💩</div><div class="emo" id="fly1">🪰</div><div class="emo" id="fly2">🪰</div><div class="emo" id="fly3">🪰</div>
+  <div class="emo" id="devil">😈</div>
+  <div id="bubble"></div>
+  <div class="cap stroke" id="top"></div>
+  <div class="cap stroke" id="bot"></div>
+  <div class="o" id="end">
+    <div class="row stroke" style="top:150px"><span class="e">🟩</span> <span class="y">BEĞEN</span> <span class="eq">=</span> <span class="g">MİNECRAFT</span></div>
+    <div class="row stroke" style="top:270px"><span class="y">YORUM YAP</span> <span class="eq">=</span> <span class="g">GERÇEK MC OYUNCUSU</span> <span class="e">❤️</span></div>
+    <div class="row stroke" style="top:430px; font-size:40px; color:#aaa">(roblox oyuncuları da yorum yapabilir,<br>okumayacağız 😏)</div>
+  </div>
+  <div id="flash"></div>
+  <div id="wm">MİNECRAFT TR ● SHITPOST</div>
+</div>
+<script src="three.min.js"></script>
+<script>
+function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const ease = k => { k = clamp(k, 0, 1); return k * k * (3 - 2 * k); };
+const seg = (t, a, b) => clamp((t - a) / (b - a), 0, 1);
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+const $ = id => document.getElementById(id);
+
+// ------------------------------------------------------------------------------------
+// Text content (taken from the two reference images)
+// ------------------------------------------------------------------------------------
+const PROS = ['✔ Sonsuz Yaratıcılık', '✔ Gerçek Bir Oyun', '✔ Modlarla Sınırsız Eğlence', '✔ Sadık ve Büyük Topluluk', '✔ 15 Yıldır Zirvede!'];
+const CONS = ['✖ Çocuk Oyunu', '✖ Kopya Oyunlar', '✖ Para Kazanma Taktikleri', '✖ Beyinsiz Topluluk', '✖ Sürekli Çöküyor!'];
+const BABA = [['GERÇEK OYUN', 'Yıllardır milyonlarca kişi oynuyor.'], ['SINIRSIZ YARATICILIK', 'İstediğin her şeyi inşa edebilirsin.'], ['MODLAR EFSANE', 'Binlerce mod, sınırsız içerik.'],
+  ['TEK BİR SATIN ALIM', 'Bir kere al, sonsuza kadar senin.'], ['TOPLULUK GERÇEK', 'Sadık, olgun ve yaratıcı insanlar.'], ['EĞİTİCİ VE FAYDALI', 'Okullarda bile kullanılıyor!']];
+const KAKA = [['ÇOCUK OYUNU', '5 yaşındaki çocuklar bile oynuyor.'], ['KOPYA DOLU', 'Aynı oyunların farklı adı var.'], ['PARA TUZAĞI', 'Sürekli Robux alman isteniyor.'],
+  ['GERÇEK OYUN DEĞİL', 'Oyun değil, oyun yapma platformu.'], ['TOPLULUK ZEHİR', 'Toksik, kavgacı ve şikayetçi dolu.'], ['EĞİTİM YOK', 'Hiçbir faydası yok, zaman kaybı.']];
+const CROWNS = ['👑 Yaratıcılık', '👑 Macera', '👑 Dostluk', '👑 Sadakat', '👑 EFSANELİK'];
+PROS.forEach(x => { const d = document.createElement('div'); d.textContent = x; $('listL').appendChild(d); });
+CONS.forEach(x => { const d = document.createElement('div'); d.innerHTML = x.replace('✖', '<span style="color:#ff3b3b">✖</span>'); $('listR').appendChild(d); });
+BABA.forEach(([a, b]) => { const d = document.createElement('div'); d.className = 'it'; d.innerHTML = `<b>✅ ${a}</b>${b}`; $('bkL').appendChild(d); });
+KAKA.forEach(([a, b]) => { const d = document.createElement('div'); d.className = 'it'; d.innerHTML = `<b>❌ ${a}</b>${b}`; $('bkR').appendChild(d); });
+CROWNS.forEach(x => { const d = document.createElement('div'); d.innerHTML = x.replace('👑', '<span class="e">👑</span>'); $('crowns').appendChild(d); });
+
+// ------------------------------------------------------------------------------------
+// 3D: two little worlds — blocky grassland (x≈0) and a colourful obby (x≈100)
+// ------------------------------------------------------------------------------------
+const glCanvas = $('gl');
+const renderer = new THREE.WebGLRenderer({ canvas: glCanvas, antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(1280, 720, false); renderer.setPixelRatio(1);
+const scene = new THREE.Scene(); scene.fog = new THREE.Fog(0x7ec8ff, 30, 80);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x557744, 0.95));
+const sun = new THREE.DirectionalLight(0xffffff, 0.8); sun.position.set(10, 20, 8); scene.add(sun);
+const camL = new THREE.PerspectiveCamera(50, 640 / 720, 0.1, 200), camR = new THREE.PerspectiveCamera(50, 640 / 720, 0.1, 200), camF = new THREE.PerspectiveCamera(50, 1280 / 720, 0.1, 200);
+
+function canvasTex(w, h, draw, nearest = true) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c); if (nearest) { t.magFilter = THREE.NearestFilter; t.minFilter = THREE.NearestFilter; }
+  t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function noiseFill(g, w, h, base, vary, seed) {
+  const r = rng(seed);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const v = (r() - 0.5) * vary; const c = base.map(ch => clamp(Math.round(ch + v), 0, 255)); g.fillStyle = `rgb(${c[0]},${c[1]},${c[2]})`; g.fillRect(x, y, 1, 1); }
+}
+const box1 = new THREE.BoxGeometry(1, 1, 1);
+function block(mat, sx, sy, sz, x, y, z, parent = scene) { const m = new THREE.Mesh(box1, mat); m.scale.set(sx, sy, sz); m.position.set(x, y, z); parent.add(m); return m; }
+const M = c => new THREE.MeshLambertMaterial({ color: c });
+const B = c => new THREE.MeshBasicMaterial({ color: c });
+
+// grassland
+const grassTop = canvasTex(16, 16, (g, w, h) => noiseFill(g, w, h, [96, 168, 64], 40, 1));
+const dirtT = canvasTex(16, 16, (g, w, h) => noiseFill(g, w, h, [134, 96, 67], 40, 2));
+const grassSide = canvasTex(16, 16, (g, w, h) => { noiseFill(g, w, h, [134, 96, 67], 40, 3); const r = rng(4); for (let x = 0; x < w; x++) { g.fillStyle = '#5fa63f'; g.fillRect(x, 0, 1, 3 + Math.floor(r() * 3)); } });
+{ const mats = [grassSide, grassSide, grassTop, dirtT, grassSide, grassSide].map(m => new THREE.MeshLambertMaterial({ map: m }));
+  const cells = []; const r = rng(3);
+  for (let x = -14; x < 14; x++) for (let z = -16; z < 10; z++) cells.push([x, (Math.abs(x) > 6 || z < -6) && r() < 0.3 ? 0 : -1, z]);
+  const inst = new THREE.InstancedMesh(box1, mats, cells.length); const m = new THREE.Matrix4();
+  cells.forEach(([x, y, z], i) => { m.makeTranslation(x, y + 0.5, z); inst.setMatrixAt(i, m); }); scene.add(inst); }
+const logTex = canvasTex(16, 16, (g, w, h) => { noiseFill(g, w, h, [104, 82, 50], 30, 5); for (let x = 0; x < w; x += 4) { g.fillStyle = '#4e3b22'; g.fillRect(x, 0, 1, h); } });
+const leafTex = canvasTex(16, 16, (g, w, h) => noiseFill(g, w, h, [56, 130, 40], 70, 6));
+function tree(x, z, hgt) { const lm = new THREE.MeshLambertMaterial({ map: logTex }), fm = new THREE.MeshLambertMaterial({ map: leafTex });
+  for (let y = 0; y < hgt; y++) block(lm, 1, 1, 1, x, y + 0.5, z);
+  for (let dx = -2; dx <= 2; dx++) for (let dz = -2; dz <= 2; dz++) for (let dy = 0; dy < 2; dy++) { if (Math.abs(dx) === 2 && Math.abs(dz) === 2) continue; block(fm, 1, 1, 1, x + dx, hgt - 0.5 + dy, z + dz); }
+  block(fm, 3, 1, 3, x, hgt + 1.5, z); }
+tree(-4, -4, 5); tree(5, -6, 6); tree(-7, 2, 4);
+{ const r = rng(77); for (let i = 0; i < 6; i++) block(B(0xffffff), 4 + r() * 5, 1, 2 + r() * 3, -25 + r() * 50, 16 + r() * 4, -30 + r() * 15); }
+
+// obby world at x = 100
+const studTex = canvasTex(32, 32, (g) => { g.fillStyle = '#a3a6ad'; g.fillRect(0, 0, 32, 32); g.fillStyle = '#b8bbc2'; for (let x = 4; x < 32; x += 16) for (let y = 4; y < 32; y += 16) { g.beginPath(); g.arc(x + 4, y + 4, 4, 0, 7); g.fill(); } }, false);
+studTex.wrapS = studTex.wrapT = THREE.RepeatWrapping; studTex.repeat.set(20, 20);
+const base = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.MeshLambertMaterial({ map: studTex })); base.rotation.x = -Math.PI / 2; base.position.x = 100; scene.add(base);
+{ const cols = [0xff3b6b, 0x3fb6ff, 0xffd23f, 0x7dff6b, 0xb36bff, 0xff8a3f]; const r = rng(11);
+  for (let i = 0; i < 18; i++) { const p = block(new THREE.MeshLambertMaterial({ color: cols[i % 6], emissive: cols[i % 6], emissiveIntensity: 0.15 }), 2 + r() * 2, 0.5, 2 + r() * 2, 100 - 9 + (i % 6) * 3.5, 0.6 + Math.floor(i / 6) * 2.2 + r(), -3 - Math.floor(i / 6) * 4 - r() * 2); }
+  const truss = new THREE.Mesh(new THREE.BoxGeometry(1.4, 12, 1.4, 1, 12, 1), new THREE.MeshBasicMaterial({ color: 0xd22, wireframe: true })); truss.position.set(106, 6, -8); scene.add(truss);
+  const truss2 = truss.clone(); truss2.position.set(93, 6, -10); scene.add(truss2); }
+
+// --- characters ---------------------------------------------------------------------
+function faceTex(o, mode) {
+  return canvasTex(8, 8, (g) => {
+    g.fillStyle = o.skin; g.fillRect(0, 0, 8, 8); g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(0, 0, 8, 2);
+    if (mode === 'normal') { g.fillStyle = '#fff'; g.fillRect(1, 3, 2, 1); g.fillRect(5, 3, 2, 1); g.fillStyle = o.eye; g.fillRect(2, 3, 1, 1); g.fillRect(5, 3, 1, 1); g.fillStyle = '#5a2a1a'; g.fillRect(3, 6, 2, 1); }
+    else if (mode === 'cool') { g.fillStyle = '#000'; g.fillRect(1, 3, 6, 1); g.fillRect(1, 4, 2, 1); g.fillRect(5, 4, 2, 1); g.fillStyle = '#5a2a1a'; g.fillRect(4, 6, 3, 1); g.fillRect(6, 5, 1, 1); }
+    else if (mode === 'rage') { g.fillStyle = '#fff'; g.fillRect(1, 3, 2, 2); g.fillRect(5, 3, 2, 2); g.fillStyle = '#c00'; g.fillRect(2, 4, 1, 1); g.fillRect(5, 4, 1, 1); g.fillStyle = '#000'; g.fillRect(1, 2, 2, 1); g.fillRect(5, 2, 2, 1); g.fillRect(3, 1, 2, 1);
+      g.fillStyle = '#300'; g.fillRect(2, 6, 4, 2); g.fillStyle = '#fff'; g.fillRect(2, 6, 1, 1); g.fillRect(4, 6, 1, 1); g.fillRect(3, 7, 1, 1); g.fillRect(5, 7, 1, 1); g.fillStyle = '#e33'; g.fillRect(0, 0, 1, 2); g.fillRect(7, 0, 1, 2); }
+  });
+}
+function makeBlokcu() {
+  const o = { skin: '#c8956a', hair: '#3b2412', eye: '#3b5bd7' };
+  const root = new THREE.Group(); root.rotation.order = 'YXZ';
+  const skinM = M(o.skin), hairM = M(o.hair), shirtM = M(0x1fa58f), pantsM = M(0x3b3b8f);
+  const faces = {}; ['normal', 'cool', 'rage'].forEach(k => faces[k] = new THREE.MeshLambertMaterial({ map: faceTex(o, k) }));
+  const headMats = [hairM, hairM, hairM, skinM, faces.normal, hairM];
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), headMats);
+  const headPivot = new THREE.Group(); headPivot.position.y = 1.5; head.position.y = 0.4; headPivot.add(head);
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.9, 0.4), shirtM); body.position.y = 1.05;
+  function limb(mat, w, h, x, y, endMat) { const p = new THREE.Group(); p.position.set(x, y, 0); const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, w), mat); m.position.y = -h / 2; p.add(m);
+    const e = new THREE.Mesh(new THREE.BoxGeometry(w + 0.02, 0.2, w + 0.02), endMat); e.position.y = -h + 0.1; p.add(e); return p; }
+  const armL = limb(shirtM, 0.3, 0.85, -0.55, 1.48, skinM), armR = limb(shirtM, 0.3, 0.85, 0.55, 1.48, skinM);
+  const legL = limb(pantsM, 0.38, 0.6, -0.2, 0.6, M(0x555555)), legR = limb(pantsM, 0.38, 0.6, 0.2, 0.6, M(0x555555));
+  root.add(headPivot, body, armL, armR, legL, legR); scene.add(root);
+  // pickaxe, crown, diamond armour bits, sword
+  const pick = new THREE.Group(); block(M(0x7a5230), 0.08, 0.9, 0.08, 0, -0.45, 0, pick); block(M(0x4ff0ff), 0.7, 0.12, 0.12, 0, -0.9, 0, pick);
+  pick.position.set(0, -0.8, 0.1); pick.rotation.x = Math.PI / 2; armR.add(pick);
+  const sword = new THREE.Group(); block(M(0x7a5230), 0.09, 0.3, 0.09, 0, -0.15, 0, sword); block(M(0x2a6a6a), 0.35, 0.07, 0.1, 0, -0.32, 0, sword); block(new THREE.MeshLambertMaterial({ color: 0x5ff5f0, emissive: 0x1a6060 }), 0.12, 1.1, 0.06, 0, -0.9, 0, sword);
+  sword.position.set(0, -0.82, 0.05); armR.add(sword);
+  const crown = new THREE.Group(); const gold = new THREE.MeshLambertMaterial({ color: 0xffc81a, emissive: 0x553300 });
+  block(gold, 0.9, 0.22, 0.9, 0, 0, 0, crown); [[-0.35, -0.35], [0.35, -0.35], [-0.35, 0.35], [0.35, 0.35], [0, 0.4], [0, -0.4]].forEach(([x, z]) => block(gold, 0.16, 0.3, 0.16, x, 0.24, z, crown));
+  block(B(0xff2a4a), 0.14, 0.14, 0.05, 0, 0.02, 0.46, crown); scene.add(crown);
+  const helmet = block(new THREE.MeshLambertMaterial({ color: 0x4fe6e0, emissive: 0x0c3a3a }), 0.92, 0.5, 0.92, 0, 0.18, -0.02, head);
+  return { root, head, headPivot, body, armL, armR, legL, legR, pick, sword, crown, helmet, shirtM, pantsM, setFace(k) { headMats[4] = faces[k]; head.material = headMats; } };
+}
+function makeRobloxcu() {
+  const root = new THREE.Group(); root.rotation.order = 'YXZ';
+  const yellow = M(0xffd31a), shirt = M(0xff7a1a), pants = M(0x6b6b78);
+  const faceT = mode => canvasTex(64, 64, (g) => { g.clearRect(0, 0, 64, 64); g.strokeStyle = g.fillStyle = '#111'; g.lineWidth = 4;
+    if (mode === 'smile') { g.fillRect(20, 20, 6, 10); g.fillRect(38, 20, 6, 10); g.beginPath(); g.arc(32, 34, 14, 0.2, Math.PI - 0.2); g.stroke(); }
+    else if (mode === 'scared') { g.fillRect(20, 18, 7, 12); g.fillRect(37, 18, 7, 12); g.beginPath(); g.ellipse(32, 46, 8, 7, 0, 0, 7); g.fill(); }
+    else { g.lineWidth = 5; [[18, 18], [36, 18]].forEach(([x, y]) => { g.beginPath(); g.moveTo(x, y); g.lineTo(x + 10, y + 10); g.moveTo(x + 10, y); g.lineTo(x, y + 10); g.stroke(); }); g.beginPath(); g.moveTo(20, 46); g.lineTo(44, 44); g.stroke(); } }, false);
+  const faces = { smile: faceT('smile'), scared: faceT('scared'), dead: faceT('dead') };
+  const head = new THREE.Group(); head.position.y = 2.25;
+  head.add(new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.75, 20), yellow));
+  const faceMat = new THREE.MeshBasicMaterial({ map: faces.smile, transparent: true });
+  const facePlane = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 0.6), faceMat); facePlane.position.z = 0.43; head.add(facePlane);
+  const torso = block(shirt, 1.1, 1.05, 0.55, 0, 1.38, 0, root);
+  const parts = { head, torso };
+  function limb(mat, x, y, name) { const p = new THREE.Group(); p.position.set(x, y, 0); block(mat, 0.5, 1.0, 0.5, 0, -0.5, 0, p); root.add(p); parts[name] = p; return p; }
+  limb(yellow, -0.8, 1.88, 'armL'); limb(yellow, 0.8, 1.88, 'armR'); limb(pants, -0.28, 0.85, 'legL'); limb(pants, 0.28, 0.85, 'legR');
+  root.add(head); scene.add(root);
+  const home = {}; for (const k in parts) home[k] = parts[k].position.clone();
+  return { root, parts, home, setFace(k) { faceMat.map = faces[k]; } };
+}
+const mc = makeBlokcu(), rb = makeRobloxcu();
+
+// ------------------------------------------------------------------------------------
+// helpers
+// ------------------------------------------------------------------------------------
+function show(id, on = true) { $(id).style.display = on ? 'block' : 'none'; }
+function cap(id, text, scale = 1, rot = 0, color = '#fff') { const el = $(id); el.textContent = text || ''; el.style.transform = `scale(${scale}) rotate(${rot}deg)`; el.style.color = color; }
+function flash(color, a) { $('flash').style.background = color; $('flash').style.opacity = a; }
+function proj(cam, p, vx, vw) { const q = p.clone().project(cam); return [vx + (q.x * 0.5 + 0.5) * vw, (-q.y * 0.5 + 0.5) * 720]; }
+function bubble(text, cam, p, vx = 0, vw = 1280) {
+  const el = $('bubble'); if (!text) { el.style.display = 'none'; return; }
+  el.style.display = 'block'; el.textContent = text; const [x, y] = proj(cam, p, vx, vw);
+  el.style.left = clamp(x - el.offsetWidth / 2, 10, 1270 - el.offsetWidth) + 'px'; el.style.top = clamp(y - el.offsetHeight - 30, 110, 560 - el.offsetHeight) + 'px';
+}
+function emo(id, x, y, s = 1, rot = 0) { const e = $(id); e.style.display = 'block'; e.style.left = (x - 50) + 'px'; e.style.top = (y - 55) + 'px'; e.style.transform = `scale(${s}) rotate(${rot}deg)`; }
+function pop(el, k) { el.style.opacity = clamp(k * 3, 0, 1); el.style.transform = `translateX(${(1 - ease(k * 3)) * -30}px) scale(${1 + Math.max(0, 0.25 - k) * 1.2})`; }
+function idle(c, t, ph = 0, a = 0.15) { c.armL.rotation.x = Math.sin(t * 2 + ph) * a; c.armR.rotation.x = -Math.sin(t * 2 + ph) * a; }
+function resetChars() {
+  mc.root.position.set(0, 0, 0); mc.root.rotation.set(0, 0, 0); mc.root.visible = true; mc.headPivot.rotation.set(0, 0, 0); mc.head.scale.setScalar(1);
+  [mc.armL, mc.armR, mc.legL, mc.legR].forEach(l => l.rotation.set(0, 0, 0)); mc.setFace('normal');
+  mc.pick.visible = true; mc.sword.visible = false; mc.helmet.visible = false; mc.crown.visible = false;
+  mc.shirtM.color.set(0x1fa58f); mc.pantsM.color.set(0x3b3b8f);
+  rb.root.position.set(100, 0, 0); rb.root.rotation.set(0, 0, 0); rb.root.visible = true; rb.setFace('smile');
+  for (const k in rb.parts) { rb.parts[k].position.copy(rb.home[k]); rb.parts[k].rotation.set(0, 0, 0); }
+}
+
+// ------------------------------------------------------------------------------------
+// Timeline
+// ------------------------------------------------------------------------------------
+const DURATION = 34;
+const SKY_L = new THREE.Color(0x7ec8ff), SKY_R = new THREE.Color(0xb7a6ff);
+function renderAt(t) {
+  resetChars();
+  ['divider', 'vs', 'title', 'listL', 'listR', 'verL', 'verR', 'crash', 'comment', 'tw1', 'tw2', 'bigBK', 'crowns', 'end'].forEach(id => show(id, false));
+  ['poop', 'fly1', 'fly2', 'fly3', 'devil'].forEach(id => $(id).style.display = 'none');
+  cap('top', ''); cap('bot', ''); bubble(null); flash('#fff', 0); $('vig').style.opacity = 0;
+  let split = false, shake = 0, filterL = 'none', filterR = 'none', filterF = 'none';
+
+  // camera defaults (split view)
+  camL.position.set(1.6, 2.1, 4.6); camL.lookAt(0, 1.3, 0);
+  camR.position.set(101.6, 2.3, 5.2); camR.lookAt(100, 1.5, 0);
+  camF.fov = 50;
+
+  // ---- A + B (0 – 10): title, VS, the two lists -----------------------------------
+  if (t < 10) {
+    split = true;
+    show('divider'); show('vs');
+    $('vs').style.transform = `scale(${1 + Math.sin(t * 6) * 0.06}) rotate(${-8 + Math.sin(t * 3) * 3}deg)`;
+    mc.root.rotation.y = 0.35 + Math.sin(t) * 0.1; idle(mc, t); mc.armR.rotation.x = -0.5 + Math.sin(t * 3) * 0.2;
+    rb.root.rotation.y = -0.3; rb.parts.armL.rotation.z = -0.4 + Math.sin(t * 5) * 0.4; rb.parts.armR.rotation.z = 0.4 - Math.sin(t * 5) * 0.4;
+    rb.root.position.y = Math.abs(Math.sin(t * 4)) * 0.25;
+    if (t < 3.6) {
+      show('title'); $('title').style.transform = `scale(${t < 0.3 ? lerp(2.5, 1, t / 0.3) : 1 + Math.sin(t * 5) * 0.02})`;
+      camL.position.set(1.6 + Math.sin(t * 0.6), 2.2, 5.4); camR.position.set(101.6 - Math.sin(t * 0.6), 2.4, 6);
+      camL.lookAt(0, 1.1, 0); camR.lookAt(100, 1.3, 0);
+      if (t < 0.15) flash('#fff', 0.7);
+    } else {
+      show('listL'); show('listR');
+      const items = [...$('listL').children], itemsR = [...$('listR').children];
+      for (let i = 0; i < 5; i++) {
+        pop(items[i], seg(t, 3.8 + i * 1.0, 4.8 + i * 1.0));
+        pop(itemsR[i], seg(t, 4.3 + i * 1.0, 5.3 + i * 1.0));
+      }
+      // Roblox side crashes on "Sürekli Çöküyor!"
+      if (t > 8.6) { rb.setFace('scared'); filterR = `grayscale(0.6) contrast(1.4) hue-rotate(${Math.floor(t * 20) % 2 ? 90 : -40}deg)`; show('crash');
+        $('crash').style.transform = `translate(${Math.sin(t * 50) * 4}px, 0)`; rb.root.rotation.z = 0.2; }
+      if (t > 9.0) { show('verL'); show('verR'); const k = seg(t, 9.0, 9.3); $('verL').style.transform = $('verR').style.transform = `scale(${lerp(2, 1, k)})`; mc.setFace('cool'); }
+    }
+  }
+  // ---- C (10 – 14.6): the comment + rage ----------------------------------------------
+  else if (t < 14.6) {
+    camF.position.set(0.5, 2.1, 3.4); camF.lookAt(0, 1.85, 0);
+    show('comment');
+    const k = seg(t, 10, 10.35); $('comment').style.transform = `translateY(${(1 - ease(k)) * -250}px)`;
+    mc.pick.visible = false;
+    if (t < 12) { mc.setFace('normal'); idle(mc, t); cap('bot', 'blokçu yorumları okurken:'); }
+    else {
+      const lt = t - 12;
+      mc.setFace('rage'); mc.head.scale.setScalar(1 + Math.min(lt * 2, 0.35)); mc.headPivot.rotation.z = Math.sin(lt * 50) * 0.08;
+      camF.position.set(0.15, 2.0, lerp(3.4, 1.9, ease(lt / 0.2))); camF.lookAt(0, 1.95, 0); camF.fov = lerp(70, 45, ease(lt / 0.2));
+      shake = 0.08 * Math.max(0, 1 - lt / 2); $('vig').style.opacity = 0.9; filterF = 'contrast(1.5) saturate(2)';
+      if (lt < 0.1) flash('#f00', 0.6);
+      $('comment').style.transform = `translate(${-60 + Math.sin(t * 40) * 6}px, -100px) scale(0.75)`;
+      cap('top', 'NE DEDİN SEN?!', 1.1 + Math.sin(t * 40) * 0.05, Math.sin(t * 25) * 4, '#ff2b2b');
+    }
+  }
+  // ---- D (14.6 – 21.2): the tweet and the reply ----------------------------------------
+  else if (t < 21.2) {
+    camF.position.set(3, 3, 8); camF.lookAt(50, 2, -40);
+    filterF = 'blur(6px) brightness(0.4)';
+    show('tw1');
+    const k1 = seg(t, 14.6, 14.9); $('tw1').style.transform = `translateY(${(1 - ease(k1)) * 60}px)`; $('tw1').style.opacity = ease(k1);
+    if (t < 16.6) cap('bot', 'bu sırada X\'te:', 1);
+    if (t > 16.4) {
+      show('tw2');
+      const k2 = seg(t, 16.4, 16.9);
+      // the feed scrolls up to make room for the reply
+      $('tw1').style.transform = `translateY(${-ease(k2) * 30}px) scale(${1 - 0.15 * ease(k2)})`;
+      $('tw2').style.transform = `translateY(${(1 - ease(k2)) * 400 - ease(k2) * 250}px)`;
+      [...$('bkL').querySelectorAll('.it')].forEach((d, i) => d.style.opacity = seg(t, 17.0 + i * 0.35, 17.15 + i * 0.35));
+      [...$('bkR').querySelectorAll('.it')].forEach((d, i) => d.style.opacity = seg(t, 17.17 + i * 0.35, 17.32 + i * 0.35));
+      const likes = Math.min(2.4, 2.4 * seg(t, 17, 19.4));
+      $('likes').innerHTML = `<span style="color:#f91880">❤ ${likes.toFixed(1).replace('.', ',')}B</span>`;
+    }
+    if (t > 19.6) { show('bigBK'); $('bigBK').style.transform = `scale(${1 + Math.sin(t * 9) * 0.05})`; if (t < 19.75) flash('#fff', 0.5); }
+  }
+  // ---- E (21.2 – 26): throne vs kaka (split again) ---------------------------------------
+  else if (t < 26) {
+    split = true; show('divider'); show('vs'); $('vs').style.transform = `scale(0.8) rotate(-8deg)`;
+    mc.crown.visible = true; mc.setFace('cool'); mc.pick.visible = false;
+    const fall = seg(t, 21.5, 22.2);
+    const headTop = 2.32; const bounce = t > 22.2 ? Math.abs(Math.sin((t - 22.2) * 12)) * 0.15 * Math.max(0, 1 - (t - 22.2) * 2) : 0;
+    mc.crown.position.set(0, lerp(7, headTop, fall * fall) + bounce, 0); mc.crown.rotation.y = (1 - fall) * 6;
+    mc.armL.rotation.z = t > 22.3 ? 2.6 : 0; mc.armR.rotation.z = t > 22.3 ? -2.6 : 0; mc.root.position.y = t > 22.3 ? Math.abs(Math.sin(t * 6)) * 0.2 : 0;
+    camL.position.set(1.3, 2.3, 4.6); camL.lookAt(0, 1.8, 0);
+    rb.setFace(t < 22.7 ? 'smile' : 'scared'); rb.root.rotation.y = -0.2;
+    camR.position.set(101.4, 2.7, 5.4); camR.lookAt(100, 1.9, 0);
+    if (t > 22.6) {
+      const [x, y] = proj(camR, V(100, 3.6, 0), 640, 640);
+      emo('poop', x, y, lerp(3, 1.4, ease(seg(t, 22.6, 22.9))), Math.sin(t * 6) * 8);
+      ['fly1', 'fly2', 'fly3'].forEach((id, i) => { const a = t * 3 + i * 2.1; emo(id, x + Math.cos(a) * 110, y + Math.sin(a * 1.3) * 60 - 40, 0.45); });
+      filterR = 'sepia(0.6) hue-rotate(40deg) saturate(1.5)';
+    }
+    if (t > 22.3) $('top').innerHTML = '<span class="half" style="color:#ffd23f">TAHTIN SAHİBİ <span class="e">👑</span></span><span class="half" style="color:#c8a46a">KOKAN BİR KAKA</span>';
+    if (t > 23.2) $('bot').innerHTML = '<span class="half" style="color:#fff">MİNECRAFT BABADIR!</span><span class="half" style="color:#ff3b3b">ROBLOX KAKADIR!</span>';
+  }
+  // ---- F (26 – 31.4): real legends play Minecraft ---------------------------------------
+  else if (t < 31.4) {
+    const lt = t - 26;
+    mc.pick.visible = false; mc.sword.visible = true; mc.helmet.visible = true; mc.setFace('cool');
+    mc.shirtM.color.set(0x4fe6e0); mc.pantsM.color.set(0x37b8b4);
+    mc.armR.rotation.x = lt < 0.6 ? lerp(0, -2.9, ease(lt / 0.6)) : -2.9 + Math.sin(t * 4) * 0.08;
+    // the Robloxçu was teleported here... and falls apart
+    rb.root.position.set(2.6, 0, 1.2); rb.root.rotation.y = -0.6;
+    const ap = ease(seg(t, 27.6, 28.2));
+    if (t > 27.6) rb.setFace('dead');
+    rb.parts.head.position.set(lerp(0, 0.9, ap), lerp(2.25, 0.42, ap), lerp(0, 0.6, ap)); rb.parts.head.rotation.set(lerp(0, Math.PI / 2, ap), 0, lerp(0, 0.6, ap));
+    rb.parts.torso.position.set(0, lerp(1.38, 0.28, ap), lerp(0, -0.3, ap)); rb.parts.torso.rotation.set(lerp(0, -Math.PI / 2, ap), 0, 0);
+    rb.parts.armL.position.set(lerp(-0.8, -1.4, ap), lerp(1.88, 0.25, ap), 0); rb.parts.armL.rotation.set(0, 0, lerp(0, Math.PI / 2, ap));
+    rb.parts.armR.position.set(lerp(0.8, 1.6, ap), lerp(1.88, 0.25, ap), lerp(0, -0.6, ap)); rb.parts.armR.rotation.set(lerp(0, 1.2, ap), 0, lerp(0, -Math.PI / 2, ap));
+    rb.parts.legL.position.set(-0.28, lerp(0.85, 0.25, ap), lerp(0, 0.7, ap)); rb.parts.legL.rotation.set(lerp(0, -Math.PI / 2, ap), 0, 0);
+    rb.parts.legR.position.set(lerp(0.28, 0.6, ap), lerp(0.85, 0.25, ap), lerp(0, 0.8, ap)); rb.parts.legR.rotation.set(lerp(0, -Math.PI / 2, ap), 0.4, 0);
+    camF.position.set(0.8, 1.2, 6.2); camF.lookAt(0.9, 1.8, 0); camF.fov = 55;
+    filterF = 'saturate(1.35) contrast(1.1)';
+    cap('top', 'GERÇEK EFSANELER MİNECRAFT OYNAR!', 0.9, 0, '#fff');
+    show('crowns'); [...$('crowns').children].forEach((d, i) => d.style.opacity = seg(t, 26.3 + i * 0.3, 26.45 + i * 0.3));
+    if (lt > 0.7 && lt < 0.85) flash('#bff', 0.5);
+    if (t > 28.4) bubble('MİNECRAFT HER\nZAMAN KAZANIR!', camF, V(0, 3.4, 0));
+    if (t > 28.0) { emo('devil', 1130, 560, 1 + Math.sin(t * 6) * 0.05); $('bot').innerHTML = '<span style="position:relative;left:330px;color:#ff8aff">EZİK ROBLOX!</span>'; }
+    if (t > 27.6 && t < 27.8) shake = 0.06;
+  }
+  // ---- G (31.4 – 34): like & comment ------------------------------------------------------
+  else {
+    show('end');
+    [...$('end').children].forEach((r, i) => { const k = seg(t, 31.5 + i * 0.4, 31.8 + i * 0.4); r.style.opacity = k; r.style.transform = `scale(${lerp(1.6, 1, ease(k)) + (k >= 1 ? Math.sin(t * 6 + i) * 0.03 : 0)})`; });
+  }
+
+  // ---- render --------------------------------------------------------------------------
+  const shk = (cam) => { if (shake > 0) { const r = rng(Math.floor(t * 60) + 1); cam.position.x += (r() - 0.5) * shake * 2; cam.position.y += (r() - 0.5) * shake * 2; } cam.updateProjectionMatrix(); };
+  renderer.setScissorTest(true);
+  if (split) {
+    shk(camL); shk(camR);
+    scene.background = SKY_L; scene.fog.color.copy(SKY_L);
+    renderer.setViewport(0, 0, 640, 720); renderer.setScissor(0, 0, 640, 720); renderer.render(scene, camL);
+    scene.background = SKY_R; scene.fog.color.copy(SKY_R);
+    renderer.setViewport(640, 0, 640, 720); renderer.setScissor(640, 0, 640, 720); renderer.render(scene, camR);
+    // CSS filters are per-canvas, so the per-side looks are done with overlays instead
+    glCanvas.style.filter = 'none';
+    $('flash').style.background = $('flash').style.background; // no-op, keeps flash state
+    sideFilter(filterL, filterR);
+  } else {
+    shk(camF); sideFilter('none', 'none');
+    scene.background = SKY_L; scene.fog.color.copy(SKY_L);
+    renderer.setViewport(0, 0, 1280, 720); renderer.setScissor(0, 0, 1280, 720); renderer.render(scene, camF);
+    glCanvas.style.filter = filterF;
+  }
+}
+// per-half colour treatment via backdrop-filter overlays
+const halfL = document.createElement('div'), halfR = document.createElement('div');
+[halfL, halfR].forEach((d, i) => { d.style.cssText = `position:absolute;top:0;height:720px;width:640px;left:${i * 640}px;pointer-events:none;`; $('stage').insertBefore(d, $('vig')); });
+function sideFilter(l, r) { halfL.style.backdropFilter = l === 'none' ? '' : l; halfR.style.backdropFilter = r === 'none' ? '' : r; }
+
+window.renderAt = renderAt; window.DURATION = DURATION;
+const still = new URLSearchParams(location.search).get('still');
+if (!navigator.webdriver) {
+  if (still !== null) renderAt(parseFloat(still));
+  else { const t0 = performance.now(); (function loop() { renderAt(((performance.now() - t0) / 1000) % DURATION); requestAnimationFrame(loop); })(); }
+}
+</script>
+</body>
+</html>
