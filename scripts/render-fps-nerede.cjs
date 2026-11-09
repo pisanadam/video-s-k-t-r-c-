@@ -9,7 +9,7 @@ const { spawn } = require('child_process');
 
 const OUT = path.resolve(process.argv[2] || 'fps-nerede.mp4');
 const FPS = Number(process.argv[3] || 30);
-const W = 1280, H = 720;
+const W = +(process.env.VW || 1280), H = +(process.env.VH || 720);
 
 (async () => {
   const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });

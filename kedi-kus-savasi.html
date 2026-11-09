@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evdeki Büyük Savaş</title>
+<style>
+  :root{ --meme: Impact, "Anton", "Arial Black", "DejaVu Sans", sans-serif; --sig:"DejaVu Sans", sans-serif; }
+  html,body{margin:0;height:100%;background:#000;overflow:hidden;color:#fff}
+  body{display:flex;align-items:center;justify-content:center}
+  #stage{position:relative;height:min(100vh,177.7778vw);aspect-ratio:9/16;container-type:inline-size;overflow:hidden;background:#000}
+  .ph{position:absolute;inset:0;background-size:cover;background-repeat:no-repeat;opacity:0;will-change:transform}
+  .ov{position:absolute;pointer-events:none}
+  .meme{font-family:var(--meme);font-weight:900;color:#fff;text-transform:uppercase;-webkit-text-stroke:.8cqw #000;paint-order:stroke fill;letter-spacing:.03em;text-align:center;line-height:1.08}
+  #top{left:4cqw;right:4cqw;top:7cqw;font-size:8.4cqw;opacity:0;background:rgba(0,0,0,.5);border-radius:2.4cqw;padding:1.6cqw 2cqw}
+  #cap{left:4cqw;right:4cqw;bottom:14cqw;font-size:7.4cqw;opacity:0;background:rgba(0,0,0,.5);border-radius:2.4cqw;padding:1.6cqw 2cqw}
+  #big{left:0;right:0;top:50%;transform:translateY(-50%);font-size:17cqw;opacity:0}
+  #tag{left:5cqw;top:34cqw;padding:2cqw 3.6cqw;border:.7cqw solid #000;border-radius:2.4cqw;font:900 5.4cqw/1.1 var(--meme);letter-spacing:.04em;opacity:0;box-shadow:1.2cqw 1.2cqw 0 #000}
+  #tag small{display:block;font:700 3.2cqw/1.2 var(--sig);letter-spacing:.06em}
+  #bub{left:7cqw;right:7cqw;bottom:34cqw;background:#fff;color:#111;border:.8cqw solid #111;border-radius:5cqw;padding:3.6cqw 4.6cqw;font:900 6.2cqw/1.18 var(--meme);text-align:center;opacity:0;text-transform:uppercase}
+  #bub::after{content:"";position:absolute;left:18%;top:-6.4cqw;border:3cqw solid transparent;border-bottom:4.4cqw solid #111}
+  #vote{left:6cqw;right:6cqw;top:58%;background:rgba(0,0,0,.82);border:.7cqw solid #fff;border-radius:3cqw;padding:3.6cqw 4cqw;opacity:0;font-family:var(--meme)}
+  #vote h3{margin:0 0 2.4cqw;font:900 6cqw/1 var(--meme);text-align:center;letter-spacing:.06em}
+  .row{display:flex;align-items:center;gap:2cqw;margin:2cqw 0}
+  .row b{flex:0 0 26cqw;font:900 4.6cqw/1 var(--meme)}
+  .bar{flex:1;height:6.4cqw;background:#333;border-radius:1.6cqw;overflow:hidden;position:relative}
+  .bar i{position:absolute;left:0;top:0;bottom:0;width:0}
+  .row span{flex:0 0 14cqw;text-align:right;font:900 5cqw/1 var(--meme)}
+  #vs{left:0;right:0;top:50%;transform:translateY(-50%);font:900 30cqw/1 var(--meme);color:#ffcc00;-webkit-text-stroke:1.2cqw #b30000;paint-order:stroke fill;text-align:center;opacity:0;text-shadow:0 0 6cqw #ff6a00}
+  #split{position:absolute;inset:0;opacity:0}
+  #split .h{position:absolute;left:0;right:0;height:50%;background-size:cover;background-repeat:no-repeat;overflow:hidden}
+  #crown{left:0;right:0;top:12%;text-align:center;font:900 34cqw/1 "DejaVu Sans",sans-serif;color:#ffd200;-webkit-text-stroke:.8cqw #7a5200;opacity:0;text-shadow:0 0 6cqw #ffb000}
+  #fx{position:absolute;inset:0;width:100%;height:100%}
+  #end{position:absolute;inset:0;opacity:0;background:linear-gradient(180deg,#0f8f2e 0 50%,#5b1fa8 50% 100%);overflow:hidden}
+  #end .t{position:absolute;left:3cqw;right:3cqw;font-family:var(--meme);font-weight:900;text-align:center;-webkit-text-stroke:1cqw #000;paint-order:stroke fill;line-height:1.02;text-transform:uppercase}
+  #end .c{position:absolute;width:30cqw;height:30cqw;border-radius:50%;border:1.2cqw solid #fff;background-size:cover;box-shadow:0 0 0 1cqw #000}
+  #end .btn{position:absolute;left:50%;transform:translateX(-50%);padding:2.4cqw 6cqw;border-radius:3cqw;border:.8cqw solid #000;font:900 6.4cqw/1 var(--meme);color:#fff;white-space:nowrap}
+  #flash{inset:0;background:#fff;opacity:0}
+  #ui{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3cqw;background:rgba(0,0,0,.7);z-index:10;font-family:var(--sig)}
+  #ui button{font:900 7cqw/1 var(--meme);padding:3cqw 7cqw;border:.6cqw solid #ffcc00;cursor:pointer;background:#111;color:#fff;letter-spacing:.06em}
+  #ui .hint{font-size:3.4cqw;color:#ccc;letter-spacing:.1em;text-align:center}
+  #bar{position:absolute;left:0;bottom:0;height:.8cqw;background:#ffcc00;width:0;z-index:5}
+  body.render #ui,body.render #bar{display:none}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="p_k1" class="ph" style="background-image:url(assets/kedikus/kapak1.jpg)"></div>
+  <div id="p_tp" class="ph" style="background-image:url(assets/kedikus/tombis-pamuk.jpg)"></div>
+  <div id="p_pm" class="ph" style="background-image:url(assets/kedikus/pamuk.jpg)"></div>
+  <div id="p_tw" class="ph" style="background-image:url(assets/kedikus/tweet.jpg)"></div>
+  <div id="p_di" class="ph" style="background-image:url(assets/kedikus/daha-iyi.jpg);background-size:100% auto;background-color:#000"></div>
+  <div id="p_lm" class="ph" style="background-image:url(assets/kedikus/limon.jpg)"></div>
+  <div id="p_k2" class="ph" style="background-image:url(assets/kedikus/kapak2.jpg)"></div>
+  <div id="p_km" class="ph" style="background-image:url(assets/kedikus/kemal.jpg)"></div>
+  <div id="split"><div class="h" id="sA" style="top:0;background-image:url(assets/kedikus/tombis-pamuk.jpg)"></div><div class="h" id="sB" style="top:50%;background-image:url(assets/kedikus/pamuk.jpg)"></div></div>
+  <div id="end">
+    <div class="t" style="top:6cqw;font-size:12cqw;color:#fff">MAMA<br><span style="color:#ffe14a">DİYORSAN</span></div>
+    <div class="btn" style="top:43cqw;background:#e31b1b">▶ ABONE OL</div>
+    <div class="c" style="left:6cqw;top:62cqw;background-image:url(assets/kedikus/kemal.jpg);background-position:50% 40%"></div>
+    <div class="c" style="right:6cqw;top:62cqw;background-image:url(assets/kedikus/tombis-pamuk.jpg);background-position:22% 30%;background-size:auto 160%"></div>
+    <div class="t" style="top:96cqw;font-size:16cqw;color:#ffcc00;-webkit-text-stroke:1.2cqw #b30000">VS</div>
+    <div class="c" style="left:6cqw;top:118cqw;background-image:url(assets/kedikus/pamuk.jpg);background-position:30% 25%;background-size:auto 150%"></div>
+    <div class="c" style="right:6cqw;top:118cqw;background-image:url(assets/kedikus/limon.jpg);background-position:35% 40%"></div>
+    <div class="t" style="top:136cqw;font-size:12cqw;color:#fff">KUŞ<br><span style="color:#5cc8ff">DİYORSAN</span></div>
+    <div class="btn" style="top:164cqw;background:#1f6fe0">👍 LIKE AT</div>
+  </div>
+  <div id="tag" class="ov"></div>
+  <div id="vote" class="ov"><h3 id="vh">OYLAMA</h3>
+    <div class="row"><b style="color:#5cff5c">MINECRAFT</b><div class="bar"><i id="v1" style="background:#2ecc40"></i></div><span id="n1">0%</span></div>
+    <div class="row"><b style="color:#ff5050">ROBLOX</b><div class="bar"><i id="v2" style="background:#e31b1b"></i></div><span id="n2">0%</span></div>
+    <div class="row" id="r3" style="opacity:0"><b style="color:#ffcc00">MAMA</b><div class="bar"><i id="v3" style="background:#ffcc00"></i></div><span id="n3">0%</span></div>
+  </div>
+  <div id="vs" class="ov">VS</div>
+  <div id="crown" class="ov">♛</div>
+  <canvas id="fx" width="540" height="960"></canvas>
+  <div id="bub" class="ov"></div>
+  <div id="top" class="ov meme"></div>
+  <div id="big" class="ov meme"></div>
+  <div id="cap" class="ov meme"></div>
+  <div id="flash" class="ov"></div>
+  <div id="bar"></div>
+  <div id="ui"><button id="play">▶ OYNAT</button><div class="hint">EVDEKİ BÜYÜK SAVAŞ:<br>MİNECRAFT MI ROBLOX MU?</div></div>
+</div>
+<script>
+const DUR = 58;
+const RENDER_MODE = new URLSearchParams(location.search).has('render');
+if (RENDER_MODE) document.body.classList.add('render');
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const easeIO = k => k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+const easeOutBack = k => { const c = 1.9; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); };
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const $ = id => document.getElementById(id);
+const PH = ['k1', 'tp', 'pm', 'tw', 'di', 'lm', 'k2', 'km'];
+const cache = {};
+const setHTML = (e, s) => { if (cache[e.id] !== s) { e.innerHTML = s; cache[e.id] = s; } };
+function shk(t, a) { const f = Math.floor(t * 30); return [(hash(f) - .5) * a, (hash(f + 50) - .5) * a, (hash(f + 99) - .5) * a]; }
+// fotoğraf göster: pos = background-position, o = zoom merkezi (sahne %), s = ölçek
+function photo(id, { pos = '50% 50%', o = [50, 50], s = 1, r = 0, f = '', sh = 0, t = 0 } = {}) {
+  const e = $('p_' + id); e.style.opacity = 1; e.style.backgroundPosition = pos; e.style.transformOrigin = `${o[0]}% ${o[1]}%`;
+  const [dx, dy, dr] = shk(t, sh); e.style.transform = `translate(${dx}cqw,${dy}cqw) scale(${s}) rotate(${r + dr * 4}deg)`; e.style.filter = f;
+}
+const FRY = 'saturate(3.2) contrast(1.8) brightness(1.08)';
+const fxC = $('fx'), fx = fxC.getContext('2d');
+function confetti(t, t0) { const d = t - t0; if (d < 0) return; const cols = ['#ffcc00', '#2ecc40', '#e31b1b', '#1f6fe0', '#ffffff', '#ff7cc8'];
+  for (let i = 0; i < 140; i++) { const x = hash(i) * 540 + Math.sin(d * 2 + i) * 30, y = ((d * (90 + hash(i + 3) * 160) + hash(i + 7) * 960) % 1020) - 60; fx.save(); fx.translate(x, y); fx.rotate(d * 4 + i); fx.fillStyle = cols[i % 6]; fx.fillRect(-6, -9, 12, 18); fx.restore(); } }
+
+function renderAt(t) {
+  t = clamp(t, 0, DUR - 1e-4);
+  PH.forEach(id => { const e = $('p_' + id); e.style.opacity = 0; });
+  ['top', 'cap', 'big', 'tag', 'bub', 'vote', 'vs', 'crown'].forEach(i => $(i).style.opacity = 0); $('split').style.opacity = 0; $('end').style.opacity = 0;
+  fx.clearRect(0, 0, 540, 960);
+  let top = '', cap = '', big = '', bigCol = '#fff', tag = null, bub = '', fl = 0, fc = '#fff';
+
+  if (t < 4.5) { const k = seg(t, 0, .45); photo('k1', { s: lerp(2.2, 1, easeOutBack(k)) + seg(t, .5, 4.5) * .12, r: (1 - k) * -12, sh: t < .8 ? 3 : 0, t, o: [50, 45] });
+    top = t > .5 ? 'İNTERNETTE BÜYÜK SAVAŞ BAŞLADI' : ''; cap = t > 2.3 ? 'AMA BU EVDE DURUM FARKLI...' : ''; if (t < .25) fl = .8; }
+  else if (t < 10) { const fr = t >= 8; photo('tp', { pos: '13% 50%', o: [57, 38], s: fr ? lerp(2.4, 3.6, seg(t, 8, 10)) : lerp(1, 1.3, seg(t, 4.5, 8)), f: fr ? FRY : '', sh: fr ? 1.4 : 0, t });
+    tag = ['TOMBİŞ', "MİNECRAFT'ÇI · 4 YAŞINDA · GRİ", '#2ecc40']; if (t > 5.3 && t < 8) bub = 'KUŞU YEMEYECEĞİM.<br>SADECE... İZLİYORUM.';
+    if (fr) { big = '15 SAATTİR<br>İZLİYOR'; bigCol = '#ff4040'; tag = null; if (t < 8.2) fl = .7; } }
+  else if (t < 15) { const fr = t >= 12.8; photo('pm', { o: fr ? [12, 37] : [40, 35], s: fr ? lerp(2.4, 3.4, seg(t, 12.8, 15)) : lerp(1.05, 1.25, seg(t, 10, 12.8)), f: fr ? FRY + ' hue-rotate(-15deg)' : '', sh: fr ? 3 : 0, t, r: fr ? Math.sin(t * 40) * 2 : 0 });
+    tag = ['PAMUK', "ROBLOX'ÇU · 1000 ROBUX'U VAR", '#1f6fe0']; if (t > 10.6 && t < 12.8) bub = "BENİM 1000<br>ROBUX'UM VAR.";
+    if (fr) { tag = null; big = 'AAAAAAAAA<br>AAAAAAA!!'; bigCol = '#ffcc00'; if (t < 13) fl = .7; } }
+  else if (t < 21) { const k1 = seg(t, 15, 17.4), k2 = seg(t, 17.4, 19.3), fr = t >= 19.3;
+    const oy = t < 17.4 ? 0 : lerp(0, 30, easeIO(k2)); photo('tw', { o: fr ? [50, 22] : [t < 17.4 ? 0 : lerp(0, 50, easeIO(k2)), oy], s: fr ? lerp(1.9, 2.3, seg(t, 19.3, 21)) : (t < 17.4 ? 1.4 : lerp(1.4, 1.15, k2)), f: fr ? FRY : '', sh: fr ? 1.4 : 0, t });
+    cap = t < 17.4 ? "PAMUK TWİTTER'DA KAVGA BAŞLATTI" : 'TOMBİŞ CEVAP VERDİ:'; if (fr) { cap = ''; big = 'BABADIR!'; bigCol = '#5cff5c'; if (t < 19.5) fl = .6; } }
+  else if (t < 26) { const fr = t >= 23.4; photo('di', { pos: '50% 50%', o: fr ? [58, 55.6] : [50, 50], s: fr ? lerp(2.2, 2.7, seg(t, 23.4, 26)) : lerp(1, 1.08, seg(t, 21, 23.4)), f: fr ? FRY : '', sh: fr ? 2 : 0, t });
+    top = !fr ? 'TOMBİŞ BİR DE BUNU ATTI.' : "PAMUK'UN TEPKİSİ:"; if (t < 21.25) fl = .5; if (fr) { big = 'NE DEDİN<br>SEN?!'; bigCol = '#ff3030'; if (t < 23.6) fl = .7; } }
+  else if (t < 31) { const fr = t >= 28.4; photo('lm', { o: [35, 45], s: fr ? lerp(1.9, 2.4, seg(t, 28.4, 31)) : lerp(1.05, 1.3, seg(t, 26, 28.4)), r: fr ? 9 : 0, f: fr ? FRY + ' blur(1px)' : '', sh: fr ? 1 : 0, t });
+    tag = ['LİMON', 'KARARSIZ · KAMERAYI SEVİYOR', '#e0b800']; cap = !fr && t > 26.6 ? 'LİMON YAKIN ÇEKİM İSTEDİ.' : '';
+    if (fr) { tag = null; big = 'SEYİR<br>ZEVKİ: 0'; bigCol = '#ffcc00'; if (t < 28.6) fl = .6; } }
+  else if (t < 36) { const k = seg(t, 31, 31.45); photo('k2', { s: lerp(2.2, 1, easeOutBack(k)), r: (1 - k) * 10, sh: t < 31.8 ? 3 : 0, t, o: [50, 30] }); if (t < 31.2) fl = .7;
+    if (t > 32.2) { $('vote').style.opacity = 1; setHTML($('vh'), 'OYLAMA: HANGİSİ DAHA İYİ?'); $('r3').style.opacity = 0; const w = 50 + Math.sin(t * 6) * 6; $('v1').style.width = w * seg(t, 32.2, 33) + '%'; $('v2').style.width = (100 - w) * seg(t, 32.2, 33) + '%';
+      setHTML($('n1'), Math.round(w) + '%'); setHTML($('n2'), Math.round(100 - w) + '%'); }
+    cap = t > 32.2 ? 'TOMBİŞ VE PAMUK KAFA KAFAYA...' : ''; }
+  else if (t < 43) { const fr = t >= 39.4; photo('km', { o: [48, 47], s: fr ? lerp(1.6, 2.0, seg(t, 39.4, 43)) : lerp(1.05, 1.35, seg(t, 36, 39.4)), f: fr ? 'saturate(1.6) contrast(1.2)' : '', sh: fr && t < 40 ? 2 : 0, t });
+    tag = ['SOKAK KEDİSİ KEMAL', 'OYLAMAYA DIŞARIDAN KATILDI', '#ff7a00']; if (t > 36.8 && t < 39.4) bub = 'İNTERNETİM YOK.<br>AMA... MAMA VAR MI?';
+    if (fr) { tag = null; $('vote').style.opacity = 1; $('vote').style.top = '40%'; setHTML($('vh'), 'YENİ SEÇENEK EKLENDİ'); $('r3').style.opacity = 1; const k = easeOutBack(seg(t, 39.6, 40.4));
+      $('v1').style.width = lerp(50, 0, k) + '%'; $('v2').style.width = lerp(50, 0, k) + '%'; $('v3').style.width = 100 * k + '%'; setHTML($('n1'), Math.max(0, Math.round(lerp(50, 0, k))) + '%'); setHTML($('n2'), Math.max(0, Math.round(lerp(50, 0, k))) + '%'); setHTML($('n3'), Math.min(100, Math.round(100 * k)) + '%');
+      cap = 'MAMA KAZANIYOR?!'; if (t < 39.6) fl = .6; } else $('vote').style.top = '58%'; }
+  else if (t < 48) { $('split').style.opacity = 1; const fast = t >= 45.2; const beat = Math.floor((t - 45.2) / .45);
+    const A = $('sA'), B = $('sB'); A.style.backgroundPosition = '22% 35%'; A.style.backgroundSize = 'auto ' + (fast && beat % 2 === 0 ? 330 : 210) + '%'; B.style.backgroundPosition = fast && beat % 2 ? '8% 34%' : '35% 30%'; B.style.backgroundSize = 'auto ' + (fast && beat % 2 ? 260 : 150) + '%';
+    A.style.filter = fast && beat % 2 === 0 ? FRY : ''; B.style.filter = fast && beat % 2 ? FRY : '';
+    $('vs').style.opacity = 1; const k = seg(t, 43, 43.4); $('vs').style.transform = `translateY(-50%) scale(${1 + 1.5 * (1 - easeOutBack(k)) + .06 * Math.sin(t * 20)}) rotate(-8deg)`;
+    top = 'FİNAL: TOMBİŞ vs PAMUK'; if (fast) { top = ''; cap = beat % 2 ? 'AAAAAA!' : '*İZLİYOR*'; } if (t < 43.2) fl = .8; }
+  else if (t < 54) { photo('km', { o: [48, 47], s: 1.15 + .05 * Math.sin(t * 3), sh: t < 48.6 ? 2 : 0, t }); $('crown').style.opacity = 1; const k = seg(t, 48, 48.5); $('crown').style.transform = `translateY(${(1 - easeOutBack(k)) * -60}cqw) rotate(${Math.sin(t * 3) * 6}deg)`;
+    big = 'KAZANAN:<br>MAMA'; bigCol = '#ffcc00'; if (t > 50.5) { big = ''; cap = 'MİNECRAFT DA ROBLOX DA KAYBETTİ.<br>MAMA KAZANDI.'; } confetti(t, 48); if (t < 48.25) { fl = 1; fc = '#ffe066'; } }
+  else { $('end').style.opacity = 1; const k = seg(t, 54, 54.4); $('end').style.transform = `scale(${1 + .4 * (1 - easeOutBack(k))})`; confetti(t, 54); if (t < 54.2) fl = .7;
+  }
+
+  if (tag) { const e = $('tag'); e.style.opacity = 1; e.style.background = tag[2]; setHTML(e, tag[0] + '<small>' + tag[1] + '</small>'); e.style.transform = `rotate(-3deg) scale(${1 + .15 * Math.max(0, Math.sin(t * 6)) * 0})`; }
+  if (bub) { const e = $('bub'); setHTML(e, bub); e.style.opacity = 1; }
+  const T = $('top'); setHTML(T, top); T.style.opacity = top ? 1 : 0;
+  const Cp = $('cap'); setHTML(Cp, cap); Cp.style.opacity = cap ? 1 : 0;
+  const Bg = $('big'); setHTML(Bg, big); Bg.style.opacity = big ? 1 : 0; Bg.style.color = bigCol; const [a, b2, c] = shk(t, 2.2); Bg.style.transform = `translate(${a}cqw, calc(-50% + ${b2}cqw)) rotate(${c * 6 - 4}deg) scale(${1 + .05 * Math.sin(t * 25)})`;
+  for (const s of [4.5, 10, 15, 21, 26, 31, 36, 43, 48]) if (t > s && t < s + .1) fl = Math.max(fl, .35);
+  $('flash').style.opacity = fl; $('flash').style.background = fc;
+  $('bar').style.width = (t / DUR * 100) + '%';
+}
+
+/* ---------- SES ---------- */
+function buildAudio(ac, T) {
+  const out = ac.createDynamicsCompressor(); out.threshold.value = -14; out.ratio.value = 6; out.connect(ac.destination);
+  const master = ac.createGain(); master.gain.value = .7; master.connect(out);
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+  let seed = 7; const nbuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate); { const d = nbuf.getChannelData(0); for (let i = 0; i < d.length; i++) { seed = (seed * 16807) % 2147483647; d[i] = seed / 2147483647 * 2 - 1; } }
+  const env = (g, s, dur, vol, att = .008) => { g.gain.setValueAtTime(0, s); g.gain.linearRampToValueAtTime(vol, s + att); g.gain.exponentialRampToValueAtTime(.0001, s + dur); };
+  const dist = ac.createWaveShaper(); { const c = new Float32Array(1024); for (let i = 0; i < 1024; i++) c[i] = Math.tanh((i / 512 - 1) * 9); dist.curve = c; } const dg = ac.createGain(); dg.gain.value = .5; dist.connect(dg); dg.connect(master);
+  function tone(type, f, s, dur, vol, { fEnd, dest = master, vib = 0, lp = 0 } = {}) { s += T; const o = ac.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, s); if (fEnd) o.frequency.exponentialRampToValueAtTime(fEnd, s + dur);
+    const g = ac.createGain(); env(g, s, dur, vol); let n = o; if (lp) { const b = ac.createBiquadFilter(); b.type = 'lowpass'; b.frequency.value = lp; o.connect(b); n = b; } n.connect(g); g.connect(dest);
+    if (vib) { const l = ac.createOscillator(); l.frequency.value = 7; const lg = ac.createGain(); lg.gain.value = vib; l.connect(lg); lg.connect(o.frequency); l.start(s); l.stop(s + dur + .05); } o.start(s); o.stop(s + dur + .05); }
+  function noise(s, dur, vol, freq, type = 'lowpass', dest = master) { s += T; const n = ac.createBufferSource(); n.buffer = nbuf; n.loop = true; const f = ac.createBiquadFilter(); f.type = type; f.frequency.value = freq; const g = ac.createGain(); env(g, s, dur, vol, .004); n.connect(f); f.connect(g); g.connect(dest); n.start(s); n.stop(s + dur + .05); }
+  const vine = s => { tone('sine', 90, s, 1.1, .9, { fEnd: 40 }); noise(s, .25, .4, 300); tone('sine', 90, s, .9, .5, { fEnd: 40, dest: dist }); };
+  const slam = s => { tone('sine', 140, s, .5, .8, { fEnd: 45 }); noise(s, .2, .5, 1500); };
+  const scream = (s, d) => { tone('sawtooth', 1400, s, d, .12, { vib: 120, lp: 4000 }); tone('square', 1900, s, d, .06, { vib: 160 }); noise(s, d, .1, 3000, 'bandpass'); };
+  const meow = s => { tone('sawtooth', 500, s, .5, .1, { fEnd: 800, lp: 1800 }); tone('sawtooth', 800, s + .25, .35, .08, { fEnd: 450, lp: 1800 }); };
+  const chirp = s => { for (let i = 0; i < 3; i++) tone('sine', 2600 + i * 300, s + i * .09, .07, .08, { fEnd: 3400 }); };
+  const ding = s => { tone('sine', mtof(84), s, .3, .1); tone('sine', mtof(91), s + .07, .4, .08); };
+  const pluck = (m, s, v = .08) => { tone('triangle', mtof(m), s, .3, v); tone('sine', mtof(m + 12), s, .18, v * .4); };
+  const kick = s => tone('sine', 160, s, .4, .8, { fEnd: 40 }); const clap = s => noise(s, .12, .4, 1600, 'bandpass'); const hat = s => noise(s, .03, .07, 8000, 'highpass');
+  const cowbell = (m, s) => { tone('square', mtof(m), s, .2, .05, { lp: 2400 }); tone('square', mtof(m) * 1.48, s, .2, .04, { lp: 2400 }); };
+  // neşeli fon (ukulele)
+  const P = [[60, 64, 67], [55, 59, 62], [57, 60, 64], [53, 57, 60]], BT = .42;
+  const uke = (a, b, v = .05) => { for (let i = 0; a + i * BT < b; i++) { const s = a + i * BT, ch = P[(i >> 2) % 4]; ch.forEach((m, j) => pluck(m, s + j * .025, v)); if (i % 2 === 0) tone('triangle', mtof(ch[0] - 24), s, .4, .14); const mel = [72, 74, 76, 79, 76, 74, 72, 67][i % 8]; if (i % 2) pluck(mel, s, v * 1.2); } };
+  uke(0, 8, .045); uke(10.2, 12.8, .045); uke(15, 19.3, .04); uke(21, 23.4, .04); uke(26, 28.4, .045); uke(36, 39.4, .045);
+  slam(0); vine(2.3); meow(5.6); for (let x = 4.6; x < 8; x += 1.1) noise(x, .05, .05, 4000, 'highpass');
+  vine(8); tone('sine', 50, 8.2, 1.6, .2);
+  chirp(10.5); chirp(11.4); scream(12.8, 2.1); noise(12.8, .2, .4, 600);
+  for (let i = 0; i < 4; i++) noise(15.1 + i * .5, .03, .15, 3000, 'highpass'); ding(15.2); ding(17.4); vine(19.3); for (let s = 19.4; s < 21; s += .42) { kick(s); hat(s + .21); }
+  slam(21); vine(23.4); scream(23.6, 1.6);
+  meow(26.3); chirp(27.2); vine(28.4); tone('sine', 300, 28.6, 2.2, .04, { fEnd: 200, vib: 20 });
+  slam(31); for (let x = 32.2; x < 36; x += .14) tone('square', 700 + (x * 37 % 1) * 500, x, .05, .02);
+  meow(36.9); vine(39.4); for (let i = 0; i < 8; i++) tone('square', mtof(72 + i * 2), 39.6 + i * .08, .08, .06);
+  // VS phonk
+  slam(43); const MEL = [65, null, 65, 68, null, 65, 63, null, 60, null, 63, null, 65, 68, 70, null];
+  for (let i = 0, s = 43; s < 48; s += .1154, i++) { const k = i % 16; if (k === 0 || k === 7 || k === 10) { kick(s); tone('sine', mtof(41), s, .5, .4, { fEnd: mtof(41) * .9, dest: dist }); } if (k === 4 || k === 12) clap(s); if (k % 2 === 0) hat(s); if (MEL[k]) cowbell(MEL[k], s); }
+  for (let s = 45.2; s < 48; s += .9) { meow(s); scream(s + .45, .4); }
+  // kazanan
+  slam(48); [72, 76, 79, 84, 79, 84, 88].forEach((m, i) => { tone('sawtooth', mtof(m), 48.1 + i * .18, .17, .07, { lp: 2400 }); tone('square', mtof(m - 12), 48.1 + i * .18, .17, .03); }); uke(49.4, 54, .05); meow(50.6);
+  slam(54); uke(54.3, 58, .05); for (let i = 0; i < 5; i++) tone('square', mtof([72, 76, 79, 84, 88][i]), 54.1 + i * .08, .1, .06); chirp(56); meow(56.5);
+}
+
+function resize() {}
+renderAt(0);
+if (RENDER_MODE) {
+  window.DUR = DUR;
+  window.renderAudioWav = async () => {
+    const sr = 44100, oac = new OfflineAudioContext(2, Math.ceil(sr * DUR), sr); buildAudio(oac, 0); const buf = await oac.startRendering();
+    const n = buf.length, d = new DataView(new ArrayBuffer(44 + n * 4)); const S = (o, s) => [...s].forEach((c, i) => d.setUint8(o + i, c.charCodeAt(0)));
+    S(0, 'RIFF'); d.setUint32(4, 36 + n * 4, true); S(8, 'WAVEfmt '); d.setUint32(16, 16, true); d.setUint16(20, 1, true); d.setUint16(22, 2, true); d.setUint32(24, sr, true); d.setUint32(28, sr * 4, true); d.setUint16(32, 4, true); d.setUint16(34, 16, true); S(36, 'data'); d.setUint32(40, n * 4, true);
+    const a = buf.getChannelData(0), b = buf.getChannelData(1); for (let i = 0; i < n; i++) { d.setInt16(44 + i * 4, clamp(a[i], -1, 1) * 32767, true); d.setInt16(46 + i * 4, clamp(b[i], -1, 1) * 32767, true); }
+    const u8 = new Uint8Array(d.buffer); let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s);
+  };
+  // görseller yüklenince hazır
+  Promise.all(['kapak1', 'tombis-pamuk', 'pamuk', 'tweet', 'daha-iyi', 'limon', 'kapak2', 'kemal'].map(n => new Promise(r => { const i = new Image(); i.onload = i.onerror = r; i.src = 'assets/kedikus/' + n + '.jpg'; }))).then(() => { window.READY = true; });
+} else {
+  let ac = null, start = 0; const now = () => ac ? ac.currentTime : performance.now() / 1000;
+  const schedule = () => { start = now() + .08; if (ac) buildAudio(ac, start); };
+  $('play').onclick = async () => { try { ac = new AudioContext(); await ac.resume(); } catch (e) { ac = null; } $('ui').style.display = 'none'; schedule();
+    (function loop() { let t = now() - start; if (t >= DUR) { schedule(); t = 0; } renderAt(Math.max(0, t)); requestAnimationFrame(loop); })(); };
+}
+</script>
+</body>
+</html>
