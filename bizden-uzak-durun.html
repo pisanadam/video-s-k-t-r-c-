@@ -396,12 +396,30 @@ function buildAudio(ac, T) {
   noise(6, .3, .5, 2500, 'bandpass'); tone('sawtooth', 900, 6, .3, .15, { fEnd: 120 }); boom(6.2, false);
   [7.3, 7.8, 8.3].forEach((s, i) => { tone('sine', 55 + i * 10, s, .5, .7, { fEnd: 35 }); noise(s, .1, .3, 2000, 'bandpass'); });
   tone('sine', 300, 8.6, .9, .06, { fEnd: 1400 }); noise(8.6, .9, .1, 2000, 'bandpass');
-  boom(9.6, true); tone('sine', mtof(96), 9.8, .8, .07); phonk(9.6, 17.2);
-  boom(17.2, true); phonk(17.2, 23, 1.6); noise(17.2, 5.8, .05, 300);
+  // SYNTHWAVE (80'ler neon)
+  const verb = ac.createConvolver(); { const len = ac.sampleRate * 2.4, bb = ac.createBuffer(2, len, ac.sampleRate); let sd = 5;
+    for (let ch = 0; ch < 2; ch++) { const dd = bb.getChannelData(ch); for (let i = 0; i < len; i++) { sd = (sd * 16807) % 2147483647; dd[i] = (sd / 2147483647 * 2 - 1) * Math.pow(1 - i / len, 2.5); } } verb.buffer = bb; }
+  const vg = ac.createGain(); vg.gain.value = .45; verb.connect(vg); vg.connect(master);
+  const syn = (m, s, d, v, type = 'sawtooth', lp = 2400) => { [-6, 6].forEach(det => { const ss = s + T; const o = ac.createOscillator(); o.type = type; o.frequency.value = mtof(m); o.detune.value = det;
+    const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = lp; const g = ac.createGain(); env(g, ss, d, v, .01); o.connect(f); f.connect(g); g.connect(master); g.connect(verb); o.start(ss); o.stop(ss + d + .05); }); };
+  const gsnare = s => { noise(s, .35, .35, 1800, 'bandpass', verb); noise(s, .12, .3, 2500, 'bandpass'); tone('sine', 220, s, .12, .2, { fEnd: 150 }); };
+  const CH = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]]; // Am F C G
+  function synthwave(a, b, bpm = 104, solo = true) { const bt = 60 / bpm; let i = 0;
+    for (let s = a; s < b - .01; s += bt / 4, i++) { const bar = Math.floor(i / 16), k = i % 16, ch = CH[bar % 4];
+      syn(ch[k % 3] + 12 + (k % 6 === 5 ? 12 : 0), s, bt / 4 * .9, .025, 'square', 3200);                       // arpej
+      if (k % 2 === 0) syn(ch[0] - 24, s, bt / 2 * .85, .07, 'sawtooth', 600);                                     // bas (sekizlik)
+      if (k === 0 || k === 8) tone('sine', 150, s, .35, .8, { fEnd: 45 });                                         // kick
+      if (k === 4 || k === 12) gsnare(s);                                                                          // gated snare
+      if (k % 2 === 1) noise(s, .03, .05, 9000, 'highpass');
+      if (k === 0) ch.forEach(m => syn(m, s, bt * 4, .018, 'sawtooth', 1400)); }                                   // pad
+    if (solo) { const L = [[76, 1], [74, .5], [72, .5], [71, 1], [72, .5], [74, .5], [76, 1.5], [79, .5], [81, 2], [79, .5], [76, .5], [74, 1], [72, 1], [76, 2]];
+      let s = a + bt * 8; L.forEach(([m, d]) => { if (s < b - .1) tone('sawtooth', mtof(m), s, bt * d * .95, .07, { lp: 3000, vib: 5, dest: verb }), tone('square', mtof(m), s, bt * d * .95, .03, { lp: 2200 }); s += bt * d; }); } }
+  boom(9.6, true); tone('sine', mtof(96), 9.8, .8, .07); synthwave(9.6, 17.2, 104, true);
+  boom(17.2, true); synthwave(17.2, 23, 70, false); [[69, 2.2], [72, 1.2], [76, 2.4]].reduce((s, [m, d]) => { tone('sawtooth', mtof(m), s, d, .07, { lp: 2600, vib: 6, dest: verb }); return s + d; }, 17.4);
   noise(23, .35, .5, 2500, 'bandpass'); tone('sawtooth', 900, 23, .35, .15, { fEnd: 120 }); tone('sine', 120, 23.6, .3, .2, { fEnd: 60 });
   tone('sine', 900, 25, .6, .1, { fEnd: 200 });
   [[311.1, .4], [293.7, .4], [277.2, .4], [261.6, 1.3]].forEach(([f, d], i) => tone('sawtooth', f / 2, 25.3 + i * .4, d, .2, { lp: 1100, vib: i === 3 ? 9 : 0 }));
-  boom(27, false); phonk(27.1, 29);
+  boom(27, false); synthwave(27.1, 29, 104, false);
 }
 
 
