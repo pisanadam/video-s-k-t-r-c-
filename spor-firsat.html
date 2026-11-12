@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spor Fırsat</title>
+<style>
+  :root{ --meme: Impact, "Anton", "Arial Black", "DejaVu Sans", sans-serif; --sig:"DejaVu Sans", sans-serif; --g:#19d36b; --y:#ffd400; --r:#ff3b3b; }
+  html,body{margin:0;height:100%;background:#000;overflow:hidden;color:#fff;font-family:var(--sig)}
+  body{display:flex;align-items:center;justify-content:center}
+  #stage{position:relative;height:min(100vh,177.7778vw);aspect-ratio:9/16;container-type:inline-size;overflow:hidden;
+    background:radial-gradient(120% 70% at 50% 0%,#1d2b55 0%,#0b0f1e 55%,#05070d 100%)}
+  #rays{position:absolute;inset:-40%;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.035) 0 8deg,transparent 8deg 16deg);pointer-events:none}
+  .ov{position:absolute;pointer-events:none}
+  #hdr{left:0;right:0;top:0;height:17cqw;display:flex;align-items:center;justify-content:space-between;padding:0 5cqw;box-sizing:border-box;background:linear-gradient(90deg,#ff3b3b,#ff7a00);box-shadow:0 1cqw 3cqw rgba(0,0,0,.5)}
+  #hdr .lg{font:900 7cqw/1 var(--meme);letter-spacing:.06em;-webkit-text-stroke:.35cqw #000;paint-order:stroke fill}
+  #hdr .lg span{color:var(--y)}
+  #hdr .dt{font:900 3.6cqw/1.1 var(--meme);text-align:right;letter-spacing:.06em}
+  #hdr .dt small{display:block;font:700 2.4cqw/1.2 var(--sig);letter-spacing:.08em;opacity:.95}
+  #sec{left:0;right:0;top:21cqw;text-align:center;font:900 7.4cqw/1 var(--meme);letter-spacing:.05em;-webkit-text-stroke:.45cqw #000;paint-order:stroke fill;opacity:0;white-space:nowrap}
+  .card{position:absolute;left:4cqw;right:4cqw;height:62cqw;background:#fff;color:#111;border-radius:5cqw;box-shadow:0 2cqw 5cqw rgba(0,0,0,.55);overflow:hidden;opacity:0;display:flex}
+  .card .img{flex:0 0 34cqw;background:#f2f2f2 center/contain no-repeat;margin:3cqw;border-radius:3.6cqw;background-color:#f3f3f3}
+  .card .tx{flex:1;padding:3.6cqw 3.6cqw 3cqw 0;display:flex;flex-direction:column;justify-content:center;gap:1.2cqw;min-width:0}
+  .card .nm{font:900 4.3cqw/1.08 var(--meme);letter-spacing:.01em;text-transform:uppercase}
+  .card .st{display:inline-block;align-self:flex-start;font:700 2.7cqw/1 var(--sig);padding:1cqw 2cqw;border-radius:5cqw;color:#fff;letter-spacing:.04em}
+  .card .old{font:700 4cqw/1 var(--sig);color:#8a8a8a;text-decoration:line-through;text-decoration-thickness:.6cqw;text-decoration-color:var(--r)}
+  .card .new{font:900 8.2cqw/1 var(--meme);color:#0a8f43;letter-spacing:.01em;white-space:nowrap}
+  .card .nt{font:400 2.7cqw/1.3 var(--sig);color:#444}
+  .badge{position:absolute;left:1.6cqw;top:1.6cqw;width:17cqw;height:17cqw;border-radius:50%;background:var(--r);color:#fff;display:flex;align-items:center;justify-content:center;
+    font:900 5.4cqw/1 var(--meme);border:.8cqw solid #fff;box-shadow:0 1cqw 2cqw rgba(0,0,0,.4);transform:rotate(12deg)}
+  #c1{top:35cqw} #c2{top:101cqw}
+  #big{left:4cqw;right:4cqw;top:33cqw;height:122cqw;background:#fff;color:#111;border-radius:6cqw;box-shadow:0 2cqw 6cqw rgba(0,0,0,.6);overflow:hidden;opacity:0;text-align:center}
+  #big .img{height:54cqw;margin:4cqw;border-radius:4cqw;background:#f3f3f3 center/contain no-repeat}
+  #big .nm{font:900 6.6cqw/1.05 var(--meme);text-transform:uppercase;padding:0 4cqw}
+  #big .old{font:700 5.6cqw/1 var(--sig);color:#8a8a8a;text-decoration:line-through;text-decoration-thickness:.7cqw;text-decoration-color:var(--r);margin-top:2.4cqw}
+  #big .new{font:900 12.5cqw/1 var(--meme);color:#0a8f43;margin-top:1cqw;white-space:nowrap}
+  #big .sv{display:inline-block;margin-top:1.6cqw;font:900 4.4cqw/1 var(--meme);background:var(--y);padding:1.4cqw 3cqw;border-radius:2cqw;letter-spacing:.04em}
+  #big .badge{width:24cqw;height:24cqw;font-size:7.4cqw;left:auto;right:4cqw;top:4cqw}
+  #intro{inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3cqw;opacity:0;text-align:center}
+  #intro .a{font:900 12.4cqw/.98 var(--meme);letter-spacing:.03em;-webkit-text-stroke:.6cqw #000;paint-order:stroke fill}
+  #intro .a span{color:var(--y)}
+  #intro .b{font:900 5cqw/1 var(--meme);letter-spacing:.12em;background:#fff;color:#111;padding:2cqw 4cqw;border-radius:3cqw}
+  #intro .c{font:700 3.6cqw/1.3 var(--sig);letter-spacing:.2em;color:#cdd6ff}
+  #outro{inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3.4cqw;opacity:0;text-align:center;padding:0 6cqw;box-sizing:border-box}
+  #outro .a{font:900 10cqw/1 var(--meme);letter-spacing:.03em;-webkit-text-stroke:.5cqw #000;paint-order:stroke fill}
+  #outro .row{display:flex;gap:3cqw}
+  #outro .row div{width:26cqw;height:26cqw;border-radius:4cqw;background:#fff center/contain no-repeat;border:.8cqw solid var(--y)}
+  #outro .sub{font:900 7cqw/1 var(--meme);padding:2.6cqw 6cqw;background:#e31b1b;border-radius:3cqw;border:.6cqw solid #fff;letter-spacing:.05em}
+  #outro .n{font:400 3cqw/1.4 var(--sig);color:#b8c0e0}
+  #foot{left:0;right:0;bottom:3cqw;text-align:center;font:700 2.8cqw/1.3 var(--sig);color:#b8c0e0;letter-spacing:.06em}
+  #fx{position:absolute;inset:0;width:100%;height:100%}
+  #flash{inset:0;background:#fff;opacity:0}
+  #ui{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3cqw;background:rgba(0,0,0,.7);z-index:10}
+  #ui button{font:900 7cqw/1 var(--meme);padding:3cqw 7cqw;border:.6cqw solid var(--y);cursor:pointer;background:#111;color:#fff;letter-spacing:.06em}
+  #bar{position:absolute;left:0;bottom:0;height:.8cqw;background:var(--y);width:0;z-index:5}
+  body.render #ui,body.render #bar{display:none}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="rays"></div>
+  <div id="hdr" class="ov"><div class="lg">SPOR<span>FIRSAT</span></div><div class="dt">12 KASIM 2026<small>İNTERSPORT · DECATHLON</small></div></div>
+  <div id="sec" class="ov"></div>
+  <div id="c1" class="card"><div class="img"></div><div class="tx"><div class="nm"></div><div class="st"></div><div class="old"></div><div class="new"></div><div class="nt"></div></div><div class="badge"></div></div>
+  <div id="c2" class="card"><div class="img"></div><div class="tx"><div class="nm"></div><div class="st"></div><div class="old"></div><div class="new"></div><div class="nt"></div></div><div class="badge"></div></div>
+  <div id="big" class="ov"><div class="img" style="background-image:url(assets/firsat/superfly.jpg)"></div><div class="nm">Nike Mercurial Superfly 10 Academy MG</div>
+    <div class="old">3.899 TL</div><div class="new" id="bigNew">3.899 TL</div><div class="sv">1.715,80 TL TASARRUF</div><div class="badge">-%44</div></div>
+  <div id="intro" class="ov"><div class="a">BUGÜNÜN<br><span>İNDİRİMLERİ</span></div><div class="b">5 ÜRÜN · İKİŞER İKİŞER</div><div class="c">FUTBOL · BASKETBOL · KRAMPON</div></div>
+  <div id="outro" class="ov"><div class="a">HANGİSİNİ<br>ALIRDIN?</div>
+    <div class="row"><div style="background-image:url(assets/firsat/mercurial-top.jpg)"></div><div style="background-image:url(assets/firsat/playground.jpg)"></div><div style="background-image:url(assets/firsat/superfly.jpg)"></div></div>
+    <div class="sub">🔔 ABONE OL</div><div class="n">Fiyatlar 12 Kasım 2026 kontrolüdür; sepet indirimleri ve stoklar değişebilir. Satın almadan önce mağazadan kontrol edin.</div></div>
+  <div id="foot" class="ov">* Fiyatlar 12 Kasım 2026 · değişebilir</div>
+  <canvas id="fx" width="540" height="960"></canvas>
+  <div id="flash" class="ov"></div>
+  <div id="bar"></div>
+  <div id="ui"><button id="play">▶ OYNAT</button></div>
+</div>
+<script>
+const DUR = 32;
+const RENDER_MODE = new URLSearchParams(location.search).has('render');
+if (RENDER_MODE) document.body.classList.add('render');
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const easeIO = k => k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+const easeOut = k => 1 - Math.pow(1 - k, 3);
+const easeOutBack = k => { const c = 1.9; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); };
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const $ = id => document.getElementById(id);
+const tl = (v, dec) => v.toFixed(dec).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' TL';
+const STORE = { I: ['INTERSPORT', '#1b3fa8'], D: ['DECATHLON', '#0082c3'] };
+const P = {
+  fade: { img: 'mercurial-top', nm: 'Nike Mercurial Fade Futbol Topu', st: 'I', old: 899, nw: 485.10, dec: 2, bd: '-%46', nt: '539 TL + %10 sepet indirimi · 3 ve 5 numara' },
+  pro: { img: 'protouch', nm: 'Pro Touch Beyaz Futbol Topu', st: 'I', old: 999, nw: 699.30, dec: 2, bd: '-%30', nt: '%30 sepet indirimi · 3 numara' },
+  play: { img: 'playground', nm: 'Nike Everyday Playground 8P Basketbol Topu', st: 'I', old: 1499, nw: 749.50, dec: 2, bd: '-%50', nt: '%50 sepet indirimi · 7 numara · açık saha' },
+  tarmak: { img: 'tarmak', nm: 'Tarmak SS500H Çocuk Basketbol Ayakkabısı', st: 'D', old: 2290, nw: 1690, dec: 0, bd: '-%26', nt: 'Stok: 32, 35, 36, 37, 38 numara · kampanya 14 Kasım\'a kadar' },
+};
+const PAIRS = [[3, 11, '⚽ FUTBOL TOPLARI', 'fade', 'pro', '#ffffff'], [11, 19, '🏀 BASKETBOL', 'play', 'tarmak', '#ffd400']];
+const cache = {};
+const set = (e, k, v) => { const key = e.id + k + (e.className || ''); if (cache[key] !== v) { cache[key] = v; if (k === 'html') e.innerHTML = v; else e.style[k] = v; } };
+function fill(card, p) { const q = s => card.querySelector(s); if (card.dataset.p === p.img) return; card.dataset.p = p.img;
+  q('.img').style.backgroundImage = `url(assets/firsat/${p.img}.jpg)`; q('.nm').textContent = p.nm; const s = STORE[p.st]; q('.st').textContent = s[0]; q('.st').style.background = s[1];
+  q('.old').textContent = tl(p.old, 0); q('.nt').textContent = p.nt; q('.badge').textContent = p.bd; }
+const fxC = $('fx'), fx = fxC.getContext('2d');
+function confetti(t, t0, n = 90, y0 = -40) { const d = t - t0; if (d < 0 || d > 2.6) return; const cols = ['#ffd400', '#19d36b', '#ff3b3b', '#1f6fe0', '#ffffff', '#ff7a00'];
+  for (let i = 0; i < n; i++) { const x = 270 + (hash(i) - .5) * 600 * Math.min(1, d * 2), y = y0 + 380 * (hash(i + 3) - .5) + d * (180 + hash(i + 7) * 260) - 300 * Math.max(0, .4 - d);
+    fx.save(); fx.globalAlpha = 1 - seg(d, 2, 2.6); fx.translate(x, y + d * d * 120); fx.rotate(d * 6 + i); fx.fillStyle = cols[i % 6]; fx.fillRect(-6, -10, 12, 20); fx.restore(); } }
+
+function renderAt(t) {
+  t = clamp(t, 0, DUR - 1e-4);
+  fx.clearRect(0, 0, 540, 960);
+  $('rays').style.transform = `rotate(${t * 8}deg)`;
+  let fl = 0;
+  // intro
+  const ik = seg(t, 0, .45), io = 1 - seg(t, 2.6, 3); set($('intro'), 'opacity', String(t < 3 ? Math.min(ik * 2, io) : 0)); $('intro').style.transform = `scale(${1 + .5 * (1 - easeOutBack(ik))})`;
+  if (t < .2) fl = .8;
+  // çiftler
+  const pair = PAIRS.find(p => t >= p[0] && t < p[1]);
+  ['c1', 'c2'].forEach(id => $(id).style.opacity = 0);
+  if (pair) { const [a, b, title, k1, k2, col] = pair, loc = t - a, out = 1 - seg(t, b - .4, b);
+    set($('sec'), 'html', title); $('sec').style.opacity = Math.min(seg(loc, 0, .3), out); $('sec').style.color = col; $('sec').style.transform = `scale(${1 + .4 * (1 - easeOutBack(seg(loc, 0, .35)))})`;
+    [[ 'c1', k1, .3, -1 ], [ 'c2', k2, 1.0, 1 ]].forEach(([id, key, d0, side]) => { const c = $(id), p = P[key]; fill(c, p); const k = seg(loc, d0, d0 + .55);
+      c.style.opacity = Math.min(k * 3, out); c.style.transform = `translateX(${side * (1 - easeOutBack(k)) * 110}cqw) scale(${out < 1 ? lerp(.85, 1, out) : 1})`;
+      const pk = seg(loc, d0 + 1.0, d0 + 2.4); const v = lerp(p.old, p.nw, easeOut(pk)); const nw = c.querySelector('.new'); const txt = tl(v, p.dec); if (nw.textContent !== txt) nw.textContent = txt;
+      nw.style.transform = `scale(${pk >= 1 ? 1 + .18 * Math.max(0, 1 - (loc - d0 - 2.4) / .4) : 1})`; nw.style.transformOrigin = 'left center';
+      const bg = c.querySelector('.badge'); const bk = seg(loc, d0 + 2.4, d0 + 2.75); bg.style.opacity = bk > 0 ? 1 : 0; bg.style.transform = `rotate(12deg) scale(${bk > 0 ? lerp(2.4, 1, easeOutBack(bk)) : 0})`;
+      if (loc > d0 + 2.4 && loc < d0 + 2.55) fl = Math.max(fl, .35); });
+    confetti(t, a + 3.4, 36, 40); } else { $('sec').style.opacity = 0; }
+  // bonus tek ürün
+  const bk = seg(t, 19, 19.5), bo = 1 - seg(t, 25.6, 26); const big = $('big'); big.style.opacity = t >= 19 && t < 26 ? Math.min(bk * 3, bo) : 0;
+  big.style.transform = `translateY(${(1 - easeOutBack(bk)) * 120}cqw) rotate(${(1 - bk) * -8}deg)`;
+  if (t >= 19 && t < 26) { set($('sec'), 'html', '🔥 GÜNÜN KRAMPONU'); $('sec').style.opacity = Math.min(seg(t, 19, 19.3), bo); $('sec').style.color = '#ff7a00'; $('sec').style.transform = `scale(${1 + .4 * (1 - easeOutBack(seg(t, 19, 19.35)))})`;
+    const pk = seg(t, 20.2, 22); const tx = tl(lerp(3899, 2183.20, easeOut(pk)), 2); if ($('bigNew').textContent !== tx) $('bigNew').textContent = tx; $('bigNew').style.transform = `scale(${pk >= 1 ? 1 + .15 * Math.max(0, 1 - (t - 22) / .4) : 1})`;
+    const bb = big.querySelector('.badge'), sv = big.querySelector('.sv'); const bkk = seg(t, 22, 22.35); bb.style.opacity = bkk > 0 ? 1 : 0; bb.style.transform = `rotate(12deg) scale(${bkk > 0 ? lerp(2.4, 1, easeOutBack(bkk)) : 0})`;
+    sv.style.opacity = seg(t, 22.5, 22.8); sv.style.transform = `scale(${lerp(1.6, 1, easeOutBack(seg(t, 22.5, 22.8)))})`; if (t > 22 && t < 22.2) fl = .45; confetti(t, 22, 50, 20); }
+  // outro
+  const ok = seg(t, 26, 26.45); $('outro').style.opacity = t >= 26 ? ok : 0; $('outro').style.transform = `scale(${1 + .4 * (1 - easeOutBack(ok))})`;
+  $('outro').querySelector('.sub').style.transform = `scale(${1 + .06 * Math.sin(t * 8)})`; if (t >= 26) confetti(t, 26.2, 120, -20);
+  $('foot').style.opacity = t >= 3 && t < 26 ? 1 : 0; $('hdr').style.transform = `translateY(${(1 - easeOutBack(seg(t, 0, .4))) * -20}cqw)`;
+  for (const s of [3, 11, 19, 26]) if (t > s && t < s + .12) fl = Math.max(fl, .5);
+  $('flash').style.opacity = fl;
+  $('bar').style.width = (t / DUR * 100) + '%';
+}
+
+/* ---------- SES: enerjik house ---------- */
+function buildAudio(ac, T) {
+  const out = ac.createDynamicsCompressor(); out.threshold.value = -14; out.ratio.value = 5; out.connect(ac.destination);
+  const master = ac.createGain(); master.gain.value = .75; master.connect(out);
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+  let seed = 3; const nbuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate); { const d = nbuf.getChannelData(0); for (let i = 0; i < d.length; i++) { seed = (seed * 16807) % 2147483647; d[i] = seed / 2147483647 * 2 - 1; } }
+  const env = (g, s, dur, vol, att = .006) => { g.gain.setValueAtTime(0, s); g.gain.linearRampToValueAtTime(vol, s + att); g.gain.exponentialRampToValueAtTime(.0001, s + dur); };
+  function tone(type, f, s, dur, vol, { fEnd, lp = 0, det = 0 } = {}) { s += T; const o = ac.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, s); o.detune.value = det; if (fEnd) o.frequency.exponentialRampToValueAtTime(fEnd, s + dur);
+    const g = ac.createGain(); env(g, s, dur, vol); let n = o; if (lp) { const b = ac.createBiquadFilter(); b.type = 'lowpass'; b.frequency.value = lp; o.connect(b); n = b; } n.connect(g); g.connect(master); o.start(s); o.stop(s + dur + .05); }
+  function noise(s, dur, vol, freq, type = 'lowpass') { s += T; const n = ac.createBufferSource(); n.buffer = nbuf; n.loop = true; const f = ac.createBiquadFilter(); f.type = type; f.frequency.value = freq; const g = ac.createGain(); env(g, s, dur, vol, .003); n.connect(f); f.connect(g); g.connect(master); n.start(s); n.stop(s + dur + .05); }
+  const BPM = 124, B = 60 / BPM; const CH = [[57, 60, 64], [53, 57, 60], [48, 52, 55], [55, 59, 62]];
+  const kick = s => { tone('sine', 150, s, .35, .9, { fEnd: 42 }); noise(s, .02, .25, 3000, 'highpass'); };
+  const clap = s => { noise(s, .14, .35, 1700, 'bandpass'); noise(s + .015, .12, .25, 1300, 'bandpass'); };
+  const hat = (s, v = .08) => noise(s, .04, v, 9000, 'highpass');
+  const stab = (ch, s, v = .05) => ch.forEach(m => { [-7, 7].forEach(d => tone('sawtooth', mtof(m + 12), s, B * .45, v / 2, { lp: 2600, det: d })); });
+  const bass = (m, s) => tone('sawtooth', mtof(m - 24), s, B * .45, .16, { lp: 450 });
+  const kaching = s => { [1318, 1760, 2637].forEach((f, i) => tone('square', f, s + i * .05, .25, .05, { lp: 6000 })); noise(s, .15, .25, 5000, 'highpass'); tone('sine', 2093, s + .12, .5, .08); };
+  const whoosh = s => { noise(s - .25, .4, .25, 1200, 'bandpass'); tone('sine', 300, s - .25, .35, .05, { fEnd: 1400 }); };
+  const riser = (s, d) => { noise(s, d, .14, 3000, 'bandpass'); tone('sawtooth', 200, s, d, .03, { fEnd: 1600, lp: 3000 }); };
+  // intro
+  riser(0, 2.6); [64, 67, 71, 76].forEach((m, i) => tone('square', mtof(m + 12), .2 + i * .12, .12, .05)); tone('sine', 55, 2.9, .6, .6, { fEnd: 30 });
+  // gövde 3 → 26
+  for (let i = 0, s = 3; s < 26; s += B, i++) { const bar = Math.floor(i / 4), ch = CH[bar % 4];
+    kick(s); hat(s + B / 2, .09); if (i % 2 === 1) clap(s); bass(ch[0], s + B / 2); if (i % 4 === 0 || i % 4 === 2) stab(ch, s + B * .75, .045); if (i % 8 === 7) hat(s + B * .75, .06); }
+  // melodi kancası
+  const HOOK = [76, null, 79, 76, 74, null, 72, 74, 76, null, 79, 81, 79, null, 76, null];
+  [11, 19].forEach(a => { for (let i = 0; i < 32; i++) { const m = HOOK[i % 16]; if (m) tone('square', mtof(m), a + i * B / 2, B * .42, .035, { lp: 3500 }); } });
+  [3, 11, 19, 26].forEach(whoosh);
+  [[3, 1.0], [3, 0.3], [11, 1.0], [11, .3]].forEach(([a, d0]) => kaching(a + d0 + 2.4));
+  kaching(22); kaching(22.5); riser(24.5, 1.5);
+  // outro
+  tone('sine', 60, 26, .8, .8, { fEnd: 30 }); for (let i = 0, s = 26; s < 31.5; s += B, i++) { kick(s); hat(s + B / 2); if (i % 2) clap(s); stab(CH[Math.floor(i / 4) % 4], s + B * .75, .04); }
+  [76, 79, 84].forEach((m, i) => tone('square', mtof(m), 31.2 + i * .1, .4, .05));
+}
+
+renderAt(0);
+if (RENDER_MODE) {
+  window.DUR = DUR;
+  window.renderAudioWav = async () => {
+    const sr = 44100, oac = new OfflineAudioContext(2, Math.ceil(sr * DUR), sr); buildAudio(oac, 0); const buf = await oac.startRendering();
+    const n = buf.length, d = new DataView(new ArrayBuffer(44 + n * 4)); const S = (o, s) => [...s].forEach((c, i) => d.setUint8(o + i, c.charCodeAt(0)));
+    S(0, 'RIFF'); d.setUint32(4, 36 + n * 4, true); S(8, 'WAVEfmt '); d.setUint32(16, 16, true); d.setUint16(20, 1, true); d.setUint16(22, 2, true); d.setUint32(24, sr, true); d.setUint32(28, sr * 4, true); d.setUint16(32, 4, true); d.setUint16(34, 16, true); S(36, 'data'); d.setUint32(40, n * 4, true);
+    const a = buf.getChannelData(0), b = buf.getChannelData(1); for (let i = 0; i < n; i++) { d.setInt16(44 + i * 4, clamp(a[i], -1, 1) * 32767, true); d.setInt16(46 + i * 4, clamp(b[i], -1, 1) * 32767, true); }
+    const u8 = new Uint8Array(d.buffer); let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s);
+  };
+  Promise.all(['mercurial-top', 'protouch', 'playground', 'tarmak', 'superfly'].map(n => new Promise(r => { const i = new Image(); i.onload = i.onerror = r; i.src = 'assets/firsat/' + n + '.jpg'; }))).then(() => { window.READY = true; });
+} else {
+  let ac = null, start = 0; const now = () => ac ? ac.currentTime : performance.now() / 1000;
+  const schedule = () => { start = now() + .08; if (ac) buildAudio(ac, start); };
+  $('play').onclick = async () => { try { ac = new AudioContext(); await ac.resume(); } catch (e) { ac = null; } $('ui').style.display = 'none'; schedule();
+    (function loop() { let t = now() - start; if (t >= DUR) { schedule(); t = 0; } renderAt(Math.max(0, t)); requestAnimationFrame(loop); })(); };
+}
+</script>
+</body>
+</html>
