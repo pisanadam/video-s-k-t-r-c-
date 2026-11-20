@@ -28,5 +28,5 @@ for i in "${!BOL[@]}"; do n=$((i+1)); f="${BOL[$i]}"
 done
 card "$TMP/cz.mp4" 3.5 "SON" "abdullah hâlâ uzayda · koku hâlâ geçmedi"; LIST+=("$TMP/cz.mp4")
 : > "$TMP/list.txt"; for p in "${LIST[@]}"; do echo "file '$p'" >> "$TMP/list.txt"; done
-ffmpeg -v error -y -f concat -safe 0 -i "$TMP/list.txt" -c:v libx264 -crf 22 -preset medium -pix_fmt yuv420p -r 30 -c:a aac -b:a 160k -movflags +faststart "$OUT"
+ffmpeg -v error -y -f concat -safe 0 -i "$TMP/list.txt" -c:v libx264 -crf "$([ "$MODE" = 16x9 ] && echo 22 || echo 25)" -preset medium -pix_fmt yuv420p -r 30 -c:a aac -b:a 160k -movflags +faststart "$OUT"
 echo "bitti: $OUT"
