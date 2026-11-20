@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gerçek Fail</title>
+<style>
+  :root{ --meme: Impact, "Anton", "Arial Black", "DejaVu Sans", sans-serif; --sig:"DejaVu Sans", sans-serif; --gold:#ffd84a; --pur:#c98e3a; }
+  html,body{margin:0;height:100%;background:#000;overflow:hidden;color:#fff}
+  body{display:flex;align-items:center;justify-content:center}
+  #stage{position:relative;width:min(100vw,177.7778vh);aspect-ratio:16/9;container-type:inline-size;overflow:hidden;background:#000}
+  #c{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .ov{position:absolute;pointer-events:none}
+  #grain{inset:0;width:100%;height:100%;opacity:.05;mix-blend-mode:screen;image-rendering:pixelated}
+  #vig{inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 45%,rgba(0,0,0,.75) 100%)}
+  .meme{font-family:var(--meme);font-weight:900;color:#fff;text-transform:uppercase;-webkit-text-stroke:.4cqw #000;paint-order:stroke fill;letter-spacing:.05em;text-align:center;line-height:1.05}
+  #top{left:2cqw;right:24cqw;top:2.4cqw;font-size:3.6cqw;text-align:left}
+  #cap{left:0;right:0;bottom:4cqw;font-size:4cqw}
+  #aura{right:2cqw;top:2cqw;padding:.8cqw 1.6cqw;border-radius:1cqw;background:rgba(0,0,0,.55);border:.25cqw solid var(--pur);
+    font:900 2.8cqw/1 var(--meme);letter-spacing:.06em;color:var(--gold);text-shadow:0 0 1.2cqw rgba(178,107,255,.9);white-space:nowrap;transform-origin:top right}
+  #aura small{display:block;font:700 1.1cqw/1 var(--sig);letter-spacing:.3em;color:#cbb6ff;margin-bottom:.4cqw;text-shadow:none}
+  #stamp{left:0;right:0;top:48%;font-size:10cqw;transform:translateY(-50%);opacity:0;white-space:nowrap}
+  #fps{left:2cqw;top:10cqw;padding:.5cqw 1cqw;background:rgba(0,0,0,.5);font:700 2.6cqw/1 "DejaVu Sans Mono",monospace;color:#5cff5c;opacity:0}
+  #title{left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font:900 9.5cqw/1 var(--meme);letter-spacing:.12em;white-space:nowrap;
+    color:#fff;text-shadow:0 0 3cqw rgba(178,107,255,.9),0 0 1cqw rgba(255,216,74,.6);opacity:0}
+  #small{left:0;right:0;top:63%;text-align:center;font:400 1.9cqw/1.3 var(--sig);letter-spacing:.35em;color:#ddd;opacity:0;text-transform:lowercase}
+  #flash{inset:0;background:#fff;opacity:0}
+  #ui{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.4cqw;background:rgba(0,0,0,.7);z-index:10;font-family:var(--sig)}
+  #ui button{font:900 3cqw/1 var(--meme);padding:1.4cqw 3cqw;border:.3cqw solid var(--pur);cursor:pointer;background:#111;color:var(--gold);letter-spacing:.1em}
+  #ui nav{display:flex;gap:1cqw;flex-wrap:wrap;justify-content:center} #ui nav a{color:#fff;border:.2cqw solid #555;padding:.6cqw 1.2cqw;text-decoration:none;font:700 1.5cqw/1 var(--sig)}
+  #ui nav a.on{border-color:var(--pur);color:var(--gold)}
+  #ui .hint{font-size:1.5cqw;color:#bbb;letter-spacing:.2em}
+  #bar{position:absolute;left:0;bottom:0;height:.4cqw;background:var(--gold);width:0;z-index:5}
+  body.render #ui,body.render #bar{display:none}
+  #phone{left:5cqw;top:5cqw;width:28cqw;height:42cqw;background:#e9e2d6;border:.8cqw solid #111;border-radius:3cqw;overflow:hidden;display:flex;flex-direction:column;opacity:0;box-shadow:0 2cqw 4cqw rgba(0,0,0,.6);font-family:"DejaVu Sans",sans-serif}
+  #phone .hd{background:#1f7a6d;color:#fff;padding:1.1cqw 1.3cqw;font:700 1.6cqw/1.2 "DejaVu Sans",sans-serif}
+  #phone .hd small{display:block;font-weight:400;font-size:1.05cqw;opacity:.85}
+  #msgs{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:.7cqw;padding:1cqw}
+  .m{background:#fff;color:#111;border-radius:1cqw;padding:.6cqw 1cqw;font-size:1.4cqw;line-height:1.3;max-width:84%;display:none}
+  .m b{display:block;font-size:1.1cqw}
+  .m.me{background:#d9fdd3;margin-left:auto}
+  .m .tk{float:right;color:#34b7f1;font-size:1.1cqw;margin-left:.6cqw}
+  #sansur{position:absolute;pointer-events:none;transform:translate(-50%,-50%);background-size:100% 100%;image-rendering:pixelated;opacity:0;border:.3cqw solid #000;display:flex;align-items:center;justify-content:center;z-index:2}
+  #sansur::after{content:"SANSÜR";background:#000;color:#fff;font:900 2.2cqw/1 Impact,"DejaVu Sans",sans-serif;letter-spacing:.2em;padding:.5cqw 1.2cqw}
+  #news{left:0;right:0;bottom:0;height:5.2cqw;display:flex;align-items:center;background:#c0001a;opacity:0;overflow:hidden;z-index:4;font:900 2.3cqw/1 var(--meme);letter-spacing:.04em;color:#fff;white-space:nowrap}
+  #news b{background:#fff;color:#c0001a;padding:0 1.4cqw;height:100%;display:flex;align-items:center;margin-right:1.6cqw}
+  #obit{left:3cqw;top:3cqw;width:54cqw;padding:2cqw 2.4cqw;background:rgba(0,0,0,.72);border:.3cqw solid #c9a227;border-radius:1cqw;opacity:0;font-family:"DejaVu Sans",sans-serif;color:#eee}
+  #obT{font:900 5cqw/1.05 var(--meme);letter-spacing:.04em;color:#fff;margin-bottom:.4cqw}
+  #obT small{display:block;font:700 1.4cqw/1.2 "DejaVu Sans",sans-serif;color:#c9a227;letter-spacing:.2em;margin-top:.6cqw;font-size:1.7cqw}
+  #obit p{margin:1.1cqw 0 0;font-size:2.3cqw;line-height:1.3;opacity:0} #obit p b{color:#ffd84a}
+  #chat{right:2cqw;top:1.5cqw;width:44cqw;height:53cqw;background:#0b141a;border:.7cqw solid #111;border-radius:2.4cqw;overflow:hidden;opacity:0;box-shadow:0 2cqw 4cqw rgba(0,0,0,.6)}
+  #chat .hd{position:absolute;left:0;right:0;top:0;height:4cqw;background:#1f2c34;color:#e9edef;font:700 1.5cqw/4cqw "DejaVu Sans",sans-serif;padding-left:2cqw;z-index:2}
+  #cmsgs{position:absolute;left:0;right:0;top:4cqw;bottom:.6cqw}
+  #cmsgs img{position:absolute;left:0;width:100%;opacity:0;transform-origin:50% 100%}
+  #hud{left:3cqw;top:3cqw;padding:1cqw 1.6cqw;background:rgba(0,0,0,.65);border:.25cqw solid #ff4b3a;border-radius:1cqw;font:700 2.1cqw/1 "DejaVu Sans Mono",monospace;color:#fff;opacity:0}
+  #hud b{color:#ff4b3a}
+  #say{left:22cqw;top:7cqw;max-width:40cqw;padding:1.6cqw 2.2cqw;background:#fff;color:#111;border-radius:2cqw;font:800 2.4cqw/1.25 "DejaVu Sans",sans-serif;opacity:0;transform-origin:20% 100%}
+  #say:after{content:"";position:absolute;left:5cqw;bottom:-2cqw;border:1.2cqw solid transparent;border-top-color:#fff}
+  #say small{display:block;font-size:1.3cqw;color:#666;margin-bottom:.5cqw;letter-spacing:.15em}
+  #note{left:10cqw;right:10cqw;bottom:13cqw;text-align:center;font:italic 700 1.8cqw/1.3 "DejaVu Sans",sans-serif;color:#ddd;opacity:0;text-shadow:0 .2cqw .4cqw #000}
+  #emo{position:absolute;pointer-events:none;font-size:12cqw;line-height:1;opacity:0;transform:translate(-50%,-50%);z-index:3}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c"></canvas>
+  <canvas id="grain" class="ov" width="320" height="180"></canvas>
+  <div id="vig" class="ov"></div>
+  <div id="fps" class="ov"></div>
+  <div id="top" class="ov meme"></div>
+  <div id="cap" class="ov meme"></div>
+  <div id="aura" class="ov"><small>DURUM</small><span id="auraV">0</span></div>
+  <div id="stamp" class="ov meme"></div>
+  <div id="sansur"></div>
+  <div id="emo">💩</div>
+  <div id="obit" class="ov"><div id="obT">AC BOARD REİS 🥀<small>2025 – 2026 · HUZUR İÇİNDE YAT</small></div><p id="ob0"></p><p id="ob1"></p><p id="ob2"></p><p id="ob3"></p><p id="ob4"></p><p id="ob5"></p></div>
+  <div id="chat" class="ov"><div class="hd">SERVİS · WhatsApp</div><div id="cmsgs"><img id="m_a" src="assets/acboard/a.png"><img id="m_b" src="assets/acboard/b.png"><img id="m_c" src="assets/acboard/c.png"><img id="m_d" src="assets/acboard/d.png"><img id="m_g" src="assets/acboard/g.png"><img id="m_h" src="assets/acboard/h.png"><img id="m_i" src="assets/acboard/i.png"><img id="m_j" src="assets/acboard/j.png"><img id="m_k" src="assets/acboard/k.png"><img id="m_l" src="assets/acboard/l.png"></div></div>
+  <div id="hud" class="ov"><span id="hudT"></span></div>
+  <div id="say" class="ov"><small>P1S DİYOR Kİ:</small>"AC Board gelsin de şu PLA'ları eriteyim artık."</div>
+  <div id="note" class="ov">Not: Şüphelilerin suçluluğuna dair henüz teknik kanıt bulunamadı.</div>
+  <div id="phone" class="ov">
+    <div class="hd">7-C VELİLER &amp; ÖĞRETMENLER<small>Matematik Öğretmeni, Abdullah'ın Annesi, +31 kişi</small></div>
+    <div id="msgs">
+      <div class="m" data-t="1.0"><b style="color:#8e44ad">Matematik Öğretmeni</b>Yarın 1. ders yazılı var.</div>
+      <div class="m" data-t="1.7"><b style="color:#16a085">Mehmet'in Annesi</b>Teşekkürler hocam</div>
+      <div class="m me" data-t="3.0">hoca çok sıkıcı yaa sınıf grubu bura dimi<span class="tk">✓✓</span></div>
+      <div class="m" data-t="5.0"><b style="color:#8e44ad">Matematik Öğretmeni</b>Ben de seni seviyorum Abdullah.</div>
+      <div class="m" data-t="6.2"><b style="color:#c0392b">Abdullah'ın Annesi</b><span style="color:#c0392b;font-weight:900">EVE GEL.</span></div>
+    </div>
+  </div>
+  <div id="title" class="ov"></div>
+  <div id="small" class="ov"></div>
+  <div id="flash" class="ov"></div>
+  <div id="bar"></div>
+  <div id="ui">
+    <nav id="nav"></nav>
+    <button id="play">▶ OYNAT</button>
+    <div class="hint">AC BOARD REİS (2025–2026)</div>
+  </div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+const QS = new URLSearchParams(location.search);
+const VID = 1, CARD = null, DUR = 26;
+const easeOutBack = k => { const c = 1.9; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); };
+const easeOut = k => 1 - Math.pow(1 - k, 3);
+const RENDER_MODE = QS.has('render');
+if (RENDER_MODE) document.body.classList.add('render');
+
+
+
+/* ---------- yardımcılar ---------- */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const easeIO = k => k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const R = rng(11);
+
+function pixTex(w, h, draw, linear = false) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c);
+  if (!linear) { t.magFilter = THREE.NearestFilter; t.minFilter = THREE.NearestFilter; }
+  t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function noisy(g, w, h, base, vary, r = R) {
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const v = (r() - .5) * vary;
+    g.fillStyle = `rgb(${clamp(base[0] + v, 0, 255)},${clamp(base[1] + v, 0, 255)},${clamp(base[2] + v, 0, 255)})`; g.fillRect(x, y, 1, 1); }
+}
+const planks = (base) => pixTex(16, 16, (g, w, h) => { noisy(g, w, h, base, 22); g.fillStyle = 'rgba(0,0,0,.35)'; for (let y = 3; y < 16; y += 4) g.fillRect(0, y, 16, 1); g.fillRect(7, 0, 1, 4); g.fillRect(2, 4, 1, 4); g.fillRect(11, 8, 1, 4); g.fillRect(5, 12, 1, 4); });
+function rep(t, x, y) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(x, y); return t; }
+
+/* ---------- sahne ---------- */
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(RENDER_MODE ? 1 : Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(55, 16 / 9, .05, 200);
+const hemi = new THREE.HemisphereLight('#ffffff', '#555', 1.1); scene.add(hemi);
+const dir = new THREE.DirectionalLight('#fff4e0', 1.2); dir.position.set(5, 10, 6); scene.add(dir);
+const pink = new THREE.PointLight('#ff4fa8', 0, 6, 1.5); scene.add(pink);
+
+const L = (m, o = {}) => new THREE.MeshLambertMaterial({ map: m, ...o });
+const C = c => new THREE.MeshLambertMaterial({ color: c });
+const BOX = new THREE.BoxGeometry(1, 1, 1);
+function block(parent, mat, sx, sy, sz, x, y, z) { const m = new THREE.Mesh(BOX, mat); m.scale.set(sx, sy, sz); m.position.set(x, y, z); parent.add(m); return m; }
+function faceTex(kind, o) {
+  return pixTex(8, 8, g => {
+    const P = (x, y, c) => { g.fillStyle = c; g.fillRect(x, y, 1, 1); };
+    g.fillStyle = o.skin; g.fillRect(0, 0, 8, 8);
+    if (!o.bald) { for (let x = 0; x < 8; x++) P(x, 0, o.hair); [0, 7].forEach(x => P(x, 1, o.hair)); } if (o.bangs) for (let x = 0; x < 6; x++) P(x, 1, o.hair);
+    const E = o.eye || '#4b3a8c', M = '#4a1e10';
+    P(3, 5, o.nose || '#9a6040'); P(4, 5, o.nose || '#9a6040');
+    if (kind === 'happy' || kind === 'talk') {
+      P(1, 4, '#fff'); P(2, 4, E); P(5, 4, E); P(6, 4, '#fff');
+      if (kind === 'happy') { P(1, 6, M); P(6, 6, M); for (let x = 2; x <= 5; x++) P(x, 7, M); for (let x = 2; x <= 5; x++) P(x, 6, '#fff'); }
+      else { for (let x = 2; x <= 5; x++) { P(x, 6, M); P(x, 7, M); } P(3, 7, '#c0404a'); P(4, 7, '#c0404a'); }
+    } else if (kind === 'sneaky') {
+      P(1, 4, E); P(2, 4, E); P(5, 4, E); P(6, 4, E); for (const x of [1, 2, 5, 6]) P(x, 3, o.hair);
+      P(2, 6, M); P(3, 6, M); P(4, 6, M); P(5, 6, '#fff'); P(6, 5, M);
+    } else if (kind === 'shock') {
+      for (const ex of [1, 5]) { P(ex, 3, '#fff'); P(ex + 1, 3, '#fff'); P(ex, 4, '#fff'); P(ex + 1, 4, '#fff'); }
+      P(2, 4, '#111'); P(5, 4, '#111'); for (const x of [1, 2, 5, 6]) P(x, 2, o.hair);
+      P(3, 6, '#2a0d06'); P(4, 6, '#2a0d06'); P(3, 7, '#2a0d06'); P(4, 7, '#2a0d06');
+    } else if (kind === 'angry') {
+      P(1, 2, '#111'); P(2, 3, '#111'); P(6, 2, '#111'); P(5, 3, '#111');
+      P(1, 4, '#fff'); P(2, 4, '#c00'); P(5, 4, '#c00'); P(6, 4, '#fff');
+      for (let x = 2; x <= 5; x++) P(x, 6, M); P(1, 7, M); P(6, 7, M);
+    } else if (kind === 'relaxed') {
+      for (const x of [1, 2, 5, 6]) P(x, 4, '#3a1d0e'); P(0, 5, '#e8907a'); P(7, 5, '#e8907a');
+      P(2, 6, M); P(5, 6, M); P(3, 7, M); P(4, 7, M);
+    } else if (kind === 'scared') {
+      P(1, 3, '#fff'); P(2, 3, '#111'); P(5, 3, '#111'); P(6, 3, '#fff'); P(2, 2, o.hair); P(5, 2, o.hair);
+      for (let y = 4; y < 8; y++) { P(1, y, '#57c7ff'); P(6, y, '#57c7ff'); }
+      P(2, 7, M); P(3, 6, M); P(4, 6, M); P(5, 7, M);
+    }
+    if (o.glasses) { g.fillStyle = '#111'; g.fillRect(0, 4, 8, 1); P(1, 3, '#111'); P(2, 3, '#111'); P(5, 3, '#111'); P(6, 3, '#111'); if (kind !== 'angry') { P(1, 4, '#fff'); P(6, 4, '#fff'); P(2, 4, '#111'); P(5, 4, '#111'); } else { P(2, 4, '#c00'); P(5, 4, '#c00'); } }
+    if (o.mustache) { for (let x = 1; x <= 6; x++) P(x, 6, o.mustache); }
+    if (o.beard) { for (let x = 0; x < 8; x++) P(x, 7, o.hair); P(0, 6, o.hair); P(7, 6, o.hair); P(0, 5, o.hair); P(7, 5, o.hair); if (kind === 'angry' || kind === 'talk') { P(3, 7, '#2a0d06'); P(4, 7, '#2a0d06'); } }
+  });
+}
+function makeChar(o) {
+  const faces = {}; ['happy', 'talk', 'sneaky', 'shock', 'angry', 'scared', 'relaxed'].forEach(k => faces[k] = faceTex(k, o));
+  const side = pixTex(8, 8, g => { g.fillStyle = o.skin; g.fillRect(0, 0, 8, 8); g.fillStyle = o.hair; if (o.bald) g.fillRect(0, 2, 3, 2); else { g.fillRect(0, 0, 8, 2); g.fillRect(0, 2, 2, 1); g.fillRect(6, 2, 2, 1); } if (o.beard) g.fillRect(0, 5, 3, 3); if (o.glasses) { g.fillStyle = '#111'; g.fillRect(0, 4, 8, 1); } });
+  const hairT = pixTex(8, 8, (g, w, h) => noisy(g, w, h, new THREE.Color(o.bald ? o.skin : o.hair).toArray().map(v => v * 255), 18));
+  const faceMat = new THREE.MeshLambertMaterial({ map: faces.happy });
+  const root = new THREE.Group(); scene.add(root);
+  const body = new THREE.Group(); root.add(body);
+  const torso = new THREE.Mesh(new THREE.BoxGeometry(.5, .75, .25), C(o.shirt)); torso.position.y = 1.125; body.add(torso);
+  if (o.tie) block(body, C(o.tie), .08, .45, .02, 0, 1.25, .13);
+  const head = new THREE.Group(); head.position.y = 1.5; body.add(head);
+  const hm = new THREE.Mesh(new THREE.BoxGeometry(.5, .5, .5), [L(side), L(side), L(hairT), C(o.skin), faceMat, L(hairT)]); hm.position.y = .25; head.add(hm);
+  const mkArm = s => { const g = new THREE.Group(); g.position.set(s * .375, 1.4, 0);
+    const sl = new THREE.Mesh(new THREE.BoxGeometry(.25, .35, .25), C(o.shirt)); sl.position.y = -.07; g.add(sl);
+    const hd = new THREE.Mesh(new THREE.BoxGeometry(.24, .45, .24), C(o.sleeve || o.skin)); hd.position.y = -.47; g.add(hd); body.add(g); return g; };
+  const mkLeg = s => { const g = new THREE.Group(); g.position.set(s * .125, .75, 0);
+    const p = new THREE.Mesh(new THREE.BoxGeometry(.25, .6, .25), C(o.pants)); p.position.y = -.3; g.add(p);
+    const sh = new THREE.Mesh(new THREE.BoxGeometry(.25, .15, .25), C(o.shoe || '#333')); sh.position.y = -.675; g.add(sh); root.add(g); return g; };
+  const c = { root, body, head, faceMat, faces, armL: mkArm(-1), armR: mkArm(1), legL: mkLeg(-1), legR: mkLeg(1) };
+  root.scale.setScalar(o.scale || 1);
+  c.reset = () => { root.visible = false; root.position.set(0, 0, 0); root.rotation.set(0, 0, 0); body.position.set(0, 0, 0); body.rotation.set(0, 0, 0);
+    [head, c.armL, c.armR, c.legL, c.legR].forEach(p => p.rotation.set(0, 0, 0)); c.face('happy'); };
+  c.face = k => { c.faceMat.map = faces[k]; };
+  c.sit = () => { root.position.y -= .3; c.legL.rotation.x = c.legR.rotation.x = -Math.PI / 2; };
+  c.walk = (t, sp = 9, a = .7) => { const s = Math.sin(t * sp); c.legL.rotation.x = s * a; c.legR.rotation.x = -s * a; c.armL.rotation.x = -s * a; c.armR.rotation.x = s * a; body.position.y = Math.abs(Math.cos(t * sp)) * .05; };
+  c.type = t => { c.armL.rotation.x = -1.25 + Math.sin(t * 26) * .12; c.armR.rotation.x = -1.25 + Math.cos(t * 23) * .12; c.armL.rotation.z = .15; c.armR.rotation.z = -.15; };
+  c.headPos = (v = new THREE.Vector3()) => { root.updateMatrixWorld(true); return head.localToWorld(v.set(0, .62, 0)); };
+  return c;
+}
+
+
+/* ======================= AC BOARD REİS ======================= */
+const usta = makeChar({ skin: '#d8a882', hair: '#2a1a0e', shirt: '#2f5fa8', sleeve: '#2f5fa8', pants: '#2b2b2b', shoe: '#eee', eye: '#2a1a10' });
+const all = [usta];
+const G = {}; const grp = (n, x) => { const g = new THREE.Group(); g.position.x = x; scene.add(g); G[n] = g; return g; };
+const showG = n => Object.entries(G).forEach(([k, g]) => g.visible = k === n);
+const BM = c => new THREE.MeshBasicMaterial({ color: c });
+function makeBoard(burnt) { const g = new THREE.Group();
+  block(g, C('#1f7a3a'), .6, .03, .4, 0, 0, 0); for (let i = 0; i < 6; i++) block(g, C('#c9a227'), .5, .005, .01, 0, .017, -.15 + i * .06);
+  block(g, C('#222'), .14, .1, .1, -.16, .065, -.08); block(g, C('#e6e6e6'), .12, .06, .08, .2, .045, .12);
+  [[.05, -.1], [.12, -.1], [.19, -.1]].forEach(([x, z]) => { const c = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .1, 12), C('#2a5aa0')); c.position.set(x, .065, z); g.add(c); });
+  block(g, C('#3a3a3a'), .12, .09, .12, -.15, .06, .11); block(g, C('#ffd84a'), .08, .03, .05, .02, .03, .13);
+  if (burnt) { const m = new THREE.Mesh(new THREE.CircleGeometry(.07, 14), BM('#111')); m.rotation.x = -Math.PI / 2; m.position.set(-.03, .017, .02); g.add(m); block(g, C('#4a2a10'), .05, .02, .05, -.03, .03, .02); }
+  return g; }
+/* --- 1) cenaze --- */
+const gF = grp('fun', 0);
+block(gF, C('#2a2026'), 12, .1, 10, 0, -.05, 0); block(gF, C('#3a2c34'), 12, 5, .1, 0, 2.5, -3); block(gF, C('#111'), 3.2, .9, 1.2, 0, .45, -1.8); block(gF, C('#1a1a1a'), 3.3, .04, 1.3, 0, .91, -1.8);
+const frame = new THREE.Group(); frame.position.set(0, 1.75, -2.2); gF.add(frame); frame.rotation.x = -.12;
+block(frame, C('#151515'), 1.25, .06, .95, 0, 0, 0); block(frame, C('#c9a227'), 1.1, .07, .8, 0, .005, 0); block(frame, C('#222831'), 1.0, .075, .7, 0, .01, 0);
+const oldBoard = makeBoard(true); oldBoard.position.set(0, .06, 0); frame.add(oldBoard); frame.rotation.set(Math.PI / 2 - .12, 0, 0);
+block(frame, C('#000'), .5, .08, .1, .45, .05, -.33).rotation.y = -.8;
+const candles = [-1.2, 1.2].map(x => { const c = new THREE.Group(); c.position.set(x, .93, -1.6); gF.add(c); block(c, C('#f2ecd8'), .12, .5, .12, 0, .25, 0); const f = new THREE.Mesh(new THREE.ConeGeometry(.05, .14, 10), BM('#ffb21a')); f.position.y = .58; c.add(f); const l = new THREE.PointLight('#ffb060', 2.2, 5, 1.6); l.position.y = .65; c.add(l); return { c, f, l }; });
+const rose = new THREE.Group(); rose.position.set(.65, .93, -1.3); gF.add(rose); block(rose, C('#2f6a2a'), .03, .55, .03, 0, .27, 0); const roseHead = new THREE.Group(); roseHead.position.y = .55; rose.add(roseHead); block(roseHead, C('#8a1020'), .13, .13, .13, 0, 0, 0); block(roseHead, C('#a01428'), .09, .08, .16, .03, .05, 0); rose.rotation.z = -.5; roseHead.rotation.z = -.9;
+for (let i = 0; i < 4; i++) block(gF, C('#5a1018'), .07, .015, .05, .4 + i * .12, .93, -1.15 + (i % 2) * .08);
+/* --- 2) atölye + yazıcı --- */
+const WX = 100, gW = grp('work', WX);
+block(gW, L(rep(planks([150, 110, 70]), 6, 6)), 12, .1, 10, 0, -.05, 0); block(gW, C('#d9d2c0'), 12, 4, .1, 0, 2, -3); block(gW, C('#d9d2c0'), .1, 4, 10, -5, 2, 0);
+block(gW, L(planks([120, 82, 50])), 3.6, .1, 1.6, 0, .85, -1.6); [[-1.7, -2.3], [1.7, -2.3], [-1.7, -.9], [1.7, -.9]].forEach(([x, z]) => block(gW, C('#5a3a20'), .1, .85, .1, x, .42, z));
+const PR = new THREE.Group(); PR.position.set(0, .9, -1.8); gW.add(PR);
+const glassM = new THREE.MeshPhongMaterial({ color: '#9ab', transparent: true, opacity: .25, shininess: 120, depthWrite: false });
+const parts = {};
+const prPart = (name, mat, sx, sy, sz, x, y, z) => { const g = new THREE.Group(); g.position.set(x, y, z); PR.add(g); block(g, mat, sx, sy, sz, 0, 0, 0); g.userData.home = new THREE.Vector3(x, y, z); parts[name] = g; return g; };
+prPart('base', C('#2b2b2e'), 1.0, .14, .95, 0, .07, 0); prPart('left', C('#333336'), .05, 1.0, .95, -.5, .6, 0); prPart('right', C('#333336'), .05, 1.0, .95, .5, .6, 0); prPart('back', C('#2e2e31'), 1.0, 1.0, .05, 0, .6, -.47);
+prPart('top', glassM, 1.0, .04, .95, 0, 1.12, 0); prPart('door', glassM, .95, .95, .03, 0, .6, .48); block(parts.door, C('#222'), .95, .04, .04, 0, .47, 0); block(parts.door, C('#222'), .95, .04, .04, 0, -.47, 0); block(parts.door, C('#555'), .04, .2, .06, .4, 0, .03);
+const bed = prPart('bed', C('#6a6a70'), .8, .03, .8, 0, .35, 0); block(bed, C('#3a3a3a'), .82, .01, .82, 0, .02, 0);
+const tool = prPart('tool', C('#e8e8e8'), .14, .16, .16, 0, .95, 0); block(tool, C('#58b030'), .1, .02, .02, 0, 0, .09);
+prPart('rail', C('#555'), .9, .03, .03, 0, 1.0, 0);
+const print = new THREE.Mesh(BOX, new THREE.MeshLambertMaterial({ color: '#ff7a1a' })); bed.add(print);
+const scrC = document.createElement('canvas'); scrC.width = 128; scrC.height = 64; const scrT = new THREE.CanvasTexture(scrC); scrT.colorSpace = THREE.SRGBColorSpace; let scrK = '';
+const scr = new THREE.Mesh(new THREE.PlaneGeometry(.26, .13), new THREE.MeshBasicMaterial({ map: scrT })); scr.position.set(-.33, .07, .48); PR.add(scr);
+function drawScr(mode, v, t) { const k = mode + Math.round(v) + (mode === 'err' ? Math.floor(t * 3) % 2 : ''); if (k === scrK) return; scrK = k; const g = scrC.getContext('2d'); g.textAlign = 'center';
+  if (mode === 'ok') { g.fillStyle = '#0d1a10'; g.fillRect(0, 0, 128, 64); g.fillStyle = '#58ff3a'; g.font = '700 13px "DejaVu Sans Mono",monospace'; g.fillText('BASKI %' + Math.round(v), 64, 26); g.fillText('TABLA ' + Math.round(v > 100 ? 60 : 60) + '°C', 64, 46); }
+  else if (mode === 'err') { g.fillStyle = Math.floor(t * 3) % 2 ? '#b3121b' : '#5a0a0e'; g.fillRect(0, 0, 128, 64); g.fillStyle = '#fff'; g.font = '700 10px "DejaVu Sans Mono",monospace'; g.fillText('Temperature', 64, 24); g.fillText('malfunction', 64, 38); g.fillText('TABLA 25°C', 64, 56); }
+  else if (mode === 'sad') { g.fillStyle = '#10151d'; g.fillRect(0, 0, 128, 64); g.fillStyle = '#9fb3d9'; g.font = '900 30px "DejaVu Sans",sans-serif'; g.fillText(':(', 64, 44); }
+  else if (mode === 'heat') { g.fillStyle = '#1a1206'; g.fillRect(0, 0, 128, 64); g.fillStyle = '#ffb21a'; g.font = '700 14px "DejaVu Sans Mono",monospace'; g.fillText('TABLA ' + Math.round(v) + '°C', 64, 28); g.fillStyle = '#58ff3a'; g.fillText(v >= 60 ? 'HAZIR ✓' : 'ISINIYOR', 64, 50); }
+  else { g.fillStyle = '#000'; g.fillRect(0, 0, 128, 64); } scrT.needsUpdate = true; }
+const boardIn = makeBoard(true); boardIn.position.set(0, .45, -.42); boardIn.rotation.x = Math.PI / 2; PR.add(boardIn);
+const newBoard = makeBoard(false); scene.add(newBoard);
+const screws = []; for (let i = 0; i < 18; i++) { const m = new THREE.Mesh(new THREE.CylinderGeometry(.015, .015, .06, 6), C('#aaa')); m.visible = false; gW.add(m); screws.push(m); }
+const smokeW = []; for (let i = 0; i < 10; i++) { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 6), new THREE.MeshLambertMaterial({ color: '#777', transparent: true, opacity: .4, depthWrite: false })); m.visible = false; scene.add(m); smokeW.push(m); }
+const clockT = pixTex(64, 64, (g) => { g.fillStyle = '#fff'; g.beginPath(); g.arc(32, 32, 30, 0, 7); g.fill(); g.strokeStyle = '#222'; g.lineWidth = 3; g.stroke(); }, true);
+const clock = new THREE.Mesh(new THREE.CircleGeometry(.4, 24), new THREE.MeshBasicMaterial({ map: clockT })); clock.position.set(1.6, 2.6, -2.94); gW.add(clock);
+const hands = [new THREE.Group(), new THREE.Group()]; hands.forEach((h, i) => { h.position.set(1.6, 2.6, -2.93); gW.add(h); block(h, BM('#111'), .025, i ? .3 : .22, .01, 0, i ? .15 : .11, 0); });
+/* --- 3) şüpheliler --- */
+const SX = 200, gS = grp('line', SX);
+block(gS, C('#3a3a40'), 12, .1, 8, 0, -.05, 0);
+const htT = pixTex(256, 128, (g) => { g.fillStyle = '#c9cfd6'; g.fillRect(0, 0, 256, 128); g.fillStyle = '#333'; g.font = '700 9px "DejaVu Sans Mono",monospace'; for (let i = 0; i < 8; i++) { const y = 120 - i * 15; g.fillRect(0, y, 256, 1); g.fillText((120 + i * 10) + '', 4, y - 2); g.fillText((120 + i * 10) + '', 230, y - 2); } }, true);
+{ const m = new THREE.Mesh(new THREE.PlaneGeometry(9, 4.5), new THREE.MeshLambertMaterial({ map: htT })); m.position.set(0, 2.25, -2); gS.add(m); }
+const eyes = (g, x, y, z, s = 1) => { [-1, 1].forEach(k => { block(g, BM('#fff'), .1 * s, .1 * s, .02, x + k * .09 * s, y, z); block(g, BM('#111'), .045 * s, .05 * s, .025, x + k * .09 * s + .01, y - .01, z); block(g, BM('#111'), .12 * s, .025 * s, .025, x + k * .09 * s, y + .08 * s, z).rotation.z = k * .35; }); };
+const sus = [];
+{ const g = new THREE.Group(); g.position.set(-2.6, 0, -1.2); gS.add(g); block(g, C('#f2f2f2'), .35, 1.4, .18, 0, .9, 0); for (let i = 0; i < 4; i++) { const m = new THREE.Mesh(new THREE.CircleGeometry(.07, 12), BM('#333')); m.position.set(0, .45 + i * .25, .095); g.add(m); }
+  for (let i = 0; i < 8; i++) block(g, C('#eee'), .06, .06, .2, .2 + Math.sin(i * .7) * .3, .2 - i * .02, .1 + i * .1); block(g, C('#ddd'), .16, .1, .12, .5, .06, .9); eyes(g, 0, 1.45, .1, 1.3); sus.push(g); }
+{ const g = new THREE.Group(); g.position.set(0, 0, -1.2); gS.add(g); const Y = new THREE.MeshLambertMaterial({ color: '#ffd400', emissive: '#6a5000' }); block(g, Y, .3, .8, .2, .1, 1.6, 0).rotation.z = -.4; block(g, Y, .6, .18, .2, 0, 1.15, 0); block(g, Y, .3, .9, .2, -.1, .65, 0).rotation.z = -.4; eyes(g, .05, 1.65, .12, 1.1); sus.push(g); }
+{ const g = new THREE.Group(); g.position.set(2.6, 0, -1.2); gS.add(g); block(g, C('#b07a3a'), 1.0, 1.0, 1.0, 0, .5, 0); block(g, C('#d8b070'), 1.02, .12, .2, 0, .95, 0);
+  const lt = pixTex(128, 48, (c) => { c.fillStyle = '#e9d7b0'; c.fillRect(0, 0, 128, 48); c.fillStyle = '#222'; c.font = '900 14px "DejaVu Sans",sans-serif'; c.textAlign = 'center'; c.fillText('FABRİKA', 64, 20); c.fillText('ÇIKIŞLI', 64, 38); }, true); const m = new THREE.Mesh(new THREE.PlaneGeometry(.7, .26), new THREE.MeshBasicMaterial({ map: lt })); m.position.set(0, .35, .505); g.add(m); eyes(g, 0, .72, .51, 1.2); sus.push(g); }
+const SUSN = ['🔌 UZATMA KABLOSU', '⚡ ANİ VOLTAJ DALGALANMASI', '🏭 FABRİKA ÇIKIŞLI ARIZA'];
+SUSN.forEach((n, i) => { const t = pixTex(256, 40, (g) => { g.fillStyle = '#111'; g.fillRect(0, 0, 256, 40); g.fillStyle = '#fff'; g.font = '900 15px "DejaVu Sans",sans-serif'; g.textAlign = 'center'; g.fillText(n.replace(/^\S+ /, ''), 128, 26); }, true); const m = new THREE.Mesh(new THREE.PlaneGeometry(2.2, .34), new THREE.MeshBasicMaterial({ map: t })); m.position.set(-2.6 + i * 2.6, 3.4, -1.98); gS.add(m); });
+const spot = new THREE.SpotLight('#ffffff', 0, 12, .35, .5, 1); scene.add(spot); scene.add(spot.target);
+/* aura + kıvılcım */
+const aur = []; const aurM = ['#ffd84a', '#ffffff', '#ff9f1a', '#58ff3a'].map(c => new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: .9, blending: THREE.AdditiveBlending, depthWrite: false }));
+for (let i = 0; i < 50; i++) { const m = new THREE.Mesh(BOX, aurM[i % 4]); m.visible = false; scene.add(m); aur.push(m); }
+const glowT = pixTex(64, 64, (g) => { const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,240,170,1)'); gr.addColorStop(.4, 'rgba(255,200,60,.5)'); gr.addColorStop(1, 'rgba(255,200,60,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); }, true);
+const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowT, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); scene.add(glow);
+/* ======================= ZAMAN / OVERLAY ======================= */
+const PX = v => { const p = v.clone().project(camera); return [(p.x * .5 + .5) * 100, (-p.y * .5 + .5) * 100]; };
+const $ = id => document.getElementById(id);
+const el = { top: $('top'), cap: $('cap'), aura: $('aura'), auraV: $('auraV'), stamp: $('stamp'), fps: $('fps'), title: $('title'), small: $('small'), flash: $('flash'), bar: $('bar'), phone: $('phone'), sans: $('sansur'), emo: $('emo'), obit: $('obit'), chat: $('chat'), msgs: $('cmsgs'), hud: $('hud'), hudT: $('hudT'), say: $('say'), note: $('note') };
+const stageRect = () => $('stage').getBoundingClientRect();
+const cache = {}; const setHTML = (e, s) => { if (cache[e.id] !== s) { e.innerHTML = s; cache[e.id] = s; } };
+function shake(t, amt) { const f = Math.floor(t * 30); return new THREE.Vector3((hash(f) - .5) * amt, (hash(f + 50) - .5) * amt, (hash(f + 99) - .5) * amt); }
+function timed(list, t) { for (const [a, b, s] of list) if (t >= a && t < b) return s; return ''; }
+const faceTo = (c, x, z) => { c.root.rotation.y = Math.atan2(x - c.root.position.x, z - c.root.position.z); };
+const OBIT = [[1.4, 'Bambu Lab P1S • 414 saatlik emektar'], [3.2, 'Ölüm nedeni: Bilinmiyor 💀'], [4.6, "Son görüldüğü yer: P1S'in arka kasası"], [5.8, 'Son sözleri: "Temperature malfunction"'], [7.4, 'Ölüm şekli: Tabla 25 °C\'de takılı kaldı.'], [8.8, 'Otopsi raporu: Henüz açıklanmadı.']];
+const CHAT = [['a', 20.0], ['b', 20.8], ['c', 24.0], ['d', 24.9], ['g', 26.3], ['h', 27.1], ['i', 28.6], ['j', 29.4], ['k', 31.4], ['l', 32.2]];
+const CH = { a: 96, b: 94, c: 96, d: 94, g: 256, h: 148, i: 253, j: 251, k: 248, l: 152 };
+const CAPS = [[10.2, 11.8, '414 SAAT SONRA... SON BASKI.'], [11.8, 15.4, 'TEMPERATURE MALFUNCTION.'], [15.4, 19.8, 'KARTI BULMAK İÇİN YAZICININ TAMAMI SÖKÜLDÜ.'],
+  [24.9, 26.3, 'BEKLEYİŞ...'], [34.4, 36.4, 'ŞÜPHELİ 1: UZATMA KABLOSU 🔌'], [36.4, 38.4, 'ŞÜPHELİ 2: ANİ VOLTAJ DALGALANMASI ⚡'], [38.4, 40.2, 'ŞÜPHELİ 3: FABRİKA ÇIKIŞLI ARIZA 🏭'],
+  [46.0, 48.6, 'YERİNE GEÇEN: AC BOARD 2.0 🗣️🔥'], [48.6, 51.4, 'TABLA ISINIYOR... P1S GERİ DÖNDÜ.']];
+const STAMPS = [[12.0, 'TEMPERATURE MALFUNCTION', '#ff4b3a'], [22.4, 'ÇOKTAN SÖKÜLDÜ 💀', '#ffd84a'], [29.9, 'GARANTİDEN ONAY GELDİ!!', '#58ff3a'], [32.8, 'İSİM YETER 🗿', '#ffffff'], [40.4, 'DOSYA DURUMU: FAİLİ MEÇHUL 😭💀', '#ff4b3a'], [46.0, 'AC BOARD 2.0 🗣️🔥', '#ffd84a']];
+
+const OBH = ['Bambu Lab P1S • <b>414 saatlik emektar</b>', 'Ölüm nedeni: <b>Bilinmiyor 💀</b>', "Son görüldüğü yer: <b>P1S'in arka kasası</b>", 'Son sözleri: <b>"Temperature malfunction"</b>', 'Ölüm şekli: <b>Tabla 25 °C\'de takılı kaldı.</b>', 'Otopsi raporu: <b>Henüz açıklanmadı.</b>'];
+OBH.forEach((h, i) => { document.getElementById('ob' + i).innerHTML = h; });
+const DISS = { left: [[-1.25, .05, .35], [0, 0, Math.PI / 2]], right: [[1.25, .05, .35], [0, 0, -Math.PI / 2]], top: [[-.6, .06, .62], [0, .3, 0]], back: [[1.35, .05, -.15], [Math.PI / 2, 0, 0]], door: [[.55, .05, .62], [Math.PI / 2, 0, .2]], bed: [[-1.4, -.03, -.45], [0, .4, 0]], tool: [[.9, .02, .7], [0, .8, 0]], rail: [[-.2, .02, .78], [0, 1.4, 0]] };
+function printerState(t, dk) { // dk: 0 toplu, 1 sökülmüş
+  Object.entries(parts).forEach(([n, g], i) => { const h = g.userData.home; const D = DISS[n]; if (!D) { g.position.copy(h); g.rotation.set(0, 0, 0); return; } const k = easeIO(clamp(dk * 1.4 - i * .05)); g.position.set(lerp(h.x, D[0][0], k), lerp(h.y, D[0][1], k) + Math.sin(k * Math.PI) * .5, lerp(h.z, D[0][2], k)); g.rotation.set(D[1][0] * k, D[1][1] * k, D[1][2] * k); }); }
+
+/* ======================= DOSYA YENİDEN AÇILDI ======================= */
+const sen = makeChar({ skin: '#c98e6a', hair: '#2a1a0e', shirt: '#2ecc71', sleeve: '#2ecc71', pants: '#1f2937', shoe: '#f2f2f2', bangs: true, eye: '#2a1a10' });
+const shades = new THREE.Group(); sen.head.add(shades);
+block(shades, new THREE.MeshLambertMaterial({ color: '#050505' }), .54, .11, .04, 0, .25, .27); block(shades, BM('#fff'), .07, .03, .01, -.15, .28, .295); block(shades, BM('#fff'), .07, .03, .01, .13, .28, .295);
+all.push(sen);
+const pooPts = [[0, 0], [.34, .02], [.4, .1], [.36, .2], [.28, .24], [.32, .3], [.26, .4], [.18, .44], [.21, .5], [.14, .58], [.06, .66], [0, .7]].map(([x, y]) => new THREE.Vector2(x, y));
+const poo = new THREE.Mesh(new THREE.LatheGeometry(pooPts, 14), new THREE.MeshStandardMaterial({ color: '#7a4a22', roughness: .5 })); scene.add(poo);
+[-.1, .1].forEach(x => { const w = new THREE.Mesh(new THREE.SphereGeometry(.06, 10, 8), C('#fff')); w.position.set(x, .36, .3); poo.add(w); const p = new THREE.Mesh(new THREE.SphereGeometry(.03, 8, 6), C('#111')); p.position.set(x, .36, .35); poo.add(p); });
+const sparks = []; for (let i = 0; i < 30; i++) { const m = new THREE.Mesh(BOX, new THREE.MeshBasicMaterial({ color: i % 2 ? '#fff36b' : '#7fd0ff', transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); m.visible = false; scene.add(m); sparks.push(m); }
+const abT = pixTex(256, 40, (g) => { g.fillStyle = '#b3121b'; g.fillRect(0, 0, 256, 40); g.fillStyle = '#fff'; g.font = '900 18px "DejaVu Sans",sans-serif'; g.textAlign = 'center'; g.fillText('ABDULLAH 💩', 128, 27); }, true);
+const abPlate = new THREE.Mesh(new THREE.PlaneGeometry(2.2, .34), new THREE.MeshBasicMaterial({ map: abT })); abPlate.position.set(0, 3.4, -1.95); gS.add(abPlate);
+const freeT = pixTex(128, 32, (g) => { g.fillStyle = '#1f8a3a'; g.fillRect(0, 0, 128, 32); g.fillStyle = '#fff'; g.font = '900 16px "DejaVu Sans",sans-serif'; g.textAlign = 'center'; g.fillText('SERBEST ✓', 64, 22); }, true);
+const freeP = [0, 1, 2].map(() => { const m = new THREE.Mesh(new THREE.PlaneGeometry(1.1, .28), new THREE.MeshBasicMaterial({ map: freeT, transparent: true })); scene.add(m); return m; });
+const CAPS2 = [[2.5, 4.6, 'GÜVENLİK KAMERASI · 414. SAAT · 03:12'], [4.6, 7.0, 'BİR ŞÜPHELİ YAKLAŞIYOR...'], [7.0, 8.6, 'YAZICININ KAPAĞINI AÇTI...'], [8.6, 11.0, '...VE İÇİNE SIÇTI.'], [11.0, 12.5, 'HİÇBİR ŞEY OLMAMIŞ GİBİ GİTTİ.'],
+  [12.5, 15.0, '03:14 — TEMPERATURE MALFUNCTION.'], [15.0, 17.4, 'OTOPSİ RAPORU: KARTIN ÜSTÜNDE 💩 BULUNDU.'], [17.4, 19.6, 'GERÇEK FAİL: ABDULLAH.'], [19.6, 22.0, 'UZATMA KABLOSU, VOLTAJ VE FABRİKA SERBEST.'], [22.0, 24.2, 'ABDULLAH İSE... YİNE KAÇTI.']];
+const STAMPS2 = [[.4, 'DOSYA YENİDEN AÇILDI', '#ff4b3a'], [12.8, 'TEMPERATURE MALFUNCTION', '#ff4b3a'], [17.6, 'GERÇEK FAİL: ABDULLAH 💩', '#ffd84a'], [22.2, 'YİNE KAÇTI!', '#58ff3a']];
+function path(pts, u) { const L = []; let tot = 0; for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); L.push(d); tot += d; }
+  let d = u * tot; for (let i = 0; i < L.length; i++) { if (d <= L[i] || i === L.length - 1) { const k = clamp(d / L[i]); return [lerp(pts[i][0], pts[i + 1][0], k), lerp(pts[i][1], pts[i + 1][1], k), Math.atan2(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1])]; } d -= L[i]; } }
+function squat(c) { c.legL.rotation.x = c.legR.rotation.x = -1.3; c.body.position.y = -.45; c.armL.rotation.x = c.armR.rotation.x = -.8; }
+
+function renderAt(t) {
+  t = clamp(t, 0, DUR - 1e-4);
+  all.forEach(c => c.reset()); aur.forEach(m => m.visible = false); glow.visible = false; smokeW.forEach(m => m.visible = false); screws.forEach(m => m.visible = false); newBoard.visible = false; spot.intensity = 0; poo.visible = false; sparks.forEach(m => m.visible = false); shades.visible = false; freeP.forEach(m => m.visible = false); abPlate.visible = false;
+  scene.fog = null; hemi.intensity = 1.1; hemi.color.set('#ffffff'); hemi.groundColor.set('#555'); dir.intensity = 1.1; dir.color.set('#fff4e0'); if (!dir.target.parent) scene.add(dir.target);
+  const cam = new THREE.Vector3(), look = new THREE.Vector3(); let fov = 55, shk = 0, fl = 0, fcol = '#fff', filt = 'saturate(1.12) contrast(1.06)', rec = '', sansAt = null, emoAt = null;
+  const S = sen, PRW = () => { PR.updateMatrixWorld(true); };
+  if (t < 2.5) { showG('none'); scene.background = new THREE.Color('#0b0b0d'); cam.set(0, 0, 10); look.set(0, 0, 0); }
+  else if (t < 17.4) {
+    showG('work'); dir.position.set(WX + 3, 9, 6); dir.target.position.set(WX, 0, -1.6); printerState(t, 0); boardIn.visible = true; boardIn.position.set(0, .45, -.42); boardIn.rotation.set(Math.PI / 2, 0, 0);
+    const night = t < 15.0; if (night) { scene.background = new THREE.Color('#0d1424'); hemi.intensity = 1.1; hemi.color.set('#b0c0e8'); dir.intensity = .9; dir.color.set('#c0ccff'); filt = 'grayscale(1) contrast(1.25) brightness(1.45)'; rec = '● REC · KAMERA 2 · 03:' + String(12 + Math.floor((t - 2.5) / 6)).padStart(2, '0') + ':' + String(Math.floor(((t - 2.5) * 4) % 60)).padStart(2, '0'); }
+    else scene.background = new THREE.Color('#d9d2c0');
+    const mode = t < 12.8 ? 'ok' : t < 15 ? 'err' : 'sad'; drawScr(mode, 40 + t, t); const printing = t < 12.8; parts.tool.position.x = parts.tool.userData.home.x + (printing ? Math.sin(t * 9) * .3 : 0); print.visible = t < 15; print.scale.set(.18, .08, .18); print.position.set(0, .06, 0);
+    // kapak
+    const lidK = easeIO(seg(t, 7.0, 7.6)) * (1 - easeIO(seg(t, 11.0, 11.5))); parts.top.position.set(-.5 * lidK, 1.12 + lidK * .05, 0); parts.top.rotation.set(0, 0, lidK * 1.3);
+    PRW(); const topW = PR.localToWorld(new THREE.Vector3(0, 1.12, 0)), boardW = PR.localToWorld(new THREE.Vector3(0, .42, -.36));
+    if (t < 15.0) {
+      if (t > 4.6 && t < 7.0) { const u = seg(t, 4.6, 6.6); S.root.visible = true; const [x, z, r] = path([[WX + 3.5, 1.5], [WX + 1.2, -.4], [WX + .4, -1.0]], u); S.root.position.set(x, Math.abs(Math.sin(t * 5)) * .08, z); S.root.rotation.y = r; const s = Math.sin(t * 5); S.legL.rotation.x = Math.max(0, s) * -1.2; S.legR.rotation.x = Math.max(0, -s) * -1.2; S.armL.rotation.x = S.armR.rotation.x = -1.1; S.face('sneaky'); S.head.rotation.y = Math.sin(t * 3) * .7; }
+      else if (t >= 7.0 && t < 8.6) { S.root.visible = true; const k = easeIO(seg(t, 7.6, 8.4)); S.root.position.set(lerp(WX + .4, topW.x, k), lerp(0, topW.y - .1, k) + Math.sin(k * Math.PI) * .5, lerp(-1.0, topW.z, k)); S.root.rotation.y = 0; S.armR.rotation.x = t < 7.6 ? -2.2 : -.8; S.face('sneaky'); }
+      else if (t >= 8.6 && t < 11.0) { S.root.visible = true; S.root.position.set(topW.x, topW.y - .1, topW.z); S.root.rotation.y = 0; squat(S); S.face('relaxed'); sansAt = topW.clone().add(new THREE.Vector3(0, .45, 0)); if (t > 9.4) emoAt = topW.clone().add(new THREE.Vector3(0, 1.9, 0)); }
+      else if (t >= 11.0 && t < 12.6) { S.root.visible = true; const u = seg(t, 11.0, 12.6); const k = easeIO(seg(t, 11.0, 11.5)); S.root.position.set(lerp(topW.x, WX + 1.0, k) + (u > .3 ? (u - .3) * 4 : 0), lerp(topW.y - .1, 0, k), lerp(topW.z, -.6, k) + (u > .3 ? (u - .3) * 3 : 0)); S.root.rotation.y = .8; shades.visible = true; S.face('sneaky'); S.walk(t, 6, .4); }
+      if (t > 9.6) { poo.visible = true; const k = easeIO(seg(t, 9.6, 10.4)); poo.position.copy(topW.clone().add(new THREE.Vector3(0, .1, 0)).lerp(boardW, k)); poo.scale.setScalar(.35); poo.rotation.set(0, t, 0); }
+      if (t > 12.8) { sparks.forEach((m, i) => { const e = ((t - 12.8) * 2 + hash(i)) % 1; m.visible = true; const a = hash(i + 1) * 6.28; m.position.set(boardW.x + Math.cos(a) * e * .6, boardW.y + .1 + e * .5 - e * e * .6, boardW.z + .2 + Math.sin(a) * e * .4); m.scale.setScalar(.03 * (1 - e)); });
+        smokeW.forEach((m, i) => { const ph2 = (t * .6 + i / 10) % 1; m.visible = true; m.position.set(boardW.x + Math.sin(i * 2 + t) * .15, boardW.y + .6 + ph2 * 1.0, boardW.z); m.scale.setScalar(.06 + ph2 * .15); m.material.opacity = .4 * (1 - ph2); }); if (Math.floor(t * 8) % 3 === 0) { fl = .25; fcol = '#bfe6ff'; } shk = .03; }
+      cam.set(WX + 3.4, 3.7, 2.8); look.set(WX + .4, 1.5, -1.3); fov = 62; if (t >= 8.6 && t < 11.0) { cam.set(WX + 2.0, 3.0, 1.0); look.set(WX, 2.2, -1.8); fov = 58; }
+    } else {
+      // otopsi
+      const k = easeIO(seg(t, 15.0, 15.6)); boardIn.position.set(0, lerp(.45, .75, k), lerp(-.42, .62, k)); boardIn.rotation.set(lerp(Math.PI / 2, .35, k), 0, 0); PRW(); const bw = PR.localToWorld(new THREE.Vector3(0, .79, .63));
+      poo.visible = true; poo.position.copy(bw); poo.scale.setScalar(.25); poo.rotation.set(-.35 + .35, t * .5, 0); S.root.visible = false;
+      smokeW.forEach((m, i) => { const ph2 = (t * .5 + i / 10) % 1; m.visible = true; m.position.set(bw.x + Math.sin(i * 2 + t) * .1, bw.y + .2 + ph2 * .8, bw.z); m.scale.setScalar(.04 + ph2 * .1); m.material.opacity = .3 * (1 - ph2); });
+      cam.set(WX + .5, 2.0, -.2); look.set(WX, 1.62, -1.15); fov = 40;
+    }
+  } else if (t < 24.2) {
+    showG('line'); scene.background = new THREE.Color('#1a1a20'); hemi.intensity = .6; dir.intensity = .35;
+    const k = easeIO(seg(t, 17.4, 18.2)); sus[0].position.x = -2.6 - k * 1.2; sus[2].position.x = 2.6 + k * 1.2; sus[1].position.x = k * -1.4 - k * 0; sus[1].position.z = -1.2 + k * .2; sus[1].position.x = lerp(0, -3.6 + 1.2, 0) ; sus[1].position.x = lerp(0, -1.4, k); sus[0].position.x = lerp(-2.6, -3.9, k); sus[2].position.x = lerp(2.6, 3.4, k);
+    sus.forEach((g, i) => { g.position.y = 0; g.rotation.y = Math.sin(t * 1.5 + i) * .08; if (t > 19.6) { freeP[i].visible = true; freeP[i].position.set(SX + g.position.x, (i === 2 ? 1.25 : 1.95), -1.0); g.position.y = Math.abs(Math.sin(t * 7 + i)) * .15; } });
+    abPlate.visible = t > 17.6;
+    S.root.visible = t > 17.5 && t < 23.6; const AP = new THREE.Vector3(SX + 1.1, 0, -1.1);
+    if (t < 22.0) { const kk = easeOut(seg(t, 17.5, 18.0)); S.root.position.set(AP.x, (1 - kk) * 3, AP.z); S.root.rotation.y = 0; shades.visible = true; S.face('sneaky'); S.armL.rotation.z = -.3; S.armR.rotation.z = .3; if (t > 20.5) { S.face('happy'); S.armR.rotation.x = -2.9; } }
+    else { const u = seg(t, 22.3, 23.6); S.root.position.set(AP.x + u * 6, Math.abs(Math.sin(t * 16)) * .15, AP.z + u * 2); S.root.rotation.y = Math.PI / 2; S.walk(t, 18, 1.1); S.armL.rotation.x = -2.5; S.face('happy'); shades.visible = true; }
+    spot.position.set(SX + AP.x - SX, 4.5, .6); spot.position.x = AP.x; spot.target.position.set(AP.x, .8, -1.1); spot.intensity = t > 17.6 && t < 22 ? 60 : 0;
+    cam.set(SX + .4, 1.9, 5.2); look.set(SX + .3, 1.6, -1.5); fov = 55; if (t > 17.6 && t < 19.6) { cam.set(AP.x + .4, 1.7, 2.0); look.set(AP.x, 1.4, -1.1); fov = 50; }
+  } else { showG('none'); scene.background = new THREE.Color('#0b0b0d'); cam.set(0, 0, 10); look.set(0, 0, 0); }
+  camera.fov = fov; camera.near = .05; camera.far = 400; camera.updateProjectionMatrix();
+  camera.position.copy(cam).add(shake(t, shk)); camera.up.set(0, 1, 0); camera.lookAt(look);
+  canvas.style.filter = filt; renderer.render(scene, camera);
+  if (sansAt) { const [x, y] = PX(sansAt); const s = clamp(50 / camera.position.distanceTo(sansAt), 7, 20); el.sans.style.opacity = 1; el.sans.style.left = x + '%'; el.sans.style.top = y + '%'; el.sans.style.width = s + 'cqw'; el.sans.style.height = s * .7 + 'cqw'; } else el.sans.style.opacity = 0;
+  if (emoAt) { const [x, y] = PX(emoAt); el.emo.style.opacity = 1; el.emo.style.left = x + '%'; el.emo.style.top = clamp(y, 12, 80) + '%'; el.emo.style.fontSize = '8cqw'; el.emo.style.transform = `translate(-50%,-50%) scale(${easeOutBack(seg(t, 9.4, 9.7))}) rotate(${Math.sin(t * 4) * 12}deg)`; } else el.emo.style.opacity = 0;
+  const cap = timed(CAPS2, t); setHTML(el.cap, cap); el.cap.style.opacity = cap ? 1 : 0; el.cap.style.color = /FAİL|KAÇTI|💩/.test(cap) ? '#ffd84a' : '#fff';
+  setHTML(el.top, rec); el.top.style.opacity = rec ? 1 : 0; el.top.style.color = '#ff4b3a'; el.top.style.fontSize = '2.6cqw';
+  let stA = null; for (const s of STAMPS2) if (t >= s[0] && t < s[0] + 1.8) stA = s;
+  setHTML(el.stamp, stA ? stA[1] : ''); const sk = stA ? seg(t, stA[0], stA[0] + .3) : 0; el.stamp.style.opacity = stA ? 1 - seg(t, stA[0] + 1.4, stA[0] + 1.8) : 0; el.stamp.style.color = stA ? stA[2] : '#fff'; el.stamp.style.top = t < 2.5 ? '45%' : '28%'; el.stamp.style.right = '0'; el.stamp.style.fontSize = stA && stA[1].length > 18 ? '5.6cqw' : '8cqw';
+  const s2 = shake(t, 1.2); el.stamp.style.transform = `translate(${s2.x}cqw, calc(-50% + ${s2.y}cqw)) scale(${1 + .7 * (1 - easeOutBack(sk))}) rotate(-4deg)`;
+  if (stA && t < stA[0] + .15) { fl = Math.max(fl, .3); fcol = stA[2]; }
+  el.aura.style.opacity = t > 2.5 && t < 24.2 ? 1 : 0; setHTML(el.auraV, t < 17.4 ? 'DOSYA: AÇIK 🔎' : 'FAİL: ABDULLAH 💩');
+  [el.fps, el.phone, el.obit, el.chat, el.hud, el.say, el.note].forEach(e => e.style.opacity = 0);
+  const ek = seg(t, 24.2, 24.7); setHTML(el.title, 'DOSYA KAPANDI ✅'); setHTML(el.small, 'fail: abdullah 💩 · ac board 2.0 nöbette'); el.title.style.whiteSpace = 'normal'; el.title.style.fontSize = '7cqw'; el.title.style.lineHeight = '1.1'; el.title.style.top = '42%'; el.small.style.top = '60%';
+  el.title.style.opacity = ek; el.title.style.transform = `translateY(-50%) scale(${1 + .3 * (1 - easeOutBack(ek))})`; el.small.style.opacity = seg(t, 24.7, 25.1);
+  if (t < 2.5) { setHTML(el.small, 'AC BOARD REİS DAVASI · YENİ DELİL'); el.small.style.top = '62%'; el.small.style.opacity = seg(t, .6, 1.0) * (1 - seg(t, 2.2, 2.5)); }
+  el.flash.style.opacity = fl; el.flash.style.background = fcol;
+  el.bar.style.width = (t / DUR * 100) + '%';
+}
+
+/* ---------- SES ---------- */
+function buildAudio(ac, T) {
+  const out = ac.createDynamicsCompressor(); out.threshold.value = -14; out.ratio.value = 6; out.connect(ac.destination);
+  const master = ac.createGain(); master.gain.value = .7; master.connect(out);
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+  let seed = 77; const nbuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
+  { const d = nbuf.getChannelData(0); for (let i = 0; i < d.length; i++) { seed = (seed * 16807) % 2147483647; d[i] = seed / 2147483647 * 2 - 1; } }
+  const env = (g, s, dur, vol, att = .008) => { g.gain.setValueAtTime(0, s); g.gain.linearRampToValueAtTime(vol, s + att); g.gain.exponentialRampToValueAtTime(.0001, s + dur); };
+  function tone(type, f, s, dur, vol, { fEnd, dest = master, vib = 0, lp = 0 } = {}) {
+    s += T; const o = ac.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, s);
+    if (fEnd) o.frequency.exponentialRampToValueAtTime(fEnd, s + dur);
+    const g = ac.createGain(); env(g, s, dur, vol); let n = o;
+    if (lp) { const f2 = ac.createBiquadFilter(); f2.type = 'lowpass'; f2.frequency.value = lp; o.connect(f2); n = f2; }
+    n.connect(g); g.connect(dest);
+    if (vib) { const l = ac.createOscillator(); l.frequency.value = 6; const lg = ac.createGain(); lg.gain.value = vib; l.connect(lg); lg.connect(o.frequency); l.start(s); l.stop(s + dur + .05); }
+    o.start(s); o.stop(s + dur + .05);
+  }
+  function noise(s, dur, vol, freq, type = 'lowpass', dest = master) {
+    s += T; const n = ac.createBufferSource(); n.buffer = nbuf; n.loop = true;
+    const f = ac.createBiquadFilter(); f.type = type; f.frequency.value = freq;
+    const g = ac.createGain(); env(g, s, dur, vol, .004); n.connect(f); f.connect(g); g.connect(dest); n.start(s); n.stop(s + dur + .05);
+  }
+  const dist = ac.createWaveShaper(); { const c = new Float32Array(1024); for (let i = 0; i < 1024; i++) c[i] = Math.tanh((i / 512 - 1) * 9); dist.curve = c; }
+  const dg = ac.createGain(); dg.gain.value = .55; dist.connect(dg); dg.connect(master);
+  function boom(s, big) { tone('sine', big ? 150 : 120, s, big ? 2.2 : 1, 1, { fEnd: 32 }); noise(s, big ? .7 : .35, .7, 500);
+    if (big) { tone('sine', 110, s, 1.8, .9, { fEnd: 30, dest: dist }); noise(s, 1, .5, 1200, 'lowpass', dist); tone('sawtooth', 220, s, 1.2, .25, { fEnd: 55 }); } }
+  function mumble(s, dur, base) { for (let x = 0; x < dur; x += .085) tone('square', base * (1 + (hash(s * 10 + x * 37) - .5) * .5), s + x, .07, .05, { lp: 1600 }); }
+  const keys = (a, b) => { for (let x = a; x < b; x += .11) noise(x + hash(x) * .05, .025, .08, 3000, 'highpass'); };
+  // --- phonk aletleri ---
+  const verb = ac.createConvolver(); { const len = ac.sampleRate * 2.2, b = ac.createBuffer(2, len, ac.sampleRate); let sd = 3;
+    for (let ch = 0; ch < 2; ch++) { const dd = b.getChannelData(ch); for (let i = 0; i < len; i++) { sd = (sd * 16807) % 2147483647; dd[i] = (sd / 2147483647 * 2 - 1) * Math.pow(1 - i / len, 3); } } verb.buffer = b; }
+  const vg = ac.createGain(); vg.gain.value = .35; verb.connect(vg); vg.connect(master);
+  function cowbell(f, s, vol = .09) { [1, 1.48].forEach(m => { const ss = s + T; const o = ac.createOscillator(); o.type = 'square'; o.frequency.value = f * m;
+    const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1800; bp.Q.value = 1.2; const g = ac.createGain(); env(g, ss, .28, vol, .002);
+    o.connect(bp); bp.connect(g); g.connect(master); g.connect(verb); o.start(ss); o.stop(ss + .35); }); }
+  const kick = s => { tone('sine', 160, s, .45, .9, { fEnd: 38 }); };
+  const b808 = (f, s, d = .55) => { tone('sine', f, s, d, .55, { fEnd: f * .92, dest: dist }); tone('sine', f, s, d, .5, { fEnd: f * .92 }); };
+  const clap = s => { noise(s, .16, .45, 1600, 'bandpass'); noise(s + .012, .12, .3, 1300, 'bandpass', dist); };
+  const hat = (s, v = .08) => noise(s, .03, v, 8000, 'highpass');
+  function phonk(a, b, { bpm = 130, root = 41, mel }) {
+    const st = 60 / bpm / 4; let i = 0;
+    for (let s = a; s < b - .01; s += st, i++) { const k = i % 16, bar = (i / 16 | 0);
+      if (k === 0 || k === 7 || k === 10) { kick(s); b808(mtof(root + (bar % 2 && k === 10 ? 3 : 0)), s); }
+      if (k === 4 || k === 12) clap(s);
+      if (k % 2 === 0) hat(s, k % 4 ? .05 : .08);
+      const m = mel[(i) % mel.length]; if (m != null) cowbell(mtof(m), s);
+    }
+  }
+  const pad = (notes, s, d, v = .05) => notes.forEach(m => { tone('sawtooth', mtof(m), s, d, v, { lp: 900 }); tone('sine', mtof(m + 12), s, d, v * .6); });
+  const riser = (s, d) => { noise(s, d, .18, 1200, 'bandpass'); tone('sine', 200, s, d, .06, { fEnd: 1800 }); };
+  const MEL1 = [65, null, 65, 68, null, 65, 63, null, 60, null, 63, null, 65, 68, 70, null];
+  const MEL2 = [72, null, null, 72, 70, null, 67, null, 72, null, 75, null, 74, null, 70, null];
+
+  const choir = (notes, s, d, v = .045) => notes.forEach((m, i) => { tone('sawtooth', mtof(m), s, d, v, { lp: 1400, vib: 3 + i }); tone('triangle', mtof(m + 12), s, d, v * .7, { vib: 4 }); });
+  const plus = s => { boom(s, false); choir([60, 64, 67, 72], s, 2.2, .05); tone('sine', mtof(96), s, 1.2, .08); tone('sine', mtof(103), s + .08, 1.2, .06); };
+  const minus = s => { boom(s, true); tone('sawtooth', 600, s, 1.4, .18, { fEnd: 60, lp: 1800 }); };
+  const steps = (a, b, gap, v = .12) => { for (let x = a; x < b; x += gap) noise(x, .05, v, 650, 'bandpass'); };
+  const scratch = s => { noise(s, .3, .5, 2500, 'bandpass'); tone('sawtooth', 900, s, .3, .15, { fEnd: 120 }); };
+  // ===== BIRAKIYOR =====
+  function fart(s, d, f = 85, v = .5) { const ss = s + T; const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(f, ss); for (let x = 0; x < d; x += .03) o.frequency.setValueAtTime(f * (.75 + hash(s * 31 + x * 97) * .6) * (1 - x / d * .3), ss + x);
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 700; lp.Q.value = 4; const g = ac.createGain(); g.gain.setValueAtTime(0, ss); g.gain.linearRampToValueAtTime(v, ss + .03); for (let x = .03; x < d; x += .025) g.gain.setValueAtTime(v * (.45 + hash(s * 13 + x * 51) * .55), ss + x); g.gain.exponentialRampToValueAtTime(.0001, ss + d);
+    o.connect(lp); lp.connect(g); g.connect(master); g.connect(dist); o.start(ss); o.stop(ss + d + .05); noise(s, d, v * .4, 260, 'bandpass'); }
+  const plop = s => { tone('sine', 900, s, .12, .25, { fEnd: 180 }); noise(s, .05, .2, 800, 'bandpass'); };
+  const beep = (s, d = 1.4) => tone('sine', 1000, s, d, .12);
+  const whistle = s => [79, 84, 83, 79, 76, 79, 81, 79].forEach((m, i) => tone('sine', mtof(m + 12), s + i * .2, .18, .06, { vib: 6 }));
+  const squish = s => { noise(s, .35, .6, 500, 'bandpass'); tone('sine', 300, s, .3, .3, { fEnd: 90 }); noise(s + .1, .3, .3, 1200, 'bandpass'); };
+  const slide = (s, d) => { tone('sine', 300, s, d, .1, { fEnd: 1400 }); noise(s, d, .1, 2000, 'bandpass'); };
+  const tuba = (m, s, d = .25) => tone('sawtooth', mtof(m), s, d, .12, { lp: 500 });
+  const sneak = (a, b) => { const N = [57, null, 60, null, 62, 63, 64, null, 67, null, 64, null, 62, null, 60, null]; let i = 0; for (let s = a; s < b; s += .18, i++) { const m = N[i % 16]; if (m) tone('triangle', mtof(m), s, .14, .1); if (i % 4 === 0) tuba(33 + (i % 8 ? 7 : 0), s, .3); } };
+  const polka = (a, b) => { const N = [36, 43, 40, 43]; const M = [72, 74, 76, 77, 79, null, 79, null, 81, 79, 77, 76, 74, null, 72, null]; let i = 0; for (let s = a; s < b; s += .22, i++) { if (i % 2 === 0) tuba(N[(i / 2 | 0) % 4], s); else tone('square', mtof(64), s, .1, .025); const m = M[i % 16]; if (m) tone('triangle', mtof(m), s, .18, .06); } };
+  const lounge = (a, b) => { const M = [76, 79, 83, 81, 79, 76, 74, 76, 79, 81, 79, 76]; let i = 0; for (let s = a; s < b - .05; s += .3, i++) { tone('triangle', mtof(M[i % 12]), s, .26, .05); if (i % 2 === 0) tone('sine', mtof([52, 57, 55, 50][(i >> 2) % 4]), s, .5, .07); } };
+  if (CARD !== null) return;
+  boom(.4, true); scratch(.4); tone('sawtooth', 55, .4, 2.0, .06, { lp: 300 });
+  for (let x = 2.5; x < 15; x += 1.0) tone('sine', 60, x, .6, .05); noise(2.5, 12.5, .03, 6000, 'highpass');
+  for (let x = 2.6; x < 12.8; x += .12) tone('square', 300 + hash(x * 50) * 400, x, .05, .012, { lp: 2000 });
+  sneak(4.6, 8.6); noise(7.0, .3, .15, 900, 'bandpass'); beep(8.7, 2.2); fart(8.9, .9, 80, .45); plop(10.4); whistle(11.0);
+  for (let x = 12.8; x < 15; x += .5) tone('square', 2200, x, .18, .05, { lp: 4000 }); for (let x = 12.8; x < 15; x += .05) noise(x, .03, .12, 5000, 'highpass'); boom(12.8, false);
+  tone('sine', 300, 15.0, .5, .08, { fEnd: 120 }); scratch(15.4); choir([45, 52, 57], 15.0, 2.4, .03);
+  [[48, 0], [47, .5], [45, 1.0]].forEach(([m, o]) => tone('sawtooth', mtof(m), 17.6 + o, o === 1.0 ? 1.4 : .45, .12, { lp: 700 })); boom(17.6, true);
+  [72, 76, 79, 84].forEach((m, i) => tone('triangle', mtof(m), 19.7 + i * .12, .2, .07)); polka(22.0, 24.2); steps(22.3, 23.6, .08, .12);
+  [72, 76, 79, 84].forEach((m, i) => { tone('triangle', mtof(m), 24.2 + i * .16, i === 3 ? 1.2 : .2, .09); tone('square', mtof(m - 12), 24.2 + i * .16, .15, .03); });
+}
+
+
+/* ---------- oynatma ---------- */
+function resize() { const r = stageRect(); renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize); resize(); renderAt(0);
+
+if (RENDER_MODE) {
+  window.renderAt = t => renderAt(t); window.DUR = DUR;
+  window.renderAudioWav = async () => {
+    const sr = 44100, oac = new OfflineAudioContext(2, Math.ceil(sr * DUR), sr); buildAudio(oac, 0); const buf = await oac.startRendering();
+    const n = buf.length, d = new DataView(new ArrayBuffer(44 + n * 4)); const S = (o, s) => [...s].forEach((c, i) => d.setUint8(o + i, c.charCodeAt(0)));
+    S(0, 'RIFF'); d.setUint32(4, 36 + n * 4, true); S(8, 'WAVEfmt '); d.setUint32(16, 16, true); d.setUint16(20, 1, true); d.setUint16(22, 2, true);
+    d.setUint32(24, sr, true); d.setUint32(28, sr * 4, true); d.setUint16(32, 4, true); d.setUint16(34, 16, true); S(36, 'data'); d.setUint32(40, n * 4, true);
+    const a = buf.getChannelData(0), b = buf.getChannelData(1);
+    for (let i = 0; i < n; i++) { d.setInt16(44 + i * 4, clamp(a[i], -1, 1) * 32767, true); d.setInt16(46 + i * 4, clamp(b[i], -1, 1) * 32767, true); }
+    const u8 = new Uint8Array(d.buffer); let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
+    return btoa(s);
+  };
+  window.READY = true;
+} else {
+  let ac = null, start = 0; const now = () => ac ? ac.currentTime : performance.now() / 1000;
+  const schedule = () => { start = now() + .08; if (ac) buildAudio(ac, start); };
+  $('play').onclick = async () => {
+    try { ac = new (window.AudioContext || window.webkitAudioContext)(); await ac.resume(); } catch (e) { ac = null; }
+    $('ui').style.display = 'none'; schedule();
+    (function loop() { let t = now() - start; if (t >= DUR) { schedule(); t = 0; } renderAt(Math.max(0, t)); requestAnimationFrame(loop); })();
+  };
+}
+</script>
+</body>
+</html>
