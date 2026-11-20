@@ -42,6 +42,9 @@
   .m .tk{float:right;color:#34b7f1;font-size:1.1cqw;margin-left:.6cqw}
   #sansur{position:absolute;pointer-events:none;transform:translate(-50%,-50%);background-size:100% 100%;image-rendering:pixelated;opacity:0;border:.3cqw solid #000;display:flex;align-items:center;justify-content:center;z-index:2}
   #sansur::after{content:"SANSÜR";background:#000;color:#fff;font:900 2.2cqw/1 Impact,"DejaVu Sans",sans-serif;letter-spacing:.2em;padding:.5cqw 1.2cqw}
+  #paper{left:4cqw;top:15cqw;width:22cqw;height:29cqw;background:#f3f2ec;color:#222;opacity:0;box-shadow:0 2cqw 4cqw rgba(0,0,0,.6);font-family:"DejaVu Sans",sans-serif;display:flex;flex-direction:column;align-items:center;padding:1.6cqw;box-sizing:border-box;gap:.8cqw;z-index:4}
+  #paper b{font-size:1.7cqw;letter-spacing:.05em} #paper i{font-style:normal;font-size:1.2cqw;color:#555;align-self:flex-start}
+  #paper span{font-size:11cqw;line-height:1;filter:grayscale(1) contrast(1.8) brightness(.7)}
   #emo{position:absolute;pointer-events:none;font-size:12cqw;line-height:1;opacity:0;transform:translate(-50%,-50%);z-index:3}
 </style>
 </head>
@@ -57,6 +60,7 @@
   <div id="stamp" class="ov meme"></div>
   <div id="sansur"></div>
   <div id="emo">💩</div>
+  <div id="paper" class="ov"><b>MATEMATİK SINAVI · 7-C</b><i>Ad Soyad: ______________</i><span>💩</span><i>1) 2x + 3 = 11 ise x = ?</i><i>2) Yukarıdaki şekli yorumlayınız.</i></div>
   <div id="phone" class="ov">
     <div class="hd">7-C VELİLER &amp; ÖĞRETMENLER<small>Matematik Öğretmeni, Abdullah'ın Annesi, +31 kişi</small></div>
     <div id="msgs">
@@ -74,7 +78,7 @@
   <div id="ui">
     <nav id="nav"></nav>
     <button id="play">▶ OYNAT</button>
-    <div class="hint">ABDULLAH SIÇIP BIRAKIYOR 2 · DAHA ABSÜRT</div>
+    <div class="hint">ABDULLAH SIÇIP BIRAKIYOR 2 · 5 YENİ SENARYO</div>
   </div>
 </div>
 
@@ -90,7 +94,7 @@ const CARD = QS.has('card') ? Math.min(6, Math.max(0, parseInt(QS.get('card'), 1
 const DUR = CARD === null ? 12 : (CARD === 0 ? 3.2 : CARD === 6 ? 4 : 2.2);
 const RENDER_MODE = QS.has('render');
 if (RENDER_MODE) document.body.classList.add('render');
-const NAMES = ['hocanın sandalyesi', 'otobüs durağı', 'piknik', 'oyun koltuğu', 'okul merdiveni'];
+const NAMES = ['asansör', 'hediye kutusu', 'müdürün ayakkabısı', 'fotokopi makinesi', 'vantilatör'];
 document.getElementById('nav').innerHTML = NAMES.map((n, i) => `<a href="?v=${i + 1}" class="${i + 1 === VID && CARD === null ? 'on' : ''}">${i + 1}. ${n}</a>`).join('');
 
 
@@ -171,11 +175,6 @@ function drawScreen(s, state, p = 0, t = 0, fps = 0) {
     g.fillStyle = '#222'; g.font = '700 13px "DejaVu Serif",serif'; g.fillText('MATEMATİK ÖDEVİ', W / 2, 42);
     g.fillStyle = '#999'; for (let i = 0; i < 6; i++) g.fillRect(28, 60 + i * 14, 200 - (i % 3) * 30, 5);
   }
-  else if (state === 'kaka') { const f = Math.floor(t * 8);
-    g.fillStyle = f % 2 ? '#7a4a22' : '#8a5a2b'; g.fillRect(0, 0, W, H); g.fillStyle = '#ffd84a'; g.strokeStyle = '#2a1608'; g.lineWidth = 6; g.font = '900 38px Impact,"DejaVu Sans",sans-serif';
-    g.strokeText('KAKA MOD', W / 2, 52); g.fillText('KAKA MOD', W / 2, 52); g.font = '700 13px "DejaVu Sans Mono",monospace'; g.fillStyle = '#fff';
-    if (p < 1) { g.fillText('yükleniyor... %' + Math.floor(p * 100), W / 2, 92); g.fillStyle = '#333'; g.fillRect(28, 108, 200, 14); g.fillStyle = '#58ff3a'; g.fillRect(30, 110, 196 * p, 10); }
-    else { g.font = '900 30px "DejaVu Sans Mono",monospace'; g.fillStyle = '#58ff3a'; g.fillText('FPS: ' + fps, W / 2, 100); g.font = '700 12px "DejaVu Sans Mono",monospace'; g.fillStyle = '#ffe14a'; g.fillText('KAKA MOD AKTİF ✓', W / 2, 132); } }
   s.tex.needsUpdate = true;
 }
 
@@ -315,13 +314,10 @@ const scrC = document.createElement('canvas'); scrC.width = 512; scrC.height = 2
 const screenM = new THREE.Mesh(new THREE.PlaneGeometry(4, 2.25), new THREE.MeshBasicMaterial({ map: scrT })); screenM.position.set(0, 2.05, -4.93); g2.add(screenM);
 block(g2, C('#ddd'), 4.2, .08, .1, 0, 3.2, -4.92);
 function drawProj(state, t) {
-  const key = state + (state === 'jenny' ? Math.floor(t * 6) : state === 'kaka' ? Math.floor(t * 3) : ''); if (key === scrKey) return; scrKey = key; const g = scrG; g.textAlign = 'center'; g.textBaseline = 'middle';
+  const key = state + (state === 'jenny' ? Math.floor(t * 6) : ''); if (key === scrKey) return; scrKey = key; const g = scrG; g.textAlign = 'center'; g.textBaseline = 'middle';
   if (state === 'desk') { const gr = g.createLinearGradient(0, 0, 512, 288); gr.addColorStop(0, '#1d4f91'); gr.addColorStop(1, '#3f8ad8'); g.fillStyle = gr; g.fillRect(0, 0, 512, 288);
     [['Sunum.pptx', '#d24726'], ['Ödev.docx', '#2b579a'], ['Oyunlar', '#e0a800']].forEach(([n, c], i) => { g.fillStyle = c; g.fillRect(30, 24 + i * 70, 44, 44); g.fillStyle = '#fff'; g.font = '700 13px "DejaVu Sans",sans-serif'; g.fillText(n, 52, 82 + i * 70); });
     g.fillStyle = 'rgba(0,0,0,.4)'; g.fillRect(0, 266, 512, 22); g.fillStyle = '#fff'; g.font = '700 22px "DejaVu Sans",sans-serif'; g.fillText('Sunum yükleniyor...', 300, 140); }
-  else if (state === 'kaka') { const f = Math.floor(t * 3); g.fillStyle = '#6b4220'; g.fillRect(0, 0, 512, 288); g.fillStyle = '#f7f1e3'; g.fillRect(20, 20, 472, 248);
-    g.fillStyle = '#6b4220'; g.font = '900 34px Impact,"DejaVu Sans",sans-serif'; g.fillText("KAKA HOCA'NIN DERSİ", 256, 70);
-    g.font = '700 46px "DejaVu Sans",sans-serif'; g.fillStyle = '#222'; g.fillText(f % 2 ? '1 + 1 = 💩' : '💩 × 2 = 💩💩', 256, 150); g.font = '700 20px "DejaVu Sans",sans-serif'; g.fillStyle = '#a0522d'; g.fillText('sınavda çıkacak!', 256, 220); }
   else { const f = Math.floor(t * 6); g.fillStyle = f % 2 ? '#ff5fb0' : '#ff7cc0'; g.fillRect(0, 0, 512, 288);
     for (let i = 0; i < 26; i++) { g.fillStyle = 'rgba(255,255,255,.25)'; g.fillRect(hash(i + f * 31) * 512, hash(i * 7 + f) * 288, 16, 16); }
     g.fillStyle = '#fff'; g.strokeStyle = '#7a1b4f'; g.lineWidth = 10; g.font = '900 76px Impact,"DejaVu Sans",sans-serif'; g.strokeText('JENNY MOD', 256, 120); g.fillText('JENNY MOD', 256, 120);
@@ -406,7 +402,7 @@ const PX = v => { const p = v.clone().project(camera); return [(p.x * .5 + .5) *
 
 /* ---------- DOM ---------- */
 const $ = id => document.getElementById(id);
-const el = { top: $('top'), cap: $('cap'), aura: $('aura'), auraV: $('auraV'), stamp: $('stamp'), fps: $('fps'), title: $('title'), small: $('small'), flash: $('flash'), bar: $('bar'), phone: $('phone'), sans: $('sansur'), emo: $('emo') };
+const el = { top: $('top'), cap: $('cap'), aura: $('aura'), auraV: $('auraV'), stamp: $('stamp'), fps: $('fps'), title: $('title'), small: $('small'), flash: $('flash'), bar: $('bar'), phone: $('phone'), sans: $('sansur'), emo: $('emo'), paper: $('paper') };
 { const c = document.createElement('canvas'); c.width = 12; c.height = 10; const g = c.getContext('2d'); const cols = ['#6b4a2b', '#8a5a2b', '#d9a47e', '#2ecc71', '#34495e', '#4a3020', '#c98e6a']; for (let y = 0; y < 10; y++) for (let x = 0; x < 12; x++) { g.fillStyle = cols[(x * 7 + y * 13 + x * y) % 7]; g.fillRect(x, y, 1, 1); } el.sans.style.backgroundImage = `url(${c.toDataURL()})`; }
 const stageRect = () => $('stage').getBoundingClientRect();
 const cache = {};
@@ -414,20 +410,111 @@ const setHTML = (e, s) => { if (cache[e.id] !== s) { e.innerHTML = s; cache[e.id
 function shake(t, amt) { const f = Math.floor(t * 30); return new THREE.Vector3((hash(f) - .5) * amt, (hash(f + 50) - .5) * amt, (hash(f + 99) - .5) * amt); }
 function timed(list, t) { for (const [a, b, s] of list) if (t >= a && t < b) return s; return ''; }
 const A0 = 1.6, A1 = 3.8, sT = 7.4;
-const STAMP = ['YENİ HOCA!', 'AÇILIŞ!', 'İYİ Kİ DOĞDUN!', '+9000 FPS', 'STRIKE!'];
+const STAMP = ['MAHSUR!', 'SÜRPRİZ!', 'ŞLOP!', 'SINAV İPTAL!', 'TAHLİYE!'];
 const CAPS = {
-  1: [[.3, 1.6, 'TENEFFÜS. SINIF BOMBOŞ.'], [1.6, 3.8, 'ABDULLAH HOCANIN SANDALYESİNE...'], [3.8, 5.6, '...BIRAKTI VE GİTTİ.'], [5.6, 7.4, 'ZİL ÇALDI. HOCA GELDİ...']],
-  2: [[.3, 1.6, 'OTOBÜS DURAĞI.'], [1.6, 3.8, 'ABDULLAH DURAĞIN ORTASINA...'], [3.8, 5.6, '...BIRAKTI, OTOBÜSE ATLADI.'], [5.6, 7.4, 'GEÇ KALAN YOLCU KOŞUYOR...']],
-  3: [[.3, 1.6, 'PİKNİK ÖRTÜSÜ HAZIR.'], [1.6, 3.8, 'ABDULLAH TAM ORTAYA...'], [3.8, 5.6, '...BIRAKTI, ISLIK ÇALARAK GİTTİ.'], [5.6, 7.4, 'MEHMET SEPETLE GELDİ...']],
-  4: [[.3, 1.6, 'ALİ MUTFAKTA.'], [1.6, 3.8, "ABDULLAH ALİ'NİN OYUN KOLTUĞUNA..."], [3.8, 5.6, '...BIRAKTI, PENCEREDEN ÇIKTI.'], [5.6, 7.4, 'ALİ GERİ GELDİ...']],
-  5: [[.3, 1.6, 'OKUL MERDİVENİ.'], [1.6, 3.8, 'ABDULLAH EN ÜST BASAMAĞA...'], [3.8, 5.6, '...BIRAKTI, ISLIK ÇALARAK İNDİ.'], [5.6, 7.4, 'MÜDÜR TELEFONLA KONUŞARAK İNİYOR...']],
+  1: [[.3, 1.6, 'ASANSÖR. ABDULLAH TEK BAŞINA.'], [1.6, 3.8, '8. KATTAN 3. KATA KADAR...'], [3.8, 5.6, '...BIRAKTI, 3. KATTA İNDİ.'], [5.6, 7.4, '2. KAT: KİMSE BİNMEDİ.']],
+  2: [[.3, 1.6, "MEHMET'İN DOĞUM GÜNÜ PARTİSİ."], [1.6, 3.8, 'ABDULLAH HEDİYE KUTUSUNA...'], [3.8, 5.6, '...BIRAKTI, PAKETLEDİ, HEDİYE ETTİ.'], [5.6, 7.4, 'MEHMET HEDİYEYE BAYILDI...']],
+  3: [[.3, 1.6, 'ÖĞRETMENLER ODASININ KAPISI.'], [1.6, 3.8, 'ABDULLAH MÜDÜRÜN AYAKKABISINA...'], [3.8, 5.6, '...BIRAKTI, ISLIK ÇALARAK GİTTİ.'], [5.6, 7.4, 'MÜDÜR TELEFONLA ÇIKTI...']],
+  4: [[.3, 1.6, 'TENEFFÜS. FOTOKOPİ MAKİNESİ BOŞ.'], [1.6, 3.8, 'ABDULLAH FOTOKOPİ CAMINA...'], [3.8, 5.6, '...BIRAKTI, KAPAĞI KAPATTI.'], [5.6, 7.4, 'HOCA SINAV KAĞIDINI GETİRDİ...']],
+  5: [[.3, 1.6, 'SINAV GÜNÜ. KORİDOR SESSİZ.'], [1.6, 3.8, 'ABDULLAH VANTİLATÖRÜN ÖNÜNE...'], [3.8, 5.6, '...BIRAKTI, 3. KADEMEYE ALDI.'], [5.6, 7.4, 'KOKU KORİDORA YAYILIYOR...']],
 };
-const FIN = { 1: 'KAKA ARTIK MATEMATİK ÖĞRETMENİ. HOCA ÖĞRENCİ OLDU.', 2: 'KAKA TARİHİ ESER İLAN EDİLDİ.', 3: 'KAKANIN 1. YAŞ GÜNÜ KUTLANDI.', 4: "ALİ'NİN FPS'İ 9000 OLDU. ŞİKAYETÇİ DEĞİL.", 5: 'MÜDÜR STRIKE YAPTI. 300 PUAN.' };
+const FIN = { 1: 'MÜDÜR 9. KATA KADAR KAKAYLA YALNIZ KALDI.', 2: 'MEHMET PAKETİ KAPATTI. HOCAYA HEDİYE ETTİ.', 3: 'MÜDÜR FARK ETMEDİ. YENİ HALIYA 13 İZ BIRAKTI.', 4: '100 SINAV KAĞIDININ HEPSİNDE 💩 VAR. SINAV İPTAL.', 5: 'OKUL TAHLİYE EDİLDİ. SINAV ERTELENDİ.' };
 function setVis(name) { room.visible = name === 'room'; G.forEach(g => g.visible = false); G[0].visible = name === 'class'; G[1].visible = name === 'stairs'; G[2].visible = name === 'street'; G[3].visible = name === 'field'; }
-function hideProps() { hideAbs(); poo.visible = false; stinkL.forEach(m => m.visible = false); phoneM.visible = false; }
+function hideProps() { hideNew(); poo.visible = false; stinkL.forEach(m => m.visible = false); phoneM.visible = false; }
 function squat(c) { c.legL.rotation.x = c.legR.rotation.x = -1.3; c.body.position.y = -.45; c.armL.rotation.x = c.armR.rotation.x = -.8; }
 function sitOn(c) { c.root.position.y -= .3; c.legL.rotation.x = c.legR.rotation.x = -Math.PI / 2; }
 function cool(c, t) { shades.visible = true; c.face('sneaky'); c.walk(t, 6, .45); c.armL.rotation.x = c.armR.rotation.x = .2; }
+
+/* ================= YENİ SAHNELER (SIÇIP BIRAKIYOR 2) ================= */
+const ABS = { top: '' };
+const STOFF = [1.5, 0, 0, 2.4, .3];
+const MID = { 1: '1. KAT: MÜDÜR BİNDİ. TELEFONDA...', 2: 'MEHMET HİÇBİR ŞEY DEMEDİ. KAPAĞI KAPATTI...', 3: 'MÜDÜR FARK ETMEDİ...', 4: 'FOTOKOPİ ÇALIŞIYOR: 100 KOPYA...', 5: 'YANGIN ALARMI ÇALDI. HERKES DIŞARI!' };
+function path(pts, u) { const L = []; let tot = 0; for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); L.push(d); tot += d; }
+  let d = u * tot; for (let i = 0; i < L.length; i++) { if (d <= L[i] || i === L.length - 1) { const k = clamp(d / L[i]); return [lerp(pts[i][0], pts[i + 1][0], k), lerp(pts[i][1], pts[i + 1][1], k), Math.atan2(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1])]; } d -= L[i]; } }
+const faceTo = (c, x, z) => { c.root.rotation.y = Math.atan2(x - c.root.position.x, z - c.root.position.z); };
+function walkPath(c, t, a, b, pts, sp = 9) { const u = seg(t, a, b); const [x, z, r] = path(pts, u); c.root.position.x = x; c.root.position.z = z; if (u < 1) { c.root.rotation.y = r; c.walk(t, sp, .55); } return u; }
+const ramp = (t, ivs) => { let v = 0; for (const [a, b] of ivs) v = Math.max(v, Math.min(seg(t, a, a + .3), 1 - seg(t, b - .3, b))); return v; };
+const txtTex = (w, h, draw) => pixTex(w, h, draw, true);
+const plane = (parent, tex, w, h, x, y, z, ry = 0) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, transparent: true })); m.position.set(x, y, z); m.rotation.y = ry; parent.add(m); return m; };
+
+/* --- 1) ASANSÖR --- */
+const EX = 200, gE = grp(EX);
+const metal = L(rep(pixTex(16, 16, (g, w, h) => { noisy(g, w, h, [178, 182, 188], 10); g.fillStyle = 'rgba(255,255,255,.18)'; for (let x = 0; x < 16; x += 3) g.fillRect(x, 0, 1, 16); }), 2, 3));
+block(gE, C('#3b3b3b'), 2.2, .05, 2, 0, -.025, 0); const backW = block(gE, metal, 2.2, 2.6, .06, 0, 1.3, -1.03); block(gE, metal, .06, 2.6, 2.1, -1.13, 1.3, 0); block(gE, metal, .06, 2.6, 2.1, 1.13, 1.3, 0);
+block(gE, C('#c9ccd2'), 2.3, .06, 2.1, 0, 2.63, 0); block(gE, new THREE.MeshBasicMaterial({ color: '#fffbe8' }), 1.2, .02, .8, 0, 2.6, 0);
+block(gE, metal, .58, 2.6, .06, -.85, 1.3, 1.0); block(gE, metal, .58, 2.6, .06, .85, 1.3, 1.0); block(gE, metal, 1.2, .4, .06, 0, 2.4, 1.0);
+const rail = block(gE, C('#888'), 2.0, .05, .05, 0, .95, -.97);
+const doorL = block(gE, C('#a9adb4'), .56, 2.2, .04, -.28, 1.1, 1.06), doorR = block(gE, C('#a9adb4'), .56, 2.2, .04, .28, 1.1, 1.06);
+const panelG = new THREE.Group(); panelG.position.set(1.095, 1.25, .55); gE.add(panelG); block(panelG, C('#222'), .02, .6, .22, 0, 0, 0);
+for (let i = 0; i < 10; i++) block(panelG, new THREE.MeshBasicMaterial({ color: '#ddd' }), .02, .04, .05, -.012, -.22 + (i >> 1) * .1, (i % 2 ? .05 : -.05));
+const dispC = document.createElement('canvas'); dispC.width = 64; dispC.height = 32; const dispT = new THREE.CanvasTexture(dispC); let dispKey = '';
+plane(gE, dispT, .36, .18, 0, 2.38, .965, Math.PI);
+function drawDisp(f, dirn) { const k = f + dirn; if (k === dispKey) return; dispKey = k; const g = dispC.getContext('2d'); g.fillStyle = '#111'; g.fillRect(0, 0, 64, 32); g.fillStyle = '#ff3b2f'; g.font = '900 24px "DejaVu Sans Mono",monospace'; g.textAlign = 'center'; g.fillText(dirn + f, 32, 25); dispT.needsUpdate = true; }
+block(gE, C('#9a9a9a'), 8, .05, 4, 0, -.03, 3);
+const hallWallM = C('#c9b98a'); block(gE, hallWallM, 8, 3, .1, 0, 1.5, 4.6);
+const floorSignC = document.createElement('canvas'); floorSignC.width = 64; floorSignC.height = 64; const floorSignT = new THREE.CanvasTexture(floorSignC); let fsKey = '';
+plane(gE, floorSignT, .6, .6, 0, 1.9, 4.54, Math.PI);
+function drawSign(f) { if (fsKey === f) return; fsKey = f; const g = floorSignC.getContext('2d'); g.fillStyle = '#1d3f8a'; g.fillRect(0, 0, 64, 64); g.fillStyle = '#fff'; g.font = '900 40px "DejaVu Sans",sans-serif'; g.textAlign = 'center'; g.fillText(f, 32, 47); floorSignT.needsUpdate = true; }
+
+/* --- 2) HEDİYE (çayır grubunda) --- */
+const gift = new THREE.Group(); G[3].add(gift);
+const giftRed = C('#d42a3a'), gold = C('#f2c230');
+block(gift, giftRed, .5, .42, .5, 0, .21, 0); block(gift, gold, .08, .425, .505, 0, .21, 0); block(gift, gold, .505, .425, .08, 0, .21, 0);
+const lid = new THREE.Group(); gift.add(lid); block(lid, giftRed, .56, .1, .56, 0, .05, 0); block(lid, gold, .09, .105, .565, 0, .05, 0); block(lid, gold, .565, .105, .09, 0, .05, 0); block(lid, gold, .16, .1, .06, -.07, .14, 0).rotation.z = .6; block(lid, gold, .16, .1, .06, .07, .14, 0).rotation.z = -.6;
+const cake = new THREE.Group(); G[3].add(cake); { const m = new THREE.Mesh(new THREE.CylinderGeometry(.3, .3, .22, 20), C('#fff3e0')); m.position.y = .11; cake.add(m); const m2 = new THREE.Mesh(new THREE.CylinderGeometry(.31, .31, .05, 20), C('#ff7aa8')); m2.position.y = .2; cake.add(m2);
+  for (let i = 0; i < 5; i++) { const a = i / 5 * Math.PI * 2; block(cake, C(['#3ad7ff', '#ffd84a', '#58ff3a'][i % 3]), .03, .12, .03, Math.cos(a) * .18, .3, Math.sin(a) * .18); block(cake, new THREE.MeshBasicMaterial({ color: '#ffb21a' }), .025, .04, .025, Math.cos(a) * .18, .38, Math.sin(a) * .18); } }
+cake.position.set(.75, .03, -1.7);
+const hats = [extras[0], extras[1], extras[3]].map((c, i) => { const h = new THREE.Mesh(new THREE.ConeGeometry(.18, .42, 12), C(['#ff4fa8', '#3ad7ff', '#ffd84a'][i])); h.position.set(.05, .72, 0); h.rotation.z = -.2; c.head.add(h); return h; });
+
+/* --- 3) AYAKKABILAR / ÖĞRETMENLER ODASI --- */
+const KX = 240, gK = grp(KX);
+block(gK, L(rep(planks([160, 120, 80]), 6, 6)), 10, .1, 9, 0, -.05, 0.5);
+block(gK, L(rep(pixTex(16, 32, (g) => { g.fillStyle = '#efe6c8'; g.fillRect(0, 0, 16, 32); g.fillStyle = '#8a6a4a'; g.fillRect(0, 22, 16, 10); }), 5, 1)), 10, 3.2, .1, 0, 1.6, -3);
+const tDoor = new THREE.Group(); tDoor.position.set(-2.05, 0, -2.92); gK.add(tDoor); block(tDoor, L(planks([110, 70, 40])), 1.1, 2.2, .06, .55, 1.1, 0); block(tDoor, C('#d4af37'), .06, .06, .1, 1.0, 1.05, .05);
+const ogT = txtTex(256, 48, (g) => { g.fillStyle = '#123a6b'; g.fillRect(0, 0, 256, 48); g.fillStyle = '#fff'; g.font = '900 22px "DejaVu Sans",sans-serif'; g.textAlign = 'center'; g.fillText('ÖĞRETMENLER ODASI', 128, 32); });
+plane(gK, ogT, 1.8, .34, -1.5, 2.55, -2.93);
+block(gK, C('#5a7a3a'), 1.3, .02, .7, -1.5, .01, -2.45);
+block(gK, L(planks([150, 110, 70])), 1.6, .06, .5, 1.4, .3, -2.7); block(gK, L(planks([150, 110, 70])), 1.6, .06, .5, 1.4, .7, -2.7); [.62, 2.18].forEach(x => block(gK, L(planks([150, 110, 70])), .06, .76, .5, x, .38, -2.7));
+const shoeM = (c) => new THREE.MeshPhongMaterial({ color: c, shininess: 60 });
+[[1.0, .35, '#7a4a22'], [1.5, .35, '#2a5aa0'], [1.9, .75, '#eeeeee'], [1.1, .75, '#444']].forEach(([x, y, c]) => [-.09, .09].forEach(dx => block(gK, shoeM(c), .13, .1, .3, x + dx, y + .05, -2.7)));
+const mShoes = [-.1, .1].map(dx => block(gK, new THREE.MeshPhongMaterial({ color: '#0b0b0b', shininess: 140, specular: '#ffffff' }), .14, .11, .32, -1.5 + dx, .065, -2.3));
+block(gK, C('#f6f2e8'), 6, .015, 4.6, .5, .01, .9);
+const haliT = txtTex(256, 40, (g) => { g.fillStyle = '#c0392b'; g.fillRect(0, 0, 256, 40); g.fillStyle = '#fff'; g.font = '900 20px "DejaVu Sans",sans-serif'; g.textAlign = 'center'; g.fillText('YENİ HALI · BASMAYIN', 128, 28); });
+const haliSign = new THREE.Mesh(new THREE.PlaneGeometry(1.4, .22), new THREE.MeshBasicMaterial({ map: haliT })); haliSign.rotation.x = -Math.PI / 2; haliSign.position.set(1.8, .03, -1.0); gK.add(haliSign);
+const prints = []; for (let i = 0; i < 40; i++) { const m = block(gK, C('#5a3418'), .13, .01, .28, 0, .025, 0); m.visible = false; prints.push(m); }
+
+/* --- 4) FOTOKOPİ (sınıf grubunda) --- */
+const copier = new THREE.Group(); copier.position.set(4.6, 0, -3.8); G[0].add(copier);
+block(copier, C('#dcdcdc'), 1.0, .95, .75, 0, .475, 0); block(copier, C('#bdbdbd'), 1.0, .05, .76, 0, .3, 0); block(copier, C('#bdbdbd'), 1.0, .05, .76, 0, .6, 0);
+block(copier, C('#1c2a33'), .86, .02, .6, 0, .96, 0);
+const cLid = new THREE.Group(); cLid.position.set(0, .97, -.36); copier.add(cLid); block(cLid, C('#e8e8e8'), .98, .06, .72, 0, .03, .36);
+const cScan = block(copier, new THREE.MeshBasicMaterial({ color: '#e9fff0' }), .05, .03, .58, 0, .965, 0); cScan.visible = false;
+block(copier, C('#333'), .3, .08, .16, .3, .99, .3); block(copier, new THREE.MeshBasicMaterial({ color: '#58ff3a' }), .14, .01, .08, .3, 1.035, .3);
+block(copier, C('#cfcfcf'), .4, .03, .5, -.7, .62, 0);
+const stack = block(copier, C('#ffffff'), .34, .01, .46, -.7, .64, 0);
+const flyP = []; for (let i = 0; i < 10; i++) { const m = block(G[0], C('#ffffff'), .34, .006, .46, 0, 0, 0); m.visible = false; flyP.push(m); }
+const deskP = SEATS.map(([x, z]) => { const m = block(G[0], C('#ffffff'), .34, .008, .46, x, .76, z + .05); m.visible = false; return m; });
+
+/* --- 5) KORİDOR + VANTİLATÖR --- */
+const VX = 280, gV = grp(VX);
+block(gV, L(rep(pixTex(16, 16, (g) => { g.fillStyle = '#d9d4c7'; g.fillRect(0, 0, 16, 16); g.fillStyle = '#bfb8a8'; g.fillRect(0, 0, 8, 8); g.fillRect(8, 8, 8, 8); }), 4, 28)), 4.2, .1, 30, 0, -.05, -10);
+const cw = L(rep(pixTex(16, 32, (g) => { g.fillStyle = '#efe6c8'; g.fillRect(0, 0, 16, 32); g.fillStyle = '#4f8a6a'; g.fillRect(0, 21, 16, 11); }), 15, 1));
+block(gV, cw, .1, 3.2, 30, -2.1, 1.6, -10); block(gV, cw, .1, 3.2, 30, 2.1, 1.6, -10); block(gV, C('#e8e4da'), 4.2, .1, 30, 0, 3.2, -10); block(gV, cw, 4.2, 3.2, .1, 0, 1.6, 4.9);
+for (let z = 3; z > -25; z -= 4) block(gV, new THREE.MeshBasicMaterial({ color: '#fffbe8' }), 1.2, .02, .3, 0, 3.14, z);
+const cDoors = []; [-4, -10, -16].forEach(z => [-1, 1].forEach(s => { const g = new THREE.Group(); g.position.set(s * 2.04, 0, z + .55); gV.add(g); block(g, L(planks([120, 82, 50])), .06, 2.2, 1.1, 0, 1.1, -.55); cDoors.push({ g, s, z }); }));
+for (let z = -1; z > -20; z -= 2.2) [-1, 1].forEach(s => { if (Math.abs(z + 4) < 1 || Math.abs(z + 10) < 1 || Math.abs(z + 16) < 1) return; block(gV, C('#3f6fb5'), .45, 1.8, .9, s * 1.85, .9, z); });
+const exitT = txtTex(128, 48, (g) => { g.fillStyle = '#0f8a3a'; g.fillRect(0, 0, 128, 48); g.fillStyle = '#fff'; g.font = '900 26px "DejaVu Sans",sans-serif'; g.textAlign = 'center'; g.fillText('ÇIKIŞ', 64, 34); });
+plane(gV, exitT, .8, .3, 0, 2.8, 4.84, Math.PI);
+const fan = new THREE.Group(); fan.position.set(0, 0, 1.4); gV.add(fan);
+block(fan, C('#333'), .5, .06, .5, 0, .03, 0); block(fan, C('#555'), .06, 1.0, .06, 0, .55, 0);
+const fanHead = new THREE.Group(); fanHead.position.set(0, 1.15, 0); fan.add(fanHead); fanHead.rotation.y = Math.PI;
+{ const cage = new THREE.Mesh(new THREE.TorusGeometry(.38, .02, 6, 32), C('#ddd')); cage.position.z = .08; fanHead.add(cage); const cage2 = cage.clone(); cage2.position.z = -.08; fanHead.add(cage2); block(fanHead, C('#666'), .14, .14, .2, 0, 0, -.14); }
+const blades = new THREE.Group(); fanHead.add(blades); for (let i = 0; i < 3; i++) { const b = block(blades, new THREE.MeshLambertMaterial({ color: '#4fb3ff', transparent: true, opacity: .85 }), .12, .34, .01, 0, .17, 0); const p = new THREE.Group(); p.rotation.z = i / 3 * Math.PI * 2; blades.add(p); p.add(b); }
+const stinkV = []; for (let i = 0; i < 46; i++) { const m = new THREE.Mesh(new THREE.BoxGeometry(.03, .26, .03), new THREE.MeshBasicMaterial({ color: '#9acd32', transparent: true, opacity: .8 })); m.visible = false; scene.add(m); stinkV.push(m); }
+const alarmL = new THREE.PointLight('#ff2020', 0, 30, 1.2); scene.add(alarmL);
+const alarmB = []; [-6, -13, -19].forEach(z => alarmB.push(block(gV, new THREE.MeshBasicMaterial({ color: '#661010' }), .25, .15, .1, -2.0, 2.6, z)));
+
+function hideNew() { gift.visible = false; cake.visible = false; hats.forEach(h => h.visible = false); prints.forEach(m => m.visible = false); flyP.forEach(m => m.visible = false); deskP.forEach(m => m.visible = false); stinkV.forEach(m => m.visible = false); copier.visible = false; alarmL.intensity = 0; ABS.top = ''; }
 
 function renderCard(t) {
   setVis('none'); all.forEach(c => c.reset()); hideProps(); auraP.forEach(m => m.visible = false); glow.visible = false; parts.forEach(m => m.visible = false); creeper.visible = false;
@@ -435,185 +522,189 @@ function renderCard(t) {
   hemi.intensity = 1.2; dir.intensity = 1; dir.position.set(2, 5, 6); dir.target.position.set(0, 0, 0); if (!dir.target.parent) scene.add(dir.target);
   placePoo(t, new THREE.Vector3(0, -2.6, 0)); poo.scale.setScalar(2.6); poo.rotation.y = Math.sin(t * 2) * .4; renderer.render(scene, camera); poo.rotation.y = 0;
   const k = seg(t, .25, .55), out = CARD === 6 ? 1 : 1 - seg(t, DUR - .3, DUR);
-  const T = CARD === 0 ? ['ABDULLAH SIÇIP<br>BIRAKIYOR 2', '5 senaryo · olaylar kontrolden çıktı'] : CARD === 6 ? ['BIRAKILAN 💩: 5', 'abdullah yine yakalanmadı'] : ['SENARYO ' + CARD, NAMES[CARD - 1]];
+  const T = CARD === 0 ? ['ABDULLAH SIÇIP<br>BIRAKIYOR 2', '5 yeni senaryo · kimse güvende değil'] : CARD === 6 ? ['BIRAKILAN 💩: 5', 'abdullah yine yakalanmadı'] : ['SENARYO ' + CARD, NAMES[CARD - 1]];
   setHTML(el.title, T[0]); setHTML(el.small, T[1]); el.title.style.fontSize = CARD === 0 ? '6.4cqw' : CARD === 6 ? '7.4cqw' : ''; el.title.style.whiteSpace = CARD === 0 ? 'normal' : 'nowrap'; el.title.style.lineHeight = '1.1';
   el.title.style.top = '42%'; el.small.style.top = CARD === 0 ? '62%' : '56%';
   el.title.style.opacity = k * out; el.title.style.transform = `translateY(-50%) scale(${1 + .3 * (1 - easeOutBack(k))})`; el.small.style.opacity = seg(t, .6, .9) * out;
   el.aura.style.opacity = CARD >= 1 && CARD <= 5 ? .9 * out : 0; setHTML(el.auraV, '💩 × ' + Math.max(0, (CARD || 1) - 1));
-  [el.top, el.cap, el.stamp, el.fps, el.phone, el.sans, el.emo].forEach(e => e.style.opacity = 0);
+  [el.top, el.cap, el.stamp, el.fps, el.phone, el.sans, el.emo, el.paper].forEach(e => e.style.opacity = 0);
   el.flash.style.opacity = t > .25 && t < .45 ? .6 * (1 - seg(t, .25, .45)) : 0; el.flash.style.background = '#8a5a2b';
   el.bar.style.width = (t / DUR * 100) + '%';
 }
 
-/* ================= ABSÜRT SONLAR ================= */
-const ABS = { top: '' };
-function path(pts, u) { const L = []; let tot = 0; for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); L.push(d); tot += d; }
-  let d = u * tot; for (let i = 0; i < L.length; i++) { if (d <= L[i] || i === L.length - 1) { const k = clamp(d / L[i]); return [lerp(pts[i][0], pts[i + 1][0], k), lerp(pts[i][1], pts[i + 1][1], k), Math.atan2(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1])]; } d -= L[i]; } }
-const STOFF = [.8, 2.4, 2.6, .9, 1.894];
-const MID = { 1: 'KAKA AYAĞA KALKTI...', 2: 'BELEDİYE BAŞKANI GELDİ...', 3: 'MEHMET MUM DİKTİ. HERKES ŞARKI SÖYLÜYOR...', 4: 'KAKA MODU YÜKLENİYOR...', 5: 'AŞAĞIDA 3 ÖĞRENCİ VAR...' };
-const dome = new THREE.Mesh(new THREE.SphereGeometry(.42, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshPhongMaterial({ color: '#cfeeff', transparent: true, opacity: .35, shininess: 140, specular: '#ffffff', side: THREE.DoubleSide, depthWrite: false })); scene.add(dome);
-const domeBase = new THREE.Mesh(new THREE.CylinderGeometry(.46, .5, .08, 20), C('#d4af37')); scene.add(domeBase);
-const ribbon = new THREE.Group(); scene.add(ribbon);
-[-.7, .7].forEach(x => { block(ribbon, C('#d4af37'), .06, .8, .06, x, .4, 0); block(ribbon, C('#d4af37'), .12, .1, .12, x, .82, 0); });
-const ribL = new THREE.Group(); ribL.position.set(-.7, .7, 0); ribbon.add(ribL); block(ribL, C('#d81e1e'), .7, .07, .02, .35, 0, 0);
-const ribR = new THREE.Group(); ribR.position.set(.7, .7, 0); ribbon.add(ribR); block(ribR, C('#d81e1e'), .7, .07, .02, -.35, 0, 0);
-const bow = block(ribbon, C('#ff3b3b'), .16, .14, .04, 0, .7, .01);
-const plaqueT = pixTex(160, 100, (g) => { g.fillStyle = '#2b2b2b'; g.fillRect(0, 0, 160, 100); g.fillStyle = '#d4af37'; g.fillRect(4, 4, 152, 92); g.fillStyle = '#2b2b2b'; g.fillRect(8, 8, 144, 84);
-  g.fillStyle = '#ffd84a'; g.textAlign = 'center'; g.font = '900 20px "DejaVu Sans",sans-serif'; g.fillText('TARİHİ ESER', 80, 36); g.font = '700 12px "DejaVu Sans",sans-serif'; g.fillStyle = '#fff'; g.fillText('"Durak Kakası"', 80, 58); g.fillText('Abdullah · 2026', 80, 78); }, true);
-const plaque = new THREE.Group(); scene.add(plaque); block(plaque, C('#444'), .06, 1.0, .06, 0, .5, 0); const plM = new THREE.Mesh(new THREE.PlaneGeometry(.8, .5), new THREE.MeshBasicMaterial({ map: plaqueT })); plM.position.set(0, 1.2, .04); plaque.add(plM);
-const candle = new THREE.Group(); scene.add(candle);
-block(candle, C('#ffffff'), .05, .22, .05, 0, .11, 0); block(candle, C('#ff4f9a'), .052, .04, .052, 0, .06, 0); block(candle, C('#ff4f9a'), .052, .04, .052, 0, .15, 0);
-const cFlame = new THREE.Mesh(new THREE.ConeGeometry(.04, .12, 10), new THREE.MeshBasicMaterial({ color: '#ffb21a' })); cFlame.position.y = .3; candle.add(cFlame);
-const cGlow = new THREE.PointLight('#ffb21a', 0, 3, 1.5); cGlow.position.y = .3; candle.add(cGlow);
-const hats = [mehmet, extras[1], extras[3]].map((c, i) => { const h = new THREE.Mesh(new THREE.ConeGeometry(.18, .42, 12), C(['#ff4fa8', '#3ad7ff', '#ffd84a'][i])); h.position.set(.05, .72, 0); h.rotation.z = -.2; c.head.add(h); const p = new THREE.Mesh(new THREE.SphereGeometry(.06, 8, 6), C('#ffffff')); p.position.y = .22; h.add(p); return h; });
-function hideAbs() { [dome, domeBase, ribbon, plaque, candle].forEach(o => o.visible = false); hats.forEach(h => h.visible = false); poo.rotation.set(0, 0, 0); cGlow.intensity = 0; ABS.top = ''; }
-const CONF = ['#ff4fa8', '#ffd84a', '#3ad7ff', '#58ff3a', '#ffffff', '#ff7a1a'];
-const pop = (t, a) => easeOutBack(seg(t, a, a + .35));
-const faceTo = (c, x, z) => { c.root.rotation.y = Math.atan2(x - c.root.position.x, z - c.root.position.z); };
-function walkTo(c, t, a, b, p0, p1) { const k = seg(t, a, b); c.root.position.set(lerp(p0[0], p1[0], k), p0[1] ?? 0, lerp(p0[2], p1[2], k)); if (k < 1) { faceTo(c, p1[0], p1[2]); c.walk(t, 9, .6); } return k; }
-
-function absurd(t, cam, look) {
-  let fov = 54; const d = t - sT;
-  if (VID === 1) {
-    const ch = new THREE.Vector3(CX - 2.6, .5, -4.4), desk = new THREE.Vector3(CX - 2.6, .84, -3.6);
-    if (d < .3) placePoo(t, ch, 1 + seg(t, sT, sT + .3) * .7);
-    else { const j = seg(t, sT + .3, sT + .9); const p = ch.clone().lerp(desk, j); p.y += Math.sin(j * Math.PI) * 1.0; if (j >= 1) p.y += Math.abs(Math.sin(t * 9)) * .1; placePoo(t, p, 1); poo.scale.multiplyScalar(1 + j * .9); poo.rotation.y = j >= 1 ? Math.sin(t * 4) * .5 : 0; }
-    hoca.reset(); hoca.root.visible = true;
-    if (d < .9) { const k = easeOut(seg(t, sT, sT + .4)); hoca.root.position.set(CX - 2.6 + k * 1.2, Math.sin(k * Math.PI) * .6, -4.3 + k * .5); hoca.root.rotation.y = 0; hoca.face('shock'); hoca.armL.rotation.z = -2.6; hoca.armR.rotation.z = 2.6; }
-    else if (d < 2.3) { const u = seg(t, sT + .9, sT + 2.3); const [x, z, a] = path([[-1.4, -3.8], [-.5, -2.6], [-.5, -.6], [-1.6, -.6]], u); hoca.root.position.set(CX + x, 0, z); hoca.root.rotation.y = a; hoca.walk(t, 8, .5); hoca.face('happy'); }
-    else { hoca.root.position.set(CX - 1.6, 0, -.55); hoca.root.rotation.y = Math.PI; hoca.sit(); hoca.type(t); hoca.head.rotation.x = Math.sin(t * 3) * .15; hoca.face('happy'); }
-    drawProj(d > .9 ? 'kaka' : 'desk', t);
-    if (d < .9) { cam.set(CX + .4, 1.8, -1.0); look.set(CX - 2.2, 1.1, -4); fov = 54; } else { cam.set(CX + 1.6, 2.3, 3.4); look.set(CX - 1.5, 1.3, -4); fov = 56; }
-  } else if (VID === 2) {
-    const spot = new THREE.Vector3(RX + .9, .17, -5); placePoo(t, spot); bus.position.set(0, 0, 999);
-    const v = extras[1]; v.reset(); v.root.visible = true; v.root.position.set(RX + 2.0, .15, -3.9); v.root.rotation.y = Math.PI;
-    if (d < 2.4) { v.face('shock'); v.armL.rotation.z = -.6; v.armR.rotation.z = .6; } else { v.face('happy'); v.armL.rotation.x = v.armR.rotation.x = -1.4; v.armL.rotation.z = -.4 - Math.abs(Math.sin(t * 14)) * .4; v.armR.rotation.z = .4 + Math.abs(Math.sin(t * 14)) * .4; }
-    const w = extras[3]; w.reset(); if (d > 1.0) { w.root.visible = true; walkTo(w, t, sT + 1.0, sT + 1.8, [RX - 2.5, .15, -2.5], [RX - .4, .15, -4.0]); if (t > sT + 1.8) { faceTo(w, RX + .9, -5); w.face(d > 2.4 ? 'happy' : 'talk'); w.armL.rotation.x = w.armR.rotation.x = -1.3; w.armL.rotation.z = -.3 - Math.abs(Math.sin(t * 13 + 1)) * .4; w.armR.rotation.z = .3 + Math.abs(Math.sin(t * 13 + 1)) * .4; } }
-    mudur.reset(); if (d > .4) { mudur.root.visible = true; const k = walkTo(mudur, t, sT + .4, sT + 1.4, [RX + 3.5, .15, -1.5], [RX + 1.3, .15, -6.3]); if (k >= 1) { faceTo(mudur, RX + .9, -3); mudur.face(Math.floor(t * 6) % 2 ? 'talk' : 'happy'); mudur.armR.rotation.x = -1.3 + (d > 2.3 && d < 2.6 ? -.8 : 0); } }
-    const dk = easeIO(seg(t, sT + .8, sT + 1.2)); if (d > .8) { dome.visible = domeBase.visible = true; domeBase.position.copy(spot).add(new THREE.Vector3(0, -.12, 0)); dome.position.copy(spot).add(new THREE.Vector3(0, lerp(5, -.08, dk), 0)); }
-    if (d > 1.2) { ribbon.visible = true; ribbon.position.set(RX + .9, .15, -4.25); ribbon.scale.setScalar(pop(t, sT + 1.2)); const c = easeOut(seg(t, sT + 2.4, sT + 2.8)); ribL.rotation.z = -c * 1.3; ribR.rotation.z = c * 1.3; bow.visible = c <= 0; }
-    if (d > 1.5) { plaque.visible = true; plaque.position.set(RX - .1, .15, -5.8); plaque.rotation.y = .25; plaque.scale.setScalar(pop(t, sT + 1.5)); }
-    if (d > 2.4) burst(t, sT + 2.4, spot.clone().add(new THREE.Vector3(0, 1.2, .3)), { n: 60, spd: 3, up: 4, col: CONF, size: .08, grav: 3, life: 2.2 });
-    cam.set(RX + .9, 2.0, .2); look.set(RX + .9, .6, -4.9); fov = 50;
-  } else if (VID === 3) {
-    const spot = new THREE.Vector3(FX, .04, -1.2); const blown = d >= 2.6; placePoo(t, spot, blown ? 1 - .25 * Math.sin(seg(t, sT + 2.6, sT + 2.9) * Math.PI) : 1);
-    candle.visible = d > .3; candle.position.set(FX, .38, -1.2); candle.scale.setScalar(pop(t, sT + .3)); cFlame.visible = !blown; cFlame.scale.set(1 + Math.sin(t * 30) * .15, 1 + Math.sin(t * 23) * .25, 1); cGlow.intensity = blown ? 0 : 1.5;
-    const m = mehmet; m.reset(); m.root.visible = true; m.root.position.set(FX + 1.0, 0, -.4); faceTo(m, FX, -1.2); m.sit(); m.root.position.y = -.27;
-    const g1 = extras[1], g2 = extras[3]; g1.reset(); g2.reset(); g1.root.visible = g2.root.visible = true;
-    const seat = (c, a, p0, p1) => { const k = walkTo(c, t, sT + .2, sT + 1.0, p0, p1); if (k >= 1) { faceTo(c, FX, -1.2); c.sit(); c.root.position.y = -.27; } return k >= 1; };
-    const s1 = seat(g1, 0, [FX - 4, 0, 0], [FX - 1.0, 0, -.5]), s2 = seat(g2, 0, [FX - 3, 0, -4], [FX - .1, 0, -2.3]);
-    hats.forEach(h => { h.visible = d > .3; });
-    [m, g1, g2].forEach((c, i) => { if (d > 1.0 && !blown) { c.face(Math.floor(t * 5 + i) % 2 ? 'talk' : 'happy'); c.body.rotation.z = Math.sin(t * 4 + i) * .12; c.armL.rotation.x = c.armR.rotation.x = -.6 + Math.sin(t * 8 + i) * .2; }
-      else if (blown) { c.face('happy'); c.armL.rotation.z = -2.6; c.armR.rotation.z = 2.6; c.root.position.y += Math.abs(Math.sin(t * 10 + i)) * .1; } });
-    if (d < .3) { m.armR.rotation.x = -1.4; }
-    if (blown) { burst(t, sT + 2.6, spot.clone().add(new THREE.Vector3(0, .9, 0)), { n: 60, spd: 2.5, up: 4.5, col: CONF, size: .07, grav: 3, life: 2.2 }); }
-    if (d > 2.2 && d < 3.1) { cam.set(FX + .25, .78, -.1); look.set(FX, .45, -1.2); fov = 46; } else { cam.set(FX + .5, 1.7, 2.1); look.set(FX, .5, -1.2); fov = 52; }
-  } else if (VID === 4) {
-    ali.reset(); ali.root.visible = true; const up = easeIO(seg(t, sT + .9, sT + 1.9));
-    ali.root.position.set(0, .2, -1.7); ali.sit(); ali.root.position.y = .2 + up * .9 + Math.sin(t * 2.5) * .05 * up;
-    ali.root.rotation.y = Math.PI + easeIO(seg(t, sT + 1.2, sT + 2.4)) * Math.PI; ali.type(t);
-    ali.face(d < .3 ? 'shock' : d < 1.2 ? 'relaxed' : 'happy');
-    const lp = seg(t, sT + .2, sT + .8); drawScreen(roomMon, 'kaka', lp, t, lp < 1 ? 0 : 9000);
-    if (d > .9) { aura(t, ali.root.position.clone().add(new THREE.Vector3(0, -.2, 0)), up); pink.color.set('#ffd84a'); pink.position.set(0, 1.8, -1.2); pink.intensity = 3 * up; }
-    if (d < .9) { cam.set(1.0, 1.8, 1.2); look.set(0, 1.2, -2.8); fov = 52; } else { cam.set(1.9, 1.9, 1.9); look.set(0, 1.6, -1.6); fov = 56; }
-  } else {
-    const k = seg(t, sT + .2, sT + 2.4); const z = lerp(.4, -9.6, k), tS = sT + STOFF[4];
-    mudur.reset(); mudur.root.visible = true; phoneM.visible = true; mudur.root.position.set(SX + .2, stairY(Math.min(-.01, z)) + .05, z); mudur.root.rotation.y = Math.PI; mudur.sit(); mudur.root.position.y += .3; mudur.root.rotation.x = z > -4 ? .35 : 0;
-    mudur.armL.rotation.z = -2.6; mudur.armR.rotation.z = 2.6; mudur.face(t < tS ? 'shock' : 'happy');
-    const PINS = [[.2, -7.6, .1, -1], [-.25, -8.2, -.8, -1], [.65, -8.2, .8, -1]];
-    [extras[1], extras[2], extras[3]].forEach((c, i) => { c.reset(); c.root.visible = true; const [x, pz, vx] = PINS[i]; c.root.position.set(SX + x, 0, pz); c.root.rotation.y = 0;
-      if (t < tS) { c.face(t > tS - .6 ? 'shock' : Math.floor(t * 4 + i) % 2 ? 'talk' : 'happy'); if (t > tS - .6) { c.armL.rotation.z = -2.5; c.armR.rotation.z = 2.5; } }
-      else { const e = t - tS, yv = 4.2 + i * .6; const y = Math.max(0, yv * e - 4.9 * e * e); const land = yv / 4.9; c.root.position.set(SX + x + vx * Math.min(e, land) * 2.2, y, pz - Math.min(e, land) * 3.2); c.root.rotation.x = e < land ? -e * 9 : -Math.PI / 2; c.root.rotation.z = e < land ? e * 4 * (vx || .5) : 0; if (e >= land) c.root.position.y = .15; c.face('shock'); c.armL.rotation.z = -2.6; c.armR.rotation.z = 2.6; } });
-    if (t >= tS) { ABS.top = 'SKOR: X X X &nbsp;·&nbsp; 300'; burst(t, tS, new THREE.Vector3(SX + .2, .6, -7.8), { n: 40, spd: 4, up: 3, col: ['#ffffff', '#d9d4c7', '#ffd84a'], size: .08, grav: 6, life: 1.4 }); }
-    const mz = Math.max(z, -6.4); cam.set(SX + 3.6, 2.6, mz + 2.6); look.set(SX, .9, mz - 2.0); fov = 58;
-  }
-  return fov;
-}
-
+function showG(g) { room.visible = false; G.forEach(x => x.visible = false); g.visible = true; }
+const FLOORS_UP = [[8.6, 2], [9.05, 3], [9.5, 4], [9.95, 5], [10.4, 6], [11.4, 7], [11.85, 8]];
+const HALLC = { 1: '#c9b98a', 2: '#9ec2a8', 3: '#c4a0a0', 6: '#a0aac8' };
 function renderAt(t) {
   t = clamp(t, 0, DUR - 1e-4);
   if (CARD !== null) return renderCard(t);
   el.title.style.top = ''; el.small.style.top = '';
   all.forEach(c => c.reset()); hideProps(); parts.forEach(m => m.visible = false); auraP.forEach(m => m.visible = false); glow.visible = false; creeper.visible = false; cobble.visible = false;
-  sen.root.visible = true; sen.face('happy'); shades.visible = false; pink.intensity = 0; scene.fog = null; bus.position.set(0, 0, 999);
+  sen.root.visible = true; sen.face('happy'); shades.visible = false; pink.intensity = 0; scene.fog = null;
   if (!dir.target.parent) scene.add(dir.target);
   hemi.intensity = 1.1; hemi.color.set('#ffffff'); hemi.groundColor.set('#555'); dir.intensity = 1.1; dir.color.set('#fff4e0');
   const cam = new THREE.Vector3(), look = new THREE.Vector3();
-  let fov = 52, shk = 0, filt = 'saturate(1.15) contrast(1.06)', fl = 0, fcol = '#fff', sansAt = null, pooAt = null, sq = 1;
-  const doing = t >= A0 && t < A1, left = t >= A1, hit = t >= sT;
+  let fov = 55, shk = 0, filt = 'saturate(1.15) contrast(1.06)', fl = 0, fcol = '#fff', sansAt = null, pooAt = null, pooS = 1, floorTxt = '', paperK = 0;
+  const doing = t >= A0 && t < A1, left = t >= A1, hit = t >= sT, d = t - sT;
+  const S = sen;
 
   if (VID === 1) {
-    setVis('class'); dir.target.position.set(CX, 0, 0); dir.position.set(CX + 3, 8, 5); scene.background = new THREE.Color('#bcd'); drawProj('desk', t);
-    const ch = new THREE.Vector3(CX - 2.6, 0, -4.4); pooAt = ch.clone().add(new THREE.Vector3(0, .5, 0));
-    if (t < A0) { const k = seg(t, .2, A0); sen.root.position.set(CX + lerp(2, -2.6, k), 0, lerp(1, -4.0, k)); sen.root.rotation.y = -2.3; sen.walk(t, 8, .5); sen.face('sneaky'); }
-    else if (doing) { sen.root.position.copy(ch).add(new THREE.Vector3(0, .5, 0)); sen.root.rotation.y = Math.PI; squat(sen); sansAt = sen.root.position.clone().add(new THREE.Vector3(0, .3, 0)); sen.face('relaxed'); }
-    else if (t < 5.6) { const k = seg(t, A1, 5.6); sen.root.position.set(CX + lerp(-2.6, 6.4, k), 0, lerp(-3.8, 2.2, k)); sen.root.rotation.y = Math.atan2(9, 6); cool(sen, t); } else sen.root.visible = false;
-    if (t >= 5.6) { hoca.root.visible = true; const k = seg(t, 5.6, 7.1); if (t < sT) { hoca.root.position.set(CX + lerp(6.4, -2.6, k), 0, lerp(2.2, -4.3, k)); hoca.root.rotation.y = k < 1 ? Math.atan2(-9, -6.5) : 0; if (k < 1) hoca.walk(t, 7, .45); hoca.face('happy'); }
-      else { const j = seg(t, sT + .25, sT + .9); hoca.root.position.set(CX - 2.6, j > 0 ? Math.sin(j * Math.PI) * 1.4 : .2, -4.3 + j * 1.2); hoca.root.rotation.y = 0; if (j <= 0) sitOn(hoca), hoca.root.position.y = .2; hoca.face('shock'); hoca.armL.rotation.z = -2.7; hoca.armR.rotation.z = 2.7; sq = .35; } }
-    if (t < A0) { cam.set(CX + 2, 2.4, 3.6); look.set(CX - 1.4, 1, -2.4); } else if (doing) { cam.set(CX + .6, 1.9, -1.6); look.set(CX - 2.6, 1, -4.3); fov = 48; } else if (t < 5.6) { cam.set(CX + 3, 2.2, 4.4); look.set(CX + 2, 1.2, -.5); } else if (!hit) { cam.set(CX + .6, 1.6, -1.8); look.set(CX - 2.6, .8, -4.4); fov = 50; } else { cam.set(CX + .2, 1.8, -1.2); look.set(CX - 2.4, 1.3, -4); fov = 52; }
+    /* ----- ASANSÖR ----- */
+    showG(gE); scene.background = new THREE.Color('#1a1a1a'); dir.position.set(EX + 1, 8, 3); dir.target.position.set(EX, 0, 0); hemi.intensity = 1.2;
+    let f, dn = '▼';
+    if (t < 3.8) f = 8 - Math.floor(t / .76); else if (t < 5.55) f = 3; else if (t < 7.15) f = 2; else if (t < 8.6) f = 1; else { f = 1; dn = '▲'; FLOORS_UP.forEach(([a, n]) => { if (t >= a) f = n; }); }
+    if (t > 3.8 && t < 5.3 || t > 5.8 && t < 6.8 || t > 7.15 && t < 8.6 || t > 10.4 && t < 11.4) dn = '';
+    drawDisp(String(f), dn); drawSign(String(f)); hallWallM.color.set(HALLC[f] || '#c9b98a'); floorTxt = 'KAT ' + (dn || '•') + ' ' + f;
+    const o = easeIO(ramp(t, [[3.8, 5.0], [5.8, 6.8], [7.4, 8.4], [10.5, 11.3]])); doorL.position.x = -.28 - o * .56; doorR.position.x = .28 + o * .56;
+    const P = new THREE.Vector3(EX + .25, 0, -.4);
+    backW.visible = rail.visible = false;
+    if (t < A0) { S.root.position.set(EX + .4, 0, .25); S.root.rotation.y = 0; S.face('sneaky'); S.head.rotation.y = Math.sin(t * 3) * .9; }
+    else if (doing) { S.root.position.copy(P); S.root.rotation.y = 0; squat(S); S.face('relaxed'); sansAt = P.clone().add(new THREE.Vector3(0, .5, 0)); }
+    else if (t < 5.0) { walkPath(S, t, 3.95, 5.0, [[EX + .25, -.35], [EX, .8], [EX, 2.2], [EX + 3, 2.4]]); cool(S, t); }
+    else S.root.visible = false;
+    if (left) pooAt = P.clone().add(new THREE.Vector3(0, .02, -.05));
+    if (t > 5.6 && t < 7.0) [extras[0], extras[1], extras[3]].forEach((c, i) => { c.root.visible = true; const x = EX + [-.7, 0, .7][i]; const fw = seg(t, 5.95, 6.15) - seg(t, 6.3, 6.6) * 1.6;
+      c.root.position.set(x, 0, 2.3 - fw * .4 + (i === 1 ? -.1 : 0)); c.root.rotation.y = Math.PI; c.face(t < 6.2 ? 'happy' : 'scared'); if (t > 6.2) { c.armR.rotation.x = -2.5; c.armR.rotation.z = .5; c.head.rotation.x = .2; } });
+    if (t > 10.3 && t < 11.5) { const c = extras[2]; c.root.visible = true; const fw = seg(t, 10.6, 10.8) - seg(t, 10.85, 11.1) * 1.8; c.root.position.set(EX - .1, 0, 2.3 - fw * .4); c.root.rotation.y = Math.PI; c.face(t < 10.85 ? 'happy' : 'scared'); if (t > 10.85) { c.armR.rotation.x = -2.5; c.armR.rotation.z = .5; } }
+    if (t > 7.15) { const m = mudur; m.root.visible = true; phoneM.visible = true;
+      if (t < 7.7) { m.root.position.set(EX + .1, 0, 2.6); m.root.rotation.y = Math.PI; }
+      else if (t < 8.3) { walkPath(m, t, 7.7, 8.3, [[EX + .1, 2.6], [EX - .3, .35]], 6); }
+      else m.root.position.set(EX - .3, 0, .35);
+      if (t < 8.9) { if (t > 8.3) m.root.rotation.y = 0; m.armR.rotation.x = -2.4; m.armR.rotation.z = .5; m.face(Math.floor(t * 6) % 2 ? 'talk' : 'happy'); }
+      else if (t < 9.3) { m.root.rotation.y = Math.PI; m.face('shock'); m.armR.rotation.x = -2.4; m.armR.rotation.z = .5; m.head.rotation.x = .3; }
+      else { m.root.rotation.y = Math.PI / 2; m.armR.rotation.x = -1.5 + Math.sin(t * 40) * .25; phoneM.visible = false; m.armL.rotation.x = -2.6; m.armL.rotation.z = -.5; m.head.rotation.y = 1.4; m.face(t > 10.6 && t < 11.2 ? 'shock' : 'scared'); m.body.position.x = Math.sin(t * 30) * .02; } }
+    if (doing) { cam.set(EX + .1, 1.45, .85); look.set(EX + .25, .7, -.4); fov = 58; } else { cam.set(EX - .45, 1.85, -2.9); look.set(EX, 1.05, .9); fov = 56; }
   } else if (VID === 2) {
-    setVis('street'); dir.target.position.set(RX, 0, 0); dir.position.set(RX + 4, 9, 8); scene.background = new THREE.Color('#9fc3e8'); scene.fog = new THREE.Fog('#9fc3e8', 15, 60);
-    const p = rainGeo.attributes.position.array; for (let i = 0; i < p.length; i++) p[i] = -999; rainGeo.attributes.position.needsUpdate = true;
-    const spot = new THREE.Vector3(RX + .9, .17, -5); pooAt = spot.clone();
-    const bz = t < 3.2 ? 40 : t < 4.6 ? lerp(18, -4, easeOut(seg(t, 3.2, 4.6))) : t < 5.4 ? -4 : lerp(-4, -50, Math.pow(seg(t, 5.4, 7.5), 2)); bus.position.set(3.2, 0, bz);
-    if (t < A0) { sen.root.position.set(RX + .9, .15, lerp(-1, -5, seg(t, .2, A0))); sen.root.rotation.y = Math.PI; sen.walk(t, 8, .5); sen.face('sneaky'); }
-    else if (doing) { sen.root.position.copy(spot); sen.root.rotation.y = 0; squat(sen); sansAt = spot.clone().add(new THREE.Vector3(0, .5, 0)); sen.face('relaxed'); }
-    else if (t < 5.2) { const k = seg(t, A1, 4.9); sen.root.position.set(RX + lerp(.9, 2.0, k), .15, lerp(-5, -4.2, k)); sen.root.rotation.y = Math.PI / 2; cool(sen, t); if (k >= 1) sen.root.visible = false; } else sen.root.visible = false;
-    if (t >= 5.4) { const v = mehmet === extras[0] ? extras[1] : extras[0]; v.root.visible = true; let z = lerp(4, -5, seg(t, 5.4, sT)); if (!hit) { v.root.position.set(RX + .9, .15, z); v.root.rotation.y = Math.PI; v.walk(t, 14, .9); v.armR.rotation.x = -2.6; v.face('scared'); }
-      else { const k = seg(t, sT, 9.2); v.root.position.set(RX + .9, .25, -5 - easeOut(k) * 3.2); v.root.rotation.y = Math.PI; v.root.rotation.x = -1.35; v.legL.rotation.x = v.legR.rotation.x = -1; v.armL.rotation.z = -2.6; v.armR.rotation.z = 2.6; v.face('shock'); sq = .6; } }
-    if (t < 5.4) { cam.set(RX - 1.4, 1.8, -1.6); look.set(RX + 1.4, .9, -5.4); fov = 55; } else { cam.set(RX - .8, 1.5, -11.2); look.set(RX + .9, .8, -5); fov = 55; }
+    /* ----- HEDİYE KUTUSU ----- */
+    showG(G[3]); dir.target.position.set(FX, 0, 0); dir.position.set(FX + 4, 10, 8); scene.background = new THREE.Color('#86b8ff'); scene.fog = new THREE.Fog('#86b8ff', 20, 45);
+    gift.visible = true; cake.visible = true; hats.forEach(h => h.visible = true);
+    const m = mehmet, g1 = extras[1], g2 = extras[3]; [m, g1, g2].forEach(c => c.root.visible = true);
+    m.root.position.set(FX, 0, -2.25); m.root.rotation.y = 0; m.sit(); m.root.position.y = -.27;
+    g1.root.position.set(FX - 1.25, 0, -1.4); g1.root.rotation.y = Math.PI / 2; g1.sit(); g1.root.position.y = -.27;
+    g2.root.position.set(FX + 1.3, 0, -1.25); g2.root.rotation.y = -Math.PI / 2; g2.sit(); g2.root.position.y = -.27;
+    [m, g1, g2].forEach((c, i) => c.face(Math.floor(t * 3 + i) % 2 ? 'happy' : 'talk'));
+    lid.position.set(0, .42, 0); lid.rotation.set(0, 0, 0);
+    if (t < A1) { gift.position.set(-4.6, 0, -6.6); if (t < 3.8) { lid.position.set(.55, -.37, .25); lid.rotation.set(0, .4, 0); } }
+    if (t < A0) { walkPath(S, t, .1, A0, [[FX - 7.0, -4.2], [FX - 4.6, -6.3]]); S.face('sneaky'); }
+    else if (doing) { S.root.position.set(FX - 4.6, .1, -6.6); S.root.rotation.y = 0; squat(S); S.face('relaxed'); sansAt = new THREE.Vector3(FX - 4.6, .75, -6.6); }
+    const carryEnd = 5.4;
+    if (left && t < carryEnd) { if (t < 4.1) { S.root.position.set(FX - 4.6, 0, -6.1); S.root.rotation.y = Math.PI; S.armL.rotation.x = S.armR.rotation.x = -1.0; const k = seg(t, 3.8, 4.1); lid.position.set(lerp(.55, 0, k), lerp(-.37, .42, k) + Math.sin(k * Math.PI) * .3, lerp(.25, 0, k)); lid.rotation.set(0, lerp(.4, 0, k), 0); S.face('sneaky'); }
+      else { walkPath(S, t, 4.1, carryEnd, [[FX - 4.6, -6.1], [FX - 2.2, -2.2], [FX - .1, -.55]], 7); cool(S, t); S.armL.rotation.x = S.armR.rotation.x = -1.2; }
+      if (t >= 4.1) { const fwd = new THREE.Vector3(Math.sin(S.root.rotation.y), 0, Math.cos(S.root.rotation.y)); gift.position.copy(S.root.position).addScaledVector(fwd, .42).sub(G[3].position); gift.position.y = .55; } }
+    if (t >= carryEnd) { const k = seg(t, carryEnd, 5.75); S.root.position.set(FX + lerp(-.1, 2.0, k), 0, lerp(-.55, .4, k)); faceTo(S, FX, -2.2); if (k < 1) S.walk(t, 7, .4); shades.visible = true; S.face('sneaky');
+      if (t >= 9.8) { S.face('shock'); shades.visible = false; } }
+    if (t >= carryEnd && t < 5.8) gift.position.set(-.1, .03, -1.15);
+    if (t >= 5.8 && t < 9.8) { const k = easeIO(seg(t, 5.8, 6.1)); gift.position.set(lerp(-.1, 0, k), lerp(.03, .32, k), lerp(-1.15, -1.75, k)); m.armL.rotation.x = m.armR.rotation.x = -1.1;
+      if (t > 6.3 && t < 7.3) { gift.rotation.set(Math.sin(t * 40) * .15, 0, Math.cos(t * 37) * .15); gift.position.y += Math.abs(Math.sin(t * 20)) * .05; } else gift.rotation.set(0, 0, 0);
+      if (t > 5.8 && t < sT) { [g1, g2].forEach(c => { c.armL.rotation.x = c.armR.rotation.x = -1.3; c.armL.rotation.z = -.3 - Math.abs(Math.sin(t * 13)) * .4; c.armR.rotation.z = .3 + Math.abs(Math.sin(t * 13)) * .4; }); } }
+    if (hit) { const lo = seg(t, sT, sT + .5), lc = seg(t, sT + 1.0, sT + 1.4);
+      if (lc <= 0) { lid.position.set(lo * .7, .42 + Math.sin(lo * Math.PI) * .7 - lo * .74, lo * .4); lid.rotation.set(lo * 2.5, lo, 0); }
+      else { lid.position.set(lerp(.7, 0, lc), lerp(-.32, .42, lc), lerp(.4, 0, lc)); lid.rotation.set(lerp(2.5, 0, lc), lerp(1, 0, lc), 0); }
+      if (lc < 1) { pooAt = gift.position.clone().add(G[3].position).add(new THREE.Vector3(0, .22, 0)); pooS = .9; }
+      [m, g1, g2].forEach(c => c.face(lc > 0 && c === m ? 'sneaky' : (t < sT + 1.6 ? 'shock' : 'happy')));
+      if (t < sT + 1.0) { g1.armL.rotation.z = -2.5; g2.armR.rotation.z = 2.5; }
+      if (t >= sT + 1.5) { const h = hoca; h.root.visible = true; walkPath(h, t, sT + 1.5, sT + 2.3, [[FX + 3.8, 1.6], [FX + .75, -1.15]], 8); if (t >= sT + 2.3) faceTo(h, FX, -2.2); h.face(t > sT + 2.4 ? 'happy' : 'talk');
+        if (t >= sT + 1.8) { const sk = seg(t, sT + 1.8, sT + 2.1); m.reset(); m.root.visible = true; m.root.position.set(FX, 0, -2.25); faceTo(m, FX + .75, -1.15); m.face('sneaky'); m.armL.rotation.x = m.armR.rotation.x = -1.2; }
+        if (t >= sT + 2.4) { const k = easeIO(seg(t, sT + 2.4, sT + 2.7)); h.armL.rotation.x = h.armR.rotation.x = -1.2; const hp = h.root.position.clone().sub(G[3].position); gift.position.set(lerp(0, hp.x - .3, k), lerp(.95, 1.0, k), lerp(-1.75, hp.z - .35, k)); }
+        else if (t >= sT + 1.8) gift.position.set(0, .95, -1.75); } }
+    if (t < A1) { cam.set(FX - 2.7, 1.5, -3.9); look.set(FX - 4.6, .55, -6.6); fov = 50; }
+    else if (t < 5.6) { cam.set(FX + 2.0, 2.6, 3.4); look.set(FX - 1.8, .6, -2.8); fov = 58; }
+    else if (t < sT) { cam.set(FX + .4, 1.6, 1.3); look.set(FX, .6, -1.7); fov = 52; }
+    else if (t < sT + 1.5) { cam.set(FX + .1, 2.4, -.4); look.set(FX, .4, -1.75); fov = 45; }
+    else { cam.set(FX - 2.4, 1.9, 1.4); look.set(FX + .4, .8, -1.5); fov = 56; }
   } else if (VID === 3) {
-    setVis('field'); dir.target.position.set(FX, 0, 0); dir.position.set(FX + 4, 10, 8); scene.background = new THREE.Color('#86b8ff'); scene.fog = new THREE.Fog('#86b8ff', 20, 45);
-    const spot = new THREE.Vector3(FX, .04, -1.2); pooAt = spot.clone();
-    if (t < A0) { sen.root.position.set(FX + lerp(-4, 0, seg(t, .2, A0)), 0, -1.2); sen.root.rotation.y = Math.PI / 2; sen.walk(t, 8, .5); sen.face('sneaky'); }
-    else if (doing) { sen.root.position.copy(spot); sen.root.rotation.y = 0; squat(sen); sansAt = spot.clone().add(new THREE.Vector3(0, .5, 0)); sen.face('relaxed'); }
-    else if (t < 5.6) { const k = seg(t, A1, 5.6); sen.root.position.set(FX - k * 6, 0, -1.2 - k * 3); sen.root.rotation.y = -2.4; cool(sen, t); } else sen.root.visible = false;
-    if (t >= 5.6) { const m = mehmet; m.root.visible = true; const k = seg(t, 5.6, 7.0); m.root.position.set(FX + lerp(4, 1.0, k), 0, lerp(1.5, -.2, k)); m.root.rotation.y = k < 1 ? -2.2 : -1.0; if (k < 1) m.walk(t, 7, .45); m.face('happy');
-      if (t > 7.0) { sitOn(m); m.root.position.y = -.27; m.body.rotation.x = .3 * seg(t, 7, 7.4); }
-      if (hit) { m.face(t < 8.6 ? 'happy' : 'shock'); m.armR.rotation.x = -1.4; m.head.rotation.x = .35; } }
-    if (t < 5.6) { cam.set(FX + 2.6, 1.8, 2.6); look.set(FX, .5, -1.2); } else if (!hit) { cam.set(FX + 3, 1.6, 2.2); look.set(FX + .4, .6, -1); } else { const hp = mehmet.headPos(); cam.set(hp.x + 1.6, hp.y - .1, hp.z + 1.3); look.set(spot.x + .3, .4, spot.z + .3); fov = 46; }
+    /* ----- AYAKKABI ----- */
+    showG(gK); scene.background = new THREE.Color('#ddd'); dir.target.position.set(KX, 0, 0); dir.position.set(KX + 3, 8, 6);
+    const P = new THREE.Vector3(KX - 1.4, .12, -2.3);
+    if (t < A0) { walkPath(S, t, .1, A0, [[KX + 3.5, -1.2], [KX - 1.4, -2.0]]); S.face('sneaky'); }
+    else if (doing) { S.root.position.set(KX - 1.4, .1, -2.25); S.root.rotation.y = 0; squat(S); S.face('relaxed'); sansAt = P.clone().add(new THREE.Vector3(0, .4, 0)); }
+    else if (t < 5.6) { walkPath(S, t, A1, 5.6, [[KX - 1.4, -2.0], [KX + 1.0, 0], [KX + 4.5, 1.6]]); cool(S, t); } else S.root.visible = false;
+    if (left && t < sT) { pooAt = P.clone(); pooS = .5; }
+    tDoor.rotation.y = -1.4 * easeIO(seg(t, 5.6, 6.0)) * (1 - seg(t, 8.4, 8.8));
+    mShoes[0].visible = t < 7.1; mShoes[1].visible = t < sT;
+    if (t > 5.6) { const m = mudur; m.root.visible = true; phoneM.visible = true; m.armR.rotation.x = -2.4; m.armR.rotation.z = .5; m.face(Math.floor(t * 6) % 2 ? 'talk' : 'happy');
+      if (t < 6.6) { m.root.position.set(KX - 1.5, 0, -3.6); walkPath(m, t, 5.8, 6.6, [[KX - 1.5, -3.6], [KX - 1.5, -2.05]], 6); }
+      else if (t < sT + .4) { m.root.position.set(KX - 1.5, 0, -2.05); m.root.rotation.y = 0; if (t > 6.8 && t < 7.1) m.legL.rotation.x = -.7 * Math.sin(seg(t, 6.8, 7.1) * Math.PI); if (t > 7.1 && t < sT) m.legR.rotation.x = -.7 * Math.sin(seg(t, 7.1, sT) * Math.PI); if (hit && t < sT + .4) { m.face('talk'); m.root.position.y = -.02; } }
+      else walkPath(m, t, sT + .4, 11.6, [[KX - 1.5, -2.05], [KX - .6, .6], [KX + 1.6, 2.0], [KX + 4.6, 2.3]], 6); }
+    let nP = 0; if (t >= sT + .5) { const tEnd = Math.min(t, 11.6); nP = Math.min(prints.length, Math.floor((tEnd - (sT + .5)) / .3) + 1);
+      for (let i = 0; i < nP; i++) { const ti = sT + .5 + i * .3, u = seg(ti, sT + .4, 11.6); const [x, z, r] = path([[-1.5, -2.05], [-.6, .6], [1.6, 2.0], [4.6, 2.3]], u); const side = i % 2 ? 1 : -1; const p = prints[i]; p.visible = true; p.position.set(x + Math.cos(r) * .12 * side, .025, z - Math.sin(r) * .12 * side); p.rotation.y = r; }
+      ABS.top = 'YENİ HALIDAKİ İZ: ' + nP; }
+    if (t < 5.6) { cam.set(KX + 1.6, 1.5, .8); look.set(KX - 1.2, .4, -2.3); }
+    else if (t < sT) { cam.set(KX + 1.1, 1.6, .5); look.set(KX - 1.5, .9, -2.4); }
+    else if (t < sT + .5) { cam.set(KX - .8, .6, -1.0); look.set(KX - 1.5, .1, -2.3); fov = 48; }
+    else { cam.set(KX + 1.4, 3.8, 5.6); look.set(KX + .5, 0, .2); fov = 60; }
   } else if (VID === 4) {
-    setVis('room'); dir.target.position.set(0, 0, 0); dir.position.set(-3, 6, -8); scene.background = new THREE.Color('#2a3150'); hemi.intensity = .95; hemi.color.set('#d8dcff');
-    drawScreen(roomMon, 'download', .6); pink.color.set('#9fc0ff'); pink.position.set(0, 1.3, -2.4); pink.distance = 5; pink.intensity = 1.5;
-    const ch = new THREE.Vector3(0, .5, -1.7); pooAt = ch.clone();
-    if (t < A0) { sen.root.position.set(lerp(3, 0, seg(t, .2, A0)), 0, lerp(1, -1.2, seg(t, .2, A0))); sen.root.rotation.y = -2.2; sen.walk(t, 8, .5); sen.face('sneaky'); }
-    else if (doing) { sen.root.position.copy(ch); sen.root.rotation.y = 0; squat(sen); sansAt = ch.clone().add(new THREE.Vector3(0, .4, 0)); sen.face('relaxed'); }
-    else if (t < 5.6) { const k = seg(t, A1, 5.4); sen.root.position.set(lerp(0, -3.6, k), Math.sin(seg(t, 4.8, 5.4) * Math.PI) * 1.2, lerp(-1.2, -1, k)); sen.root.rotation.y = -Math.PI / 2; cool(sen, t); if (k >= 1) sen.root.visible = false; } else sen.root.visible = false;
-    if (t >= 5.6) { ali.root.visible = true; const k = seg(t, 5.6, 7.0); if (t < sT) { ali.root.position.set(lerp(3.4, 0, k), 0, lerp(1.6, -1.1, k)); ali.root.rotation.y = k < 1 ? -2.2 : 0; if (k < 1) ali.walk(t, 7, .45); ali.face('happy'); }
-      else { const j = seg(t, sT + .25, sT + .9); ali.root.position.set(0, j > 0 ? Math.sin(j * Math.PI) * 1.5 : .2, -1.7 + j * 1.4); ali.root.rotation.y = 0; if (j <= 0) { sitOn(ali); ali.root.position.y = .2; } ali.face('shock'); ali.armL.rotation.z = -2.7; ali.armR.rotation.z = 2.7; sq = .35; } }
-    if (t < 5.6) { cam.set(2.2, 2.0, 1.4); look.set(-.4, .9, -1.5); } else { cam.set(1.8, 1.7, 1.6); look.set(0, 1.1, -1.6); fov = 55; }
+    /* ----- FOTOKOPİ ----- */
+    showG(G[0]); copier.visible = true; dir.target.position.set(CX, 0, 0); dir.position.set(CX + 3, 8, 5); scene.background = new THREE.Color('#bcd'); drawProj('desk', t);
+    const top = new THREE.Vector3(CX + 4.6, .97, -3.8);
+    cLid.rotation.x = -1.3 * (seg(t, 1.2, 1.55) - seg(t, 3.8, 4.1));
+    if (t < A0) { walkPath(S, t, .1, 1.3, [[CX + 1.0, -4.0], [CX + 4.6, -2.95]]); if (t > 1.3) { S.root.position.set(CX + 4.6, 0, -2.95); S.root.rotation.y = Math.PI; S.armR.rotation.x = -2.6; } S.face('sneaky'); }
+    else if (doing) { S.root.position.set(CX + 4.6, .68, -3.75); S.root.rotation.y = 0; squat(S); S.face('relaxed'); sansAt = top.clone().add(new THREE.Vector3(0, .35, 0)); }
+    else if (t < 5.6) { if (t < 4.1) { S.root.position.set(CX + 4.6, 0, -2.95); S.root.rotation.y = Math.PI; S.armR.rotation.x = -2.6; S.face('sneaky'); } else { walkPath(S, t, 4.1, 5.6, [[CX + 4.6, -2.95], [CX + 1.0, -4.0], [CX - 3, -4.2]]); cool(S, t); } }
+    else S.root.visible = false;
+    if (left && t < 4.0) pooAt = top.clone();
+    if (t > 5.6) extras.forEach((c, i) => { const [x, z] = SEATS[i]; c.root.visible = true; c.root.position.set(CX + x, 0, z + .62); c.root.rotation.y = Math.PI; c.sit(); c.root.position.y += .15; c.face(Math.floor(t * 2 + i) % 2 ? 'talk' : 'happy');
+      if (t > 9.6) { c.armL.rotation.x = c.armR.rotation.x = -1.7; c.head.rotation.x = .35; c.face('shock'); }
+      if (t > 10.5) { c.head.rotation.x = 0; c.armL.rotation.x = c.armR.rotation.x = 0; c.armL.rotation.z = -2.6 + Math.sin(t * 12 + i) * .2; c.armR.rotation.z = 2.6 - Math.sin(t * 12 + i) * .2; c.face('happy'); c.root.position.y += Math.abs(Math.sin(t * 9 + i)) * .12; } });
+    if (t > 5.6) { const h = hoca; h.root.visible = true;
+      if (t < 7.0) { walkPath(h, t, 5.6, 7.0, [[CX - 1, 4.4], [CX + 2.6, 1.0], [CX + 5.0, -2.9]], 8); h.armR.rotation.x = -1.2; }
+      else if (t < 8.6) { h.root.position.set(CX + 5.0, 0, -2.9); h.root.rotation.y = Math.PI; h.armR.rotation.x = t < sT ? -1.4 + (t > 7.1 ? Math.sin(t * 30) * .2 : 0) : -.2; h.face('happy'); }
+      else if (t < 9.6) { walkPath(h, t, 8.6, 9.6, [[CX + 5.0, -2.9], [CX, -2.4], [CX, 2.6]], 8); h.armL.rotation.x = -1.2; }
+      else { h.root.position.set(CX, 0, 2.6); h.root.rotation.y = Math.PI; h.armL.rotation.x = -1.4; h.head.rotation.x = .3; h.face(t > 10.0 ? 'shock' : 'happy'); } }
+    deskP.forEach((p, i) => { p.visible = t > [9.25, 8.95, 9.5, 9.6][i]; p.position.y = t > 9.6 ? 1.3 : .76; if (t > 9.6) { const [x, z] = SEATS[i]; p.position.set(x, 1.25, z + .3); p.rotation.x = -1.0; } else { const [x, z] = SEATS[i]; p.position.set(x, .76, z + .05); p.rotation.x = 0; } p.visible = p.visible && t < 10.5; });
+    if (hit) { const n = Math.floor(seg(t, sT, sT + 1.2) * 100); stack.scale.y = .01 * (1 + n * .12); stack.position.y = .64 + n * .0006; cScan.visible = t < sT + 1.2; cScan.position.x = Math.sin(t * 9) * .38; if (t < sT + 1.4) ABS.top = 'KOPYA: ' + n + '/100';
+      flyP.forEach((p, i) => { const tt = ((t - sT) * 6 + i * .1) % 1; if (t > sT + 1.2) return; p.visible = true; p.position.set(4.6 - .5 - tt * .25, .82 + Math.sin(tt * Math.PI) * .12 - tt * .2, -3.8); p.rotation.z = tt * .3; }); } else { stack.scale.y = .01; stack.position.y = .64; }
+    paperK = seg(t, 9.8, 10.1) * (1 - seg(t, 11.4, 11.7));
+    if (t < 5.6) { cam.set(CX + 2.2, 2.0, -.6); look.set(CX + 4.4, .9, -3.6); fov = 55; }
+    else if (t < sT) { cam.set(CX + 2.0, 2.0, -.2); look.set(CX + 4.2, 1.0, -3.4); fov = 58; }
+    else if (t < 8.6) { cam.set(CX + 2.5, 1.7, -2.0); look.set(CX + 4.4, .8, -3.8); fov = 52; }
+    else { cam.set(CX + .5, 2.6, 4.4); look.set(CX, .9, -1.6); fov = 58; }
   } else {
-    setVis('stairs'); dir.target.position.set(SX, 0, 0); dir.position.set(SX + 5, 9, 4); scene.background = new THREE.Color('#9aa');
-    const spot = new THREE.Vector3(SX + .2, 2.02, .4); pooAt = spot.clone();
-    if (t < A0) { sen.root.position.set(SX + .2, 2, lerp(2.6, .4, seg(t, .2, A0))); sen.root.rotation.y = Math.PI; sen.walk(t, 8, .5); sen.face('sneaky'); }
-    else if (doing) { sen.root.position.copy(spot); sen.root.rotation.y = 0; squat(sen); sansAt = spot.clone().add(new THREE.Vector3(0, .5, 0)); sen.face('relaxed'); }
-    else if (t < 5.6) { const z = lerp(-.3, -5, seg(t, A1, 5.6)); sen.root.position.set(SX - .4, stairY(z), z); sen.root.rotation.y = Math.PI; cool(sen, t); } else sen.root.visible = false;
-    if (t >= 5.6) { mudur.root.visible = true; phoneM.visible = true;
-      if (!hit) { mudur.root.position.set(SX + .2, 2, lerp(2.8, .6, seg(t, 5.6, sT))); mudur.root.rotation.y = Math.PI; mudur.walk(t, 6, .4); mudur.armR.rotation.x = -2.4; mudur.armR.rotation.z = .5; mudur.face(Math.floor(t * 6) % 2 ? 'talk' : 'happy'); }
-      else { const k = seg(t, sT + .2, 9.4); const z = lerp(.4, -5.6, easeIO(k)); mudur.root.position.set(SX + .2, stairY(Math.min(-.01, z)) + .05, z); mudur.root.rotation.y = Math.PI; sitOn(mudur); mudur.root.position.y += .3; mudur.root.rotation.x = .35;
-        mudur.armL.rotation.z = -2.6; mudur.armR.rotation.z = 2.6; mudur.face(k > .3 ? 'happy' : 'shock'); sq = .5; pooAt = mudur.root.position.clone().add(new THREE.Vector3(0, .02, .2)); } }
-    if (t < 5.6) { cam.set(SX + 3.6, 3.4, 1.8); look.set(SX, 2, -.6); fov = 55; } else if (!hit) { cam.set(SX + 3.2, 3.0, -1.0); look.set(SX, 2.4, 1.0); } else { cam.set(SX + 4.2, 2.4, -1.4); look.copy(mudur.root.position).add(new THREE.Vector3(0, .8, 0)); fov = 56; }
+    /* ----- VANTİLATÖR ----- */
+    showG(gV); scene.background = new THREE.Color('#cfd'); dir.target.position.set(VX, 0, -10); dir.position.set(VX + 2, 10, 2);
+    const P = new THREE.Vector3(VX, 0, .8);
+    if (t < A0) { walkPath(S, t, .1, A0, [[VX + 1.2, 4.2], [VX + 1.0, 1.0], [VX, .5]]); S.face('sneaky'); }
+    else if (doing) { S.root.position.set(VX, 0, .5); S.root.rotation.y = Math.PI; squat(S); S.face('relaxed'); sansAt = new THREE.Vector3(VX, .55, .62); }
+    else if (t < 4.25) { S.root.position.set(VX + .5, 0, .9); S.root.rotation.y = Math.PI / 2 + .4; S.armR.rotation.x = -1.6; S.body.rotation.x = .3; S.face('sneaky'); }
+    else if (t < 5.6) { walkPath(S, t, 4.25, 5.6, [[VX + .5, .9], [VX + 1.2, 2.0], [VX + 1.0, 4.4]]); cool(S, t); } else S.root.visible = false;
+    if (left) pooAt = P.clone();
+    const sp = t < 3.95 ? 0 : (t < 4.55 ? 35 * (t - 3.95) * (t - 3.95) / 1.2 : 35 * .3 + 35 * (t - 4.55)); blades.rotation.z = sp;
+    if (t > 4.2) stinkV.forEach((m, i) => { const front = Math.min(22, (t - 4.2) * 3.2); const ph = ((t - 4.2) * .5 + hash(i)) % 1; m.visible = true; const z = .6 - ph * front;
+      m.position.set(VX + Math.sin(ph * 12 + i) * 1.3 * hash(i + 2), .3 + hash(i + 5) * 2.1, z); m.rotation.z = Math.sin(ph * 14 + i) * .6; m.rotation.x = 1.2; m.scale.y = 1 + front * .03; });
+    cDoors.forEach((dd, k) => { const a = k === 0 ? Math.max(seg(t, 6.2, 6.5), seg(t, sT, sT + .2)) : seg(t, sT + k * .12, sT + k * .12 + .25); dd.g.rotation.y = -dd.s * a * 1.4; });
+    const runners = [hoca, mudur, extras[0], extras[1], extras[2], extras[3]];
+    runners.forEach((c, k) => { const dd = cDoors[k]; const sx = dd.s * 1.5, z0 = dd.z;
+      if (k === 0 && t > 6.2 && t < sT + .2) { c.root.visible = true; c.root.position.set(VX + sx, 0, z0 + .1); c.root.rotation.y = -Math.PI / 2 * dd.s; c.face(t < 6.7 ? 'happy' : 'scared'); c.head.rotation.y = .6 * dd.s; if (t > 6.7) { c.armR.rotation.x = -2.5; c.armR.rotation.z = .5; } return; }
+      const a = sT + .2 + k * .12; if (t < a) return; const u = seg(t, a, a + 2.4); if (u >= 1) return; c.root.visible = true; if (c === mudur) phoneM.visible = false;
+      const [x, z, r] = path([[sx, z0], [dd.s * .6, z0 - .8], [dd.s * .5, -27]], easeIO(u) * .3 + u * .7); c.root.position.set(VX + x, Math.abs(Math.sin(t * 20 + k)) * .15, z); c.root.rotation.y = r; c.walk(t + k, 22, 1.1);
+      c.armR.rotation.x = -2.5; c.armR.rotation.z = .5; c.armL.rotation.x = -2.6 + Math.sin(t * 22 + k) * .5; c.face('scared'); });
+    if (hit) { const on = Math.floor(t * 4) % 2; alarmL.position.set(VX, 2.6, -14); alarmL.intensity = on ? 8 : 1; alarmB.forEach(b => b.material.color.set(on ? '#ff2020' : '#661010')); if (on) { fl = .12; fcol = '#ff0000'; } }
+    if (t < A1) { cam.set(VX + 1.6, 1.6, -2.6); look.set(VX, .7, .8); }
+    else if (t < 5.6) { cam.set(VX + 1.5, 1.6, -2.4); look.set(VX, 1.0, 1.4); }
+    else if (t < sT) { cam.set(VX + .2, 1.8, -8.6); look.set(VX - .4, 1.1, -2.5); fov = 60; }
+    else { cam.set(VX + .9, 1.7, -23.5); look.set(VX, 1.2, -9); fov = 58; }
   }
-  if (hit) { fov = absurd(t, cam, look); pooAt = null; }
-  if (left && pooAt) placePoo(t, pooAt, sq);
-  if (hit && t < sT + .3) shk = .2;
+  if (pooAt) { placePoo(t, pooAt, 1); if (pooS !== 1) poo.scale.multiplyScalar(pooS); }
+  if (hit && t < sT + .3 && VID !== 4) shk = .15;
 
   camera.fov = fov; camera.near = .05; camera.far = 2000; camera.updateProjectionMatrix();
   camera.position.copy(cam).add(shake(t, shk)); camera.up.set(0, 1, 0); camera.lookAt(look);
   canvas.style.filter = filt; renderer.render(scene, camera);
 
   if (sansAt) { const [x, y] = PX(sansAt); const s = clamp(70 / camera.position.distanceTo(sansAt), 9, 28); el.sans.style.opacity = 1; el.sans.style.left = x + '%'; el.sans.style.top = y + '%'; el.sans.style.width = s + 'cqw'; el.sans.style.height = s * .75 + 'cqw'; } else el.sans.style.opacity = 0;
-  if (doing && t > A0 + .8) { const [x, y] = PX(sansAt.clone().add(new THREE.Vector3(0, 1.3, 0))); const k = seg(t, A0 + .8, A0 + 1.1); el.emo.style.opacity = 1; el.emo.style.left = x + '%'; el.emo.style.top = clamp(y, 14, 85) + '%'; el.emo.style.fontSize = '9cqw'; el.emo.style.transform = `translate(-50%,-50%) scale(${easeOutBack(k)}) rotate(${Math.sin(t * 4) * 12}deg)`; } else el.emo.style.opacity = 0;
+  if (doing && sansAt && t > A0 + .8) { const [x, y] = PX(sansAt.clone().add(new THREE.Vector3(0, 1.3, 0))); const k = seg(t, A0 + .8, A0 + 1.1); el.emo.style.opacity = 1; el.emo.style.left = x + '%'; el.emo.style.top = clamp(y, 14, 85) + '%'; el.emo.style.fontSize = '9cqw'; el.emo.style.transform = `translate(-50%,-50%) scale(${easeOutBack(k)}) rotate(${Math.sin(t * 4) * 12}deg)`; } else el.emo.style.opacity = 0;
   el.phone.style.opacity = 0;
   const finT = t >= sT + 2.6; const cap = finT ? FIN[VID] : (hit ? (t > sT + .3 ? MID[VID] : '') : timed(CAPS[VID], t));
   setHTML(el.cap, cap); el.cap.style.opacity = cap ? 1 : 0; el.cap.style.color = finT ? '#ffd84a' : '#fff'; el.cap.style.fontSize = ''; el.cap.style.transform = '';
   [el.top, el.fps, el.title, el.small].forEach(e => e.style.opacity = 0);
   if (ABS.top) { setHTML(el.top, ABS.top); el.top.style.opacity = 1; el.top.style.color = '#ffd84a'; }
+  if (floorTxt) { setHTML(el.fps, floorTxt); el.fps.style.opacity = 1; el.fps.style.color = '#ff4b3a'; }
+  el.paper.style.opacity = paperK; el.paper.style.transform = `rotate(4deg) scale(${.6 + .4 * easeOutBack(seg(t, 9.8, 10.1))})`;
   const stT = sT + STOFF[VID - 1], sOn = t >= stT && t < stT + 2.0; const sk = seg(t, stT, stT + .3), so = 1 - seg(t, stT + 1.6, stT + 2.0); setHTML(el.stamp, sOn ? STAMP[VID - 1] : ''); el.stamp.style.opacity = sOn ? so : 0;
-  el.stamp.style.color = '#ffd84a'; el.stamp.style.textShadow = '0 0 3cqw rgba(0,0,0,.6)'; el.stamp.style.top = '30%';
+  el.stamp.style.color = '#ffd84a'; el.stamp.style.textShadow = '0 0 3cqw rgba(0,0,0,.6)'; el.stamp.style.top = VID === 4 ? '15%' : '30%';
   const s2 = shake(t, 1.2); el.stamp.style.transform = `translate(${s2.x}cqw, calc(-50% + ${s2.y}cqw)) scale(${1 + .7 * (1 - easeOutBack(sk))}) rotate(-4deg)`;
   el.aura.style.opacity = 1; setHTML(el.auraV, '💩 × ' + (VID - 1 + (t >= A1 ? 1 : 0))); el.aura.style.transform = t > A1 && t < A1 + .6 ? `scale(${1 + .3 * (1 - seg(t, A1, A1 + .6))})` : '';
-  if (hit && t < sT + .2) { fl = .6; fcol = '#8a5a2b'; } if (t >= A0 && t < A0 + .15) fl = .4;
+  if (hit && t < sT + .2 && VID !== 5) { fl = .5; fcol = '#8a5a2b'; } if (t >= A0 && t < A0 + .15) fl = .4;
   el.flash.style.opacity = fl; el.flash.style.background = fcol;
   el.bar.style.width = (t / DUR * 100) + '%';
 }
@@ -690,24 +781,24 @@ function buildAudio(ac, T) {
   const polka = (a, b) => { const N = [36, 43, 40, 43]; const M = [72, 74, 76, 77, 79, null, 79, null, 81, 79, 77, 76, 74, null, 72, null]; let i = 0; for (let s = a; s < b; s += .22, i++) { if (i % 2 === 0) tuba(N[(i / 2 | 0) % 4], s); else tone('square', mtof(64), s, .1, .025); const m = M[i % 16]; if (m) tone('triangle', mtof(m), s, .18, .06); } };
   if (CARD !== null) { fart(.25, .5, 90, .4); plop(.6); if (CARD === 0 || CARD === 6) polka(1, DUR); }
   else {
-    sneak(0, A0); beep(A0 + .1, A1 - A0 - .2); fart(A0 + .2, .8, 80, .45); plop(A1 - .4); whistle(A1); polka(A1 + 1.6, sT);
-    const fanfare = (s, v = .08) => [[60, .14], [64, .14], [67, .14], [72, .5]].reduce((x, [m, d]) => { tone('sawtooth', mtof(m), x, d, v, { lp: 2200, vib: 4 }); tone('square', mtof(m - 12), x, d, v * .4, { lp: 1200 }); return x + .15; }, s);
-    const applause = (a, b, v = .14) => { for (let x = a; x < b; x += .025) noise(x + hash(x * 91) * .02, .02, v * (.5 + hash(x * 13) * .5) * (1 - .6 * (x - a) / (b - a)), 2500 + hash(x) * 2000, 'bandpass'); };
-    const popc = s => { noise(s, .06, .5, 2200, 'bandpass'); tone('sine', 700, s, .1, .15, { fEnd: 200 }); };
-    const horn = s => tone('sawtooth', 420, s, .6, .1, { lp: 1800, vib: 25 });
-    if (VID === 1) { for (let i = 0; i < 12; i++) tone('square', 1200, 5.6 + i * .07, .05, .05); steps(5.8, 7.1, .35, .1);
-      tone('sine', 180, sT, .35, .25, { fEnd: 620 }); plop(sT + .9); choir([60, 64, 67, 72], sT + .8, 1.8, .045); steps(sT + .9, sT + 2.3, .2, .1);
-      for (let x = sT + 1.0; x < DUR - .3; x += .7) mumble(x, .5, 650 + hash(x) * 150); keys(sT + 2.4, DUR - .2); polka(sT + 2.6, DUR); }
-    if (VID === 2) { noise(3.2, 1.6, .2, 200); tone('square', 330, 3.6, .3, .08); noise(5.4, 2, .2, 200); steps(5.4, sT, .15, .1);
-      tone('sawtooth', 300, sT, .3, .1, { fEnd: 140 }); steps(sT + .4, sT + 1.4, .3, .1); noise(sT + .8, .4, .2, 1500, 'bandpass'); tone('sine', 2600, sT + 1.2, .6, .08); popc(sT + 1.2); popc(sT + 1.5);
-      mumble(sT + 1.5, .8, 190); fanfare(sT + 1.6); noise(sT + 2.4, .05, .4, 6000, 'highpass'); for (let i = 0; i < 8; i++) popc(sT + 2.4 + i * .06); applause(sT + 2.4, DUR - .2); fanfare(sT + 2.6, .07); }
-    if (VID === 3) { steps(5.6, 7, .35, .08); popc(sT + .3); horn(sT + .6); steps(sT + .2, sT + 1.0, .2, .08);
-      [67, 67, 69, 67, 72, 71, null, 67, 67, 69, 67, 74, 72].forEach((m, i) => { if (m) { tone('triangle', mtof(m), sT + 1.0 + i * .13, .12, .08); tone('square', mtof(m), sT + 1.0 + i * .13, .1, .02, { lp: 1500 }); } });
-      for (let v = 0; v < 3; v++) mumble(sT + 1.0 + v * .03, 1.5, 300 + v * 90); noise(sT + 2.6, .5, .35, 900, 'bandpass'); horn(sT + 2.8); horn(sT + 2.9); for (let i = 0; i < 8; i++) popc(sT + 2.6 + i * .05); applause(sT + 2.7, DUR - .2); polka(sT + 3.0, DUR); }
-    if (VID === 4) { tone('sine', 400, 4.8, .6, .06, { fEnd: 1200 }); steps(5.6, 7, .35, .1); plop(sT);
-      [72, 76, 79, 84].forEach((m, i) => tone('sine', mtof(m), sT + .2 + i * .1, .3, .06)); riser(sT + .3, .6); boom(sT + .9, true); choir([60, 64, 67, 71], sT + .9, DUR - sT - 1, .04); phonk(sT + 1.0, DUR, { bpm: 130, root: 41, mel: MEL1 }); }
-    if (VID === 5) { mumble(5.6, 1.8, 170); squish(sT); const tS = sT + STOFF[4]; noise(sT + .2, tS - sT - .2, .3, 160); slide(sT + .2, tS - sT - .2);
-      for (let i = 0; i < 6; i++) { noise(tS + i * .04, .08, .45, 1400 + i * 300, 'bandpass'); tone('square', 300 + hash(i) * 400, tS + i * .05, .06, .08); } boom(tS, false); applause(tS + .3, DUR - .2, .16); for (let i = 0; i < 3; i++) tone('sine', mtof(84 + i * 4), tS + .4 + i * .12, .2, .08); polka(tS + 1.0, DUR); }
+    const ding = s => { tone('sine', mtof(88), s, .5, .1); tone('sine', mtof(84), s + .25, .7, .1); };
+    const whoosh = (s, d = .35) => noise(s, d, .12, 700, 'bandpass');
+    const creak = s => { tone('sawtooth', 210, s, .5, .05, { fEnd: 130, lp: 900, vib: 12 }); };
+    const lounge = (a, b) => { const M = [76, 79, 83, 81, 79, 76, 74, 76, 79, 81, 79, 76]; let i = 0; for (let s = a; s < b - .05; s += .3, i++) { tone('triangle', mtof(M[i % 12]), s, .26, .05); if (i % 2 === 0) tone('sine', mtof([52, 57, 55, 50][(i >> 2) % 4]), s, .5, .07); } };
+    const applause = (a, b, v = .12) => { for (let x = a; x < b; x += .025) noise(x + hash(x * 91) * .02, .02, v * (.5 + hash(x * 13) * .5), 2500 + hash(x) * 2000, 'bandpass'); };
+    const chunk = (a, b) => { for (let x = a; x < b; x += .12) { noise(x, .05, .25, 900, 'bandpass'); tone('square', 90, x, .05, .04); } };
+    const ring = (a, b) => { for (let x = a; x < b; x += .06) tone('square', 1800 + (Math.floor(x * 8) % 2) * 300, x, .04, .035, { lp: 3500 }); };
+    sneak(0, A0); beep(A0 + .1, A1 - A0 - .2); fart(A0 + .2, .8, 80, .45); plop(A1 - .4); whistle(A1);
+    if (VID === 1) { lounge(0, DUR); [3.8, 5.8, 7.4, 10.5].forEach(s => { ding(s - .2); whoosh(s); }); [5.0, 6.8, 8.4, 11.3].forEach(s => whoosh(s - .3)); mumble(6.2, .6, 520);
+      mumble(7.2, 1.6, 170); scratch(8.9); boom(8.9, false); for (let x = 9.3; x < DUR; x += .13) tone('square', 2100, x, .03, .05); mumble(9.4, 2.4, 230); mumble(10.85, .4, 480); }
+    if (VID === 2) { polka(4.1, sT); applause(5.4, 6.0, .1); for (let x = 6.3; x < 7.3; x += .07) noise(x, .04, .2, 400, 'bandpass'); scratch(sT); tone('sine', 300, sT + .1, .6, .12, { fEnd: 120 });
+      plop(sT + 1.35); steps(sT + 1.5, sT + 2.3, .2, .1); mumble(sT + 2.3, 1.6, 240); [72, 76, 79].forEach((m, i) => tone('triangle', mtof(m), sT + 2.5 + i * .12, .2, .07)); polka(sT + 2.7, DUR); }
+    if (VID === 3) { creak(5.6); steps(5.8, 6.6, .3, .1); for (let x = 5.9; x < DUR; x += 1.4) mumble(x, 1.0, 170); squish(sT); tone('sine', 180, sT, .25, .2, { fEnd: 90 });
+      for (let x = sT + .5; x < 11.6; x += .3) { noise(x, .1, .25, 450, 'bandpass'); tone('sine', 220, x, .08, .06, { fEnd: 110 }); } polka(sT + .6, DUR); }
+    if (VID === 4) { plop(4.0); steps(5.6, 7.0, .3, .1); [1, 1.2, 1.4].forEach(o => tone('square', 1500, 7.0 + o * .1, .05, .06)); chunk(sT, sT + 1.3); tone('sawtooth', 120, sT, 1.3, .05, { lp: 500 });
+      steps(8.6, 9.6, .3, .1); for (let i = 0; i < 4; i++) noise(8.95 + i * .2, .15, .12, 4000, 'highpass'); scratch(9.8); for (let v = 0; v < 4; v++) mumble(10.4 + v * .03, 1.4, 500 + v * 80); applause(10.4, DUR - .1, .1); polka(10.6, DUR); }
+    if (VID === 5) { tone('square', 1400, 3.85, .04, .08); noise(3.95, DUR - 4, .08, 300); tone('sawtooth', 70, 3.95, DUR - 4, .03, { lp: 250 }); creak(6.2); mumble(6.8, .5, 480);
+      ring(sT, DUR); for (let v = 0; v < 4; v++) mumble(sT + .3 + v * .1, 2.4, 520 + v * 90); steps(sT + .3, sT + 3, .07, .14); }
   }
 }
 
