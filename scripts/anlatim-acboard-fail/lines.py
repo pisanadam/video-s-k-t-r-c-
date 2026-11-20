@@ -1,0 +1,3 @@
+SEG=[(0.3,100,1300,"Dosya yeniden açıldı."),(2.6,1400,4400,"Güvenlik kamerası. Saat üçü on iki geçe."),(4.8,4700,5900,"Bir şüpheli yaklaşıyor..."),(7.0,6300,7600,"Yazıcının kapağını açtı."),
+(8.7,7900,9300,"Ve... içine sıçtı."),(11.0,9600,11100,"Hiçbir şey olmamış gibi gitti."),(12.6,11500,13600,"İki dakika sonra: Temperature malfunction."),(15.1,14000,16200,"Otopsi raporu: kartın üstünde kaka bulundu."),
+(17.6,16600,17850,"Gerçek fail: Abdullah!"),(19.0,18100,21300,"Uzatma kablosu, voltaj ve fabrika serbest bırakıldı."),(22.3,21800,23500,"Abdullah ise... yine kaçtı."),(24.3,23900,24700,"Dosya kapandı.")]
