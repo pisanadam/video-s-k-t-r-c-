@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Antalya Tsunamisi</title>
+<style>
+  :root{ --meme: Impact, "Anton", "Arial Black", "DejaVu Sans", sans-serif; --sig:"DejaVu Sans", sans-serif; --gold:#ffd84a; --pur:#c98e3a; }
+  html,body{margin:0;height:100%;background:#000;overflow:hidden;color:#fff}
+  body{display:flex;align-items:center;justify-content:center}
+  #stage{position:relative;width:min(100vw,177.7778vh);aspect-ratio:16/9;container-type:inline-size;overflow:hidden;background:#000}
+  #c{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .ov{position:absolute;pointer-events:none}
+  #grain{inset:0;width:100%;height:100%;opacity:.05;mix-blend-mode:screen;image-rendering:pixelated}
+  #vig{inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 45%,rgba(0,0,0,.75) 100%)}
+  .meme{font-family:var(--meme);font-weight:900;color:#fff;text-transform:uppercase;-webkit-text-stroke:.4cqw #000;paint-order:stroke fill;letter-spacing:.05em;text-align:center;line-height:1.05}
+  #top{left:2cqw;right:24cqw;top:2.4cqw;font-size:3.6cqw;text-align:left}
+  #cap{left:0;right:0;bottom:4cqw;font-size:4cqw}
+  #aura{right:2cqw;top:2cqw;padding:.8cqw 1.6cqw;border-radius:1cqw;background:rgba(0,0,0,.55);border:.25cqw solid var(--pur);
+    font:900 2.8cqw/1 var(--meme);letter-spacing:.06em;color:var(--gold);text-shadow:0 0 1.2cqw rgba(178,107,255,.9);white-space:nowrap;transform-origin:top right}
+  #aura small{display:block;font:700 1.1cqw/1 var(--sig);letter-spacing:.3em;color:#cbb6ff;margin-bottom:.4cqw;text-shadow:none}
+  #stamp{left:0;right:0;top:48%;font-size:10cqw;transform:translateY(-50%);opacity:0;white-space:nowrap}
+  #fps{left:2cqw;top:10cqw;padding:.5cqw 1cqw;background:rgba(0,0,0,.5);font:700 2.6cqw/1 "DejaVu Sans Mono",monospace;color:#5cff5c;opacity:0}
+  #title{left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font:900 9.5cqw/1 var(--meme);letter-spacing:.12em;white-space:nowrap;
+    color:#fff;text-shadow:0 0 3cqw rgba(178,107,255,.9),0 0 1cqw rgba(255,216,74,.6);opacity:0}
+  #small{left:0;right:0;top:63%;text-align:center;font:400 1.9cqw/1.3 var(--sig);letter-spacing:.35em;color:#ddd;opacity:0;text-transform:lowercase}
+  #flash{inset:0;background:#fff;opacity:0}
+  #ui{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.4cqw;background:rgba(0,0,0,.7);z-index:10;font-family:var(--sig)}
+  #ui button{font:900 3cqw/1 var(--meme);padding:1.4cqw 3cqw;border:.3cqw solid var(--pur);cursor:pointer;background:#111;color:var(--gold);letter-spacing:.1em}
+  #ui nav{display:flex;gap:1cqw;flex-wrap:wrap;justify-content:center} #ui nav a{color:#fff;border:.2cqw solid #555;padding:.6cqw 1.2cqw;text-decoration:none;font:700 1.5cqw/1 var(--sig)}
+  #ui nav a.on{border-color:var(--pur);color:var(--gold)}
+  #ui .hint{font-size:1.5cqw;color:#bbb;letter-spacing:.2em}
+  #bar{position:absolute;left:0;bottom:0;height:.4cqw;background:var(--gold);width:0;z-index:5}
+  body.render #ui,body.render #bar{display:none}
+  #phone{left:5cqw;top:5cqw;width:28cqw;height:42cqw;background:#e9e2d6;border:.8cqw solid #111;border-radius:3cqw;overflow:hidden;display:flex;flex-direction:column;opacity:0;box-shadow:0 2cqw 4cqw rgba(0,0,0,.6);font-family:"DejaVu Sans",sans-serif}
+  #phone .hd{background:#1f7a6d;color:#fff;padding:1.1cqw 1.3cqw;font:700 1.6cqw/1.2 "DejaVu Sans",sans-serif}
+  #phone .hd small{display:block;font-weight:400;font-size:1.05cqw;opacity:.85}
+  #msgs{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:.7cqw;padding:1cqw}
+  .m{background:#fff;color:#111;border-radius:1cqw;padding:.6cqw 1cqw;font-size:1.4cqw;line-height:1.3;max-width:84%;display:none}
+  .m b{display:block;font-size:1.1cqw}
+  .m.me{background:#d9fdd3;margin-left:auto}
+  .m .tk{float:right;color:#34b7f1;font-size:1.1cqw;margin-left:.6cqw}
+  #sansur{position:absolute;pointer-events:none;transform:translate(-50%,-50%);background-size:100% 100%;image-rendering:pixelated;opacity:0;border:.3cqw solid #000;display:flex;align-items:center;justify-content:center;z-index:2}
+  #sansur::after{content:"SANSÜR";background:#000;color:#fff;font:900 2.2cqw/1 Impact,"DejaVu Sans",sans-serif;letter-spacing:.2em;padding:.5cqw 1.2cqw}
+  #news{left:0;right:0;bottom:0;height:5.2cqw;display:flex;align-items:center;background:#c0001a;opacity:0;overflow:hidden;z-index:4;font:900 2.3cqw/1 var(--meme);letter-spacing:.04em;color:#fff;white-space:nowrap}
+  #news b{background:#fff;color:#c0001a;padding:0 1.4cqw;height:100%;display:flex;align-items:center;margin-right:1.6cqw}
+  #emo{position:absolute;pointer-events:none;font-size:12cqw;line-height:1;opacity:0;transform:translate(-50%,-50%);z-index:3}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c"></canvas>
+  <canvas id="grain" class="ov" width="320" height="180"></canvas>
+  <div id="vig" class="ov"></div>
+  <div id="fps" class="ov"></div>
+  <div id="top" class="ov meme"></div>
+  <div id="cap" class="ov meme"></div>
+  <div id="aura" class="ov"><small>ANTALYA</small><span id="auraV">0</span></div>
+  <div id="stamp" class="ov meme"></div>
+  <div id="sansur"></div>
+  <div id="emo">💩</div>
+  <div id="news" class="ov"><b>SON DAKİKA</b><span id="newsT">ACİL DURUM: ANTALYA'DA KAHVERENGİ TSUNAMİ · SAHİLLER KAPATILDI · MAVİ BAYRAK İPTAL · ŞÜPHELİ ABDULLAH SÖRF YAPIYOR · ANTALYA'DA KAHVERENGİ TSUNAMİ · SAHİLLER KAPATILDI</span></div>
+  <div id="phone" class="ov">
+    <div class="hd">7-C VELİLER &amp; ÖĞRETMENLER<small>Matematik Öğretmeni, Abdullah'ın Annesi, +31 kişi</small></div>
+    <div id="msgs">
+      <div class="m" data-t="1.0"><b style="color:#8e44ad">Matematik Öğretmeni</b>Yarın 1. ders yazılı var.</div>
+      <div class="m" data-t="1.7"><b style="color:#16a085">Mehmet'in Annesi</b>Teşekkürler hocam</div>
+      <div class="m me" data-t="3.0">hoca çok sıkıcı yaa sınıf grubu bura dimi<span class="tk">✓✓</span></div>
+      <div class="m" data-t="5.0"><b style="color:#8e44ad">Matematik Öğretmeni</b>Ben de seni seviyorum Abdullah.</div>
+      <div class="m" data-t="6.2"><b style="color:#c0392b">Abdullah'ın Annesi</b><span style="color:#c0392b;font-weight:900">EVE GEL.</span></div>
+    </div>
+  </div>
+  <div id="title" class="ov"></div>
+  <div id="small" class="ov"></div>
+  <div id="flash" class="ov"></div>
+  <div id="bar"></div>
+  <div id="ui">
+    <nav id="nav"></nav>
+    <button id="play">▶ OYNAT</button>
+    <div class="hint">ABDULLAH ANTALYA'DA</div>
+  </div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+const QS = new URLSearchParams(location.search);
+const VID = 1, CARD = null, DUR = 34;
+const easeOutBack = k => { const c = 1.9; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); };
+const easeOut = k => 1 - Math.pow(1 - k, 3);
+const RENDER_MODE = QS.has('render');
+if (RENDER_MODE) document.body.classList.add('render');
+
+
+
+/* ---------- yardımcılar ---------- */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const easeIO = k => k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const R = rng(11);
+
+function pixTex(w, h, draw, linear = false) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c);
+  if (!linear) { t.magFilter = THREE.NearestFilter; t.minFilter = THREE.NearestFilter; }
+  t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function noisy(g, w, h, base, vary, r = R) {
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const v = (r() - .5) * vary;
+    g.fillStyle = `rgb(${clamp(base[0] + v, 0, 255)},${clamp(base[1] + v, 0, 255)},${clamp(base[2] + v, 0, 255)})`; g.fillRect(x, y, 1, 1); }
+}
+const planks = (base) => pixTex(16, 16, (g, w, h) => { noisy(g, w, h, base, 22); g.fillStyle = 'rgba(0,0,0,.35)'; for (let y = 3; y < 16; y += 4) g.fillRect(0, y, 16, 1); g.fillRect(7, 0, 1, 4); g.fillRect(2, 4, 1, 4); g.fillRect(11, 8, 1, 4); g.fillRect(5, 12, 1, 4); });
+function rep(t, x, y) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(x, y); return t; }
+
+/* ---------- sahne ---------- */
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(RENDER_MODE ? 1 : Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(55, 16 / 9, .05, 200);
+const hemi = new THREE.HemisphereLight('#ffffff', '#555', 1.1); scene.add(hemi);
+const dir = new THREE.DirectionalLight('#fff4e0', 1.2); dir.position.set(5, 10, 6); scene.add(dir);
+const pink = new THREE.PointLight('#ff4fa8', 0, 6, 1.5); scene.add(pink);
+
+const L = (m, o = {}) => new THREE.MeshLambertMaterial({ map: m, ...o });
+const C = c => new THREE.MeshLambertMaterial({ color: c });
+const BOX = new THREE.BoxGeometry(1, 1, 1);
+function block(parent, mat, sx, sy, sz, x, y, z) { const m = new THREE.Mesh(BOX, mat); m.scale.set(sx, sy, sz); m.position.set(x, y, z); parent.add(m); return m; }
+function faceTex(kind, o) {
+  return pixTex(8, 8, g => {
+    const P = (x, y, c) => { g.fillStyle = c; g.fillRect(x, y, 1, 1); };
+    g.fillStyle = o.skin; g.fillRect(0, 0, 8, 8);
+    if (!o.bald) { for (let x = 0; x < 8; x++) P(x, 0, o.hair); [0, 7].forEach(x => P(x, 1, o.hair)); } if (o.bangs) for (let x = 0; x < 6; x++) P(x, 1, o.hair);
+    const E = o.eye || '#4b3a8c', M = '#4a1e10';
+    P(3, 5, o.nose || '#9a6040'); P(4, 5, o.nose || '#9a6040');
+    if (kind === 'happy' || kind === 'talk') {
+      P(1, 4, '#fff'); P(2, 4, E); P(5, 4, E); P(6, 4, '#fff');
+      if (kind === 'happy') { P(1, 6, M); P(6, 6, M); for (let x = 2; x <= 5; x++) P(x, 7, M); for (let x = 2; x <= 5; x++) P(x, 6, '#fff'); }
+      else { for (let x = 2; x <= 5; x++) { P(x, 6, M); P(x, 7, M); } P(3, 7, '#c0404a'); P(4, 7, '#c0404a'); }
+    } else if (kind === 'sneaky') {
+      P(1, 4, E); P(2, 4, E); P(5, 4, E); P(6, 4, E); for (const x of [1, 2, 5, 6]) P(x, 3, o.hair);
+      P(2, 6, M); P(3, 6, M); P(4, 6, M); P(5, 6, '#fff'); P(6, 5, M);
+    } else if (kind === 'shock') {
+      for (const ex of [1, 5]) { P(ex, 3, '#fff'); P(ex + 1, 3, '#fff'); P(ex, 4, '#fff'); P(ex + 1, 4, '#fff'); }
+      P(2, 4, '#111'); P(5, 4, '#111'); for (const x of [1, 2, 5, 6]) P(x, 2, o.hair);
+      P(3, 6, '#2a0d06'); P(4, 6, '#2a0d06'); P(3, 7, '#2a0d06'); P(4, 7, '#2a0d06');
+    } else if (kind === 'angry') {
+      P(1, 2, '#111'); P(2, 3, '#111'); P(6, 2, '#111'); P(5, 3, '#111');
+      P(1, 4, '#fff'); P(2, 4, '#c00'); P(5, 4, '#c00'); P(6, 4, '#fff');
+      for (let x = 2; x <= 5; x++) P(x, 6, M); P(1, 7, M); P(6, 7, M);
+    } else if (kind === 'relaxed') {
+      for (const x of [1, 2, 5, 6]) P(x, 4, '#3a1d0e'); P(0, 5, '#e8907a'); P(7, 5, '#e8907a');
+      P(2, 6, M); P(5, 6, M); P(3, 7, M); P(4, 7, M);
+    } else if (kind === 'scared') {
+      P(1, 3, '#fff'); P(2, 3, '#111'); P(5, 3, '#111'); P(6, 3, '#fff'); P(2, 2, o.hair); P(5, 2, o.hair);
+      for (let y = 4; y < 8; y++) { P(1, y, '#57c7ff'); P(6, y, '#57c7ff'); }
+      P(2, 7, M); P(3, 6, M); P(4, 6, M); P(5, 7, M);
+    }
+    if (o.glasses) { g.fillStyle = '#111'; g.fillRect(0, 4, 8, 1); P(1, 3, '#111'); P(2, 3, '#111'); P(5, 3, '#111'); P(6, 3, '#111'); if (kind !== 'angry') { P(1, 4, '#fff'); P(6, 4, '#fff'); P(2, 4, '#111'); P(5, 4, '#111'); } else { P(2, 4, '#c00'); P(5, 4, '#c00'); } }
+    if (o.mustache) { for (let x = 1; x <= 6; x++) P(x, 6, o.mustache); }
+    if (o.beard) { for (let x = 0; x < 8; x++) P(x, 7, o.hair); P(0, 6, o.hair); P(7, 6, o.hair); P(0, 5, o.hair); P(7, 5, o.hair); if (kind === 'angry' || kind === 'talk') { P(3, 7, '#2a0d06'); P(4, 7, '#2a0d06'); } }
+  });
+}
+function makeChar(o) {
+  const faces = {}; ['happy', 'talk', 'sneaky', 'shock', 'angry', 'scared', 'relaxed'].forEach(k => faces[k] = faceTex(k, o));
+  const side = pixTex(8, 8, g => { g.fillStyle = o.skin; g.fillRect(0, 0, 8, 8); g.fillStyle = o.hair; if (o.bald) g.fillRect(0, 2, 3, 2); else { g.fillRect(0, 0, 8, 2); g.fillRect(0, 2, 2, 1); g.fillRect(6, 2, 2, 1); } if (o.beard) g.fillRect(0, 5, 3, 3); if (o.glasses) { g.fillStyle = '#111'; g.fillRect(0, 4, 8, 1); } });
+  const hairT = pixTex(8, 8, (g, w, h) => noisy(g, w, h, new THREE.Color(o.bald ? o.skin : o.hair).toArray().map(v => v * 255), 18));
+  const faceMat = new THREE.MeshLambertMaterial({ map: faces.happy });
+  const root = new THREE.Group(); scene.add(root);
+  const body = new THREE.Group(); root.add(body);
+  const torso = new THREE.Mesh(new THREE.BoxGeometry(.5, .75, .25), C(o.shirt)); torso.position.y = 1.125; body.add(torso);
+  if (o.tie) block(body, C(o.tie), .08, .45, .02, 0, 1.25, .13);
+  const head = new THREE.Group(); head.position.y = 1.5; body.add(head);
+  const hm = new THREE.Mesh(new THREE.BoxGeometry(.5, .5, .5), [L(side), L(side), L(hairT), C(o.skin), faceMat, L(hairT)]); hm.position.y = .25; head.add(hm);
+  const mkArm = s => { const g = new THREE.Group(); g.position.set(s * .375, 1.4, 0);
+    const sl = new THREE.Mesh(new THREE.BoxGeometry(.25, .35, .25), C(o.shirt)); sl.position.y = -.07; g.add(sl);
+    const hd = new THREE.Mesh(new THREE.BoxGeometry(.24, .45, .24), C(o.sleeve || o.skin)); hd.position.y = -.47; g.add(hd); body.add(g); return g; };
+  const mkLeg = s => { const g = new THREE.Group(); g.position.set(s * .125, .75, 0);
+    const p = new THREE.Mesh(new THREE.BoxGeometry(.25, .6, .25), C(o.pants)); p.position.y = -.3; g.add(p);
+    const sh = new THREE.Mesh(new THREE.BoxGeometry(.25, .15, .25), C(o.shoe || '#333')); sh.position.y = -.675; g.add(sh); root.add(g); return g; };
+  const c = { root, body, head, faceMat, faces, armL: mkArm(-1), armR: mkArm(1), legL: mkLeg(-1), legR: mkLeg(1) };
+  root.scale.setScalar(o.scale || 1);
+  c.reset = () => { root.visible = false; root.position.set(0, 0, 0); root.rotation.set(0, 0, 0); body.position.set(0, 0, 0); body.rotation.set(0, 0, 0);
+    [head, c.armL, c.armR, c.legL, c.legR].forEach(p => p.rotation.set(0, 0, 0)); c.face('happy'); };
+  c.face = k => { c.faceMat.map = faces[k]; };
+  c.sit = () => { root.position.y -= .3; c.legL.rotation.x = c.legR.rotation.x = -Math.PI / 2; };
+  c.walk = (t, sp = 9, a = .7) => { const s = Math.sin(t * sp); c.legL.rotation.x = s * a; c.legR.rotation.x = -s * a; c.armL.rotation.x = -s * a; c.armR.rotation.x = s * a; body.position.y = Math.abs(Math.cos(t * sp)) * .05; };
+  c.type = t => { c.armL.rotation.x = -1.25 + Math.sin(t * 26) * .12; c.armR.rotation.x = -1.25 + Math.cos(t * 23) * .12; c.armL.rotation.z = .15; c.armR.rotation.z = -.15; };
+  c.headPos = (v = new THREE.Vector3()) => { root.updateMatrixWorld(true); return head.localToWorld(v.set(0, .62, 0)); };
+  return c;
+}
+
+
+/* ======================= ANTALYA ======================= */
+const BM = c => new THREE.MeshBasicMaterial({ color: c });
+const sen = makeChar({ skin: '#c98e6a', hair: '#2a1a0e', shirt: '#c98e6a', sleeve: '#c98e6a', pants: '#e74c3c', shoe: '#c98e6a', bangs: true, eye: '#2a1a10' });
+const shades = new THREE.Group(); sen.head.add(shades); block(shades, new THREE.MeshLambertMaterial({ color: '#050505' }), .54, .11, .04, 0, .25, .27); block(shades, BM('#fff'), .07, .03, .01, -.15, .28, .295); block(shades, BM('#fff'), .07, .03, .01, .13, .28, .295);
+const ring = new THREE.Mesh(new THREE.TorusGeometry(.42, .14, 10, 24), new THREE.MeshLambertMaterial({ color: '#ff7a1a' })); ring.rotation.x = Math.PI / 2; ring.position.y = .95; sen.root.add(ring);
+const T = [
+  makeChar({ skin: '#f0c8a8', hair: '#d8b04a', shirt: '#3498db', sleeve: '#f0c8a8', pants: '#3498db', shoe: '#f0c8a8', bangs: true, eye: '#2a4fb0' }),
+  makeChar({ skin: '#e8a882', hair: '#6b3b1f', shirt: '#e84393', sleeve: '#e8a882', pants: '#e84393', shoe: '#e8a882', bangs: true, eye: '#3b2a1a' }),
+  makeChar({ skin: '#ffd0b0', hair: '#c0392b', shirt: '#ffd0b0', sleeve: '#ffd0b0', pants: '#2ecc71', shoe: '#ffd0b0', eye: '#2a6b2a' }),
+  makeChar({ skin: '#b97f58', hair: '#222', shirt: '#b97f58', sleeve: '#b97f58', pants: '#f1c40f', shoe: '#b97f58', mustache: '#222', eye: '#222' }),
+  makeChar({ skin: '#f4d0b0', hair: '#eee', shirt: '#fff', sleeve: '#f4d0b0', pants: '#1d3f8a', shoe: '#f4d0b0', eye: '#2a4fb0', scale: 1.05 }),
+  makeChar({ skin: '#d8a882', hair: '#2a1a0e', shirt: '#d8a882', sleeve: '#d8a882', pants: '#9b59b6', shoe: '#d8a882', eye: '#222' }),
+];
+const mudC = T.map(c => { const h = new THREE.Group(); c.head.add(h); block(h, C('#6b4220'), .58, .16, .58, 0, .56, 0); block(h, C('#6b4220'), .18, .3, .05, -.12, .32, .27); h.visible = false; return h; });
+const all = [sen, ...T];
+// gökyüzü & güneş
+const sunT = pixTex(64, 64, (g) => { const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,230,1)'); gr.addColorStop(.3, 'rgba(255,230,150,.8)'); gr.addColorStop(1, 'rgba(255,200,120,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64); }, true);
+const sun = new THREE.Sprite(new THREE.SpriteMaterial({ map: sunT, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, fog: false })); sun.position.set(-60, 70, -180); sun.scale.setScalar(50); scene.add(sun);
+// deniz (vertex renkli, dalgalı)
+const SEA = new THREE.PlaneGeometry(260, 160, 104, 64); SEA.rotateX(-Math.PI / 2); SEA.translate(0, 0, -80);
+const seaCol = new Float32Array(SEA.attributes.position.count * 3); SEA.setAttribute('color', new THREE.BufferAttribute(seaCol, 3));
+const seaBase = SEA.attributes.position.array.slice();
+const sea = new THREE.Mesh(SEA, new THREE.MeshLambertMaterial({ vertexColors: true })); scene.add(sea);
+const cTurq = new THREE.Color('#3fd0d8'), cDeep = new THREE.Color('#1f86b8'), cBrown = new THREE.Color('#7a4a22'), cBrown2 = new THREE.Color('#5e3818'), _c = new THREE.Color();
+function seaUpdate(t, P, R, bulge) { const p = SEA.attributes.position.array; for (let i = 0; i < p.length; i += 3) { const x = seaBase[i], z = seaBase[i + 2]; let y = Math.sin(x * .15 + t * 1.6) * .12 + Math.sin(z * .2 + t * 1.2) * .1;
+    const d = Math.hypot(x - P.x, z - P.z); if (bulge > 0) y += bulge * Math.exp(-d * d / 30); p[i + 1] = y;
+    const deep = clamp(-z / 60); _c.copy(cTurq).lerp(cDeep, deep); const b = clamp((R - d) / 6); if (b > 0) _c.lerp(hash(Math.floor(x) * 7 + Math.floor(z)) > .5 ? cBrown : cBrown2, b); seaCol[i] = _c.r; seaCol[i + 1] = _c.g; seaCol[i + 2] = _c.b; }
+  SEA.attributes.position.needsUpdate = true; SEA.attributes.color.needsUpdate = true; SEA.computeVertexNormals(); }
+// kum
+block(scene, L(rep(pixTex(16, 16, (g, w, h) => noisy(g, w, h, [232, 208, 150], 26)), 60, 14)), 260, 2, 34, 0, -.95, 16);
+const flood = new THREE.Mesh(new THREE.PlaneGeometry(260, 34), new THREE.MeshLambertMaterial({ color: '#6b4220', transparent: true, opacity: .9 })); flood.rotation.x = -Math.PI / 2; flood.position.set(0, .08, 16); scene.add(flood);
+// otel ve dağlar
+const hotT = rep(pixTex(32, 32, (g) => { g.fillStyle = '#f4efe2'; g.fillRect(0, 0, 32, 32); g.fillStyle = '#7fb6e0'; g.fillRect(6, 8, 20, 12); g.fillStyle = '#c9b98a'; g.fillRect(4, 22, 24, 3); }), 6, 6);
+[[-40, 12], [-16, 16], [8, 10], [30, 18], [54, 14]].forEach(([x, h]) => block(scene, L(hotT), 18, h, 10, x, h / 2, 40));
+[[-110, 40, 60], [-60, 50, 55], [-10, 34, 45], [50, 46, 60], [110, 38, 55]].forEach(([x, h, r], i) => { const m = new THREE.Mesh(new THREE.ConeGeometry(r, h, 6), C(i % 2 ? '#7b8a6a' : '#6a7a5c')); m.position.set(x, h / 2 - 2, -165); scene.add(m); const s = new THREE.Mesh(new THREE.ConeGeometry(r * .25, h * .25, 6), C('#f4f4f4')); s.position.set(x, h - 2 - h * .125, -165); scene.add(s); });
+const antT = pixTex(256, 64, (g) => { g.fillStyle = '#1d4f9c'; g.fillRect(0, 0, 256, 64); g.strokeStyle = '#fff'; g.lineWidth = 4; g.strokeRect(5, 5, 246, 54); g.fillStyle = '#fff'; g.font = '900 40px "DejaVu Sans",sans-serif'; g.textAlign = 'center'; g.fillText('ANTALYA', 128, 47); }, true);
+const antS = new THREE.Mesh(new THREE.PlaneGeometry(6, 1.5), new THREE.MeshBasicMaterial({ map: antT, side: THREE.DoubleSide })); antS.position.set(-10, 3.4, 22); scene.add(antS); block(scene, C('#888'), .15, 3, .15, -12.5, 1.5, 22); block(scene, C('#888'), .15, 3, .15, -7.5, 1.5, 22);
+// palmiyeler
+const palms = []; [[-24, 20], [-18, 24], [18, 22], [24, 19], [36, 23], [-34, 21]].forEach(([x, z]) => { const g = new THREE.Group(); g.position.set(x, 0, z); scene.add(g); for (let i = 0; i < 6; i++) block(g, C('#8a6a3a'), .5 - i * .03, 1.1, .5 - i * .03, Math.sin(i * .3) * .4, .55 + i * 1.0, 0); for (let k = 0; k < 6; k++) { const l = block(g, C('#2f8a3a'), .5, .1, 2.6, 0, 6.2, 0); l.rotation.y = k / 6 * 6.28; l.geometry = BOX; l.position.set(Math.sin(k / 6 * 6.28) * 1.2 + .4, 6.0, Math.cos(k / 6 * 6.28) * 1.2); l.rotation.x = .3; } palms.push(g); });
+// şemsiyeler ve şezlonglar
+const props = []; for (let i = 0; i < 6; i++) { const x = -12 + i * 4.8, z = 7 + (i % 2) * 2.5; const u = new THREE.Group(); u.position.set(x, 0, z); scene.add(u); block(u, C('#ddd'), .08, 2.6, .08, 0, 1.3, 0); const top = new THREE.Mesh(new THREE.ConeGeometry(1.5, .6, 10), C(['#e74c3c', '#f1c40f', '#3498db', '#2ecc71', '#ff7a1a', '#e84393'][i])); top.position.y = 2.7; u.add(top);
+  const b = new THREE.Group(); b.position.set(x + 1.2, 0, z); scene.add(b); block(b, C('#fff'), .8, .1, 2.0, 0, .35, 0); block(b, C('#fff'), .8, .7, .1, 0, .65, -.95).rotation.x = -.5; [[-.35, -.9], [.35, -.9], [-.35, .9], [.35, .9]].forEach(([a, c]) => block(b, C('#aaa'), .05, .3, .05, a, .15, c));
+  props.push({ u, b, x, z }); }
+// cankurtaran kulesi
+const tower = new THREE.Group(); tower.position.set(16, 0, 4); scene.add(tower); [[-.8, -.8], [.8, -.8], [-.8, .8], [.8, .8]].forEach(([x, z]) => block(tower, C('#ddd'), .15, 2.6, .15, x, 1.3, z)); block(tower, C('#e74c3c'), 2.0, 1.2, 2.0, 0, 3.2, 0); block(tower, C('#999'), .06, 2, .06, .8, 4.8, .8); const tFlag = block(tower, C('#2a8fe0'), .9, .6, .03, 1.25, 5.4, .8);
+// köpük, baloncuk, sıçrama
+const bubbles = []; for (let i = 0; i < 30; i++) { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 8), new THREE.MeshLambertMaterial({ color: '#8a5a2b', transparent: true, opacity: .8 })); m.visible = false; scene.add(m); bubbles.push(m); }
+const sprays = []; for (let i = 0; i < 60; i++) { const m = new THREE.Mesh(BOX, new THREE.MeshLambertMaterial({ color: '#7a4a22' })); m.visible = false; scene.add(m); sprays.push(m); }
+const gasA = []; for (let i = 0; i < 24; i++) { const m = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 9), new THREE.MeshBasicMaterial({ color: i % 4 ? '#7ddc3a' : '#c4ff6a', transparent: true, opacity: .38, depthWrite: false })); m.visible = false; scene.add(m); gasA.push(m); }
+const shockR = new THREE.Mesh(new THREE.TorusGeometry(1, .25, 8, 64), new THREE.MeshBasicMaterial({ color: '#d8c0a0', transparent: true, opacity: .8 })); shockR.rotation.x = Math.PI / 2; scene.add(shockR);
+// tsunami dalgası
+const wave = new THREE.Group(); scene.add(wave);
+const wBody = block(wave, new THREE.MeshLambertMaterial({ color: '#6b4220' }), 260, 1, 10, 0, .5, 0);
+const wCurl = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 260, 16, 1, true, 0, Math.PI * 1.3), new THREE.MeshLambertMaterial({ color: '#7a4a22', side: THREE.DoubleSide })); wCurl.rotation.z = Math.PI / 2; wave.add(wCurl);
+const wFoam = block(wave, new THREE.MeshLambertMaterial({ color: '#d8c0a0' }), 260, .4, 2.0, 0, 1, 0);
+function squat(c) { c.legL.rotation.x = c.legR.rotation.x = -1.3; c.body.position.y = -.45; c.armL.rotation.x = c.armR.rotation.x = -.8; }
+const faceTo = (c, x, z) => { c.root.rotation.y = Math.atan2(x - c.root.position.x, z - c.root.position.z); };
+/* ======================= ZAMAN / OVERLAY ======================= */
+const PX = v => { const p = v.clone().project(camera); return [(p.x * .5 + .5) * 100, (-p.y * .5 + .5) * 100]; };
+const $ = id => document.getElementById(id);
+const el = { top: $('top'), cap: $('cap'), aura: $('aura'), auraV: $('auraV'), stamp: $('stamp'), fps: $('fps'), title: $('title'), small: $('small'), flash: $('flash'), bar: $('bar'), phone: $('phone'), sans: $('sansur'), emo: $('emo'), news: $('news') };
+{ const c = document.createElement('canvas'); c.width = 12; c.height = 10; const g = c.getContext('2d'); const cols = ['#6b4a2b', '#8a5a2b', '#d9a47e', '#2ecc71', '#34495e', '#4a3020', '#c98e6a']; for (let y = 0; y < 10; y++) for (let x = 0; x < 12; x++) { g.fillStyle = cols[(x * 7 + y * 13 + x * y) % 7]; g.fillRect(x, y, 1, 1); } el.sans.style.backgroundImage = `url(${c.toDataURL()})`; }
+const stageRect = () => $('stage').getBoundingClientRect();
+const cache = {}; const setHTML = (e, s) => { if (cache[e.id] !== s) { e.innerHTML = s; cache[e.id] = s; } };
+function shake(t, amt) { const f = Math.floor(t * 30); return new THREE.Vector3((hash(f) - .5) * amt, (hash(f + 50) - .5) * amt, (hash(f + 99) - .5) * amt); }
+function timed(list, t) { for (const [a, b, s] of list) if (t >= a && t < b) return s; return ''; }
+const CAPS = [[.3, 3.4, 'ANTALYA. 40 DERECE. DENİZ TURKUAZ.'], [3.4, 7.0, 'ABDULLAH DENİZE GİRDİ.'], [7.0, 9.1, 'BİRAZ RAHATLADI...'], [9.1, 11.2, '...VE BIRAKTI.'], [11.2, 13.4, 'DENİZ KAHVERENGİ OLDU.'], [13.4, 16.0, 'TURİSTLER KAÇIYOR.'], [16.0, 18.4, 'AMA DAHA BİTMEDİ...'],
+  [22.0, 24.6, 'ABDULLAH DALGANIN TEPESİNDE.'], [24.6, 27.4, 'DALGA SAHİLE ULAŞTI.'], [27.4, 30.8, 'ANTALYA SAHİLLERİ 3 GÜN KAPALI.']];
+const STAMPS = [[9.2, '💩 SANSÜR 💩', '#c98e3a'], [11.4, 'MAVİ BAYRAK: İPTAL', '#ff4b3a'], [18.6, 'OSSSSSSSURUK!!', '#9dff4a'], [20.8, 'TSUNAMİ!!', '#ff4b3a'], [24.6, 'ŞAPPP!!', '#c98e3a']];
+const P0 = new THREE.Vector3(0, 0, -8);
+
+function renderAt(t) {
+  t = clamp(t, 0, DUR - 1e-4);
+  all.forEach(c => c.reset()); shades.visible = false; bubbles.forEach(m => m.visible = false); sprays.forEach(m => m.visible = false); gasA.forEach(m => m.visible = false); shockR.visible = false; wave.visible = false; mudC.forEach(m => m.visible = false); ring.visible = true;
+  scene.background = new THREE.Color('#8fd0ff'); scene.fog = new THREE.Fog('#bfe6ff', 80, 260); hemi.intensity = 1.15; hemi.color.set('#ffffff'); hemi.groundColor.set('#a09070'); dir.intensity = 1.3; dir.color.set('#fff2d8'); dir.position.set(-40, 80, -60); dir.target.position.set(0, 0, 0); if (!dir.target.parent) scene.add(dir.target);
+  const cam = new THREE.Vector3(), look = new THREE.Vector3(); let fov = 55, shk = 0, fl = 0, fcol = '#fff', filt = 'saturate(1.2) contrast(1.06)', sansAt = null, emoAt = null, news = 0;
+  const S = sen, A = S.root.position; S.root.visible = true;
+  // kahverengi yarıçap, kabarma
+  const R = t < 10.6 ? 0 : t < 16 ? lerp(1.5, 150, Math.pow(seg(t, 10.6, 16), 1.6)) : 200; const bulge = t > 18.6 && t < 20.8 ? Math.sin(seg(t, 18.6, 20.8) * Math.PI) * 3 : 0; seaUpdate(t, P0, R, bulge);
+  tFlag.material.color.set(t > 11.4 ? '#7a4a22' : '#2a8fe0'); flood.visible = t > 24.6; flood.material.opacity = .9 * seg(t, 24.6, 25.4);
+  // Abdullah
+  if (t < 3.4) { S.root.visible = false; }
+  else if (t < 7.0) { const u = seg(t, 3.5, 6.6); const z = lerp(12, -8, u); A.set(0, Math.max(-.95, Math.min(0, z * .12)), z); S.root.rotation.y = Math.PI; if (u < 1) S.walk(t, 12, .9); S.face('happy'); shades.visible = true; if (u > .55 && u < .85) sprays.forEach((m, i) => { if (i > 14) return; const e = (t * 2 + hash(i)) % 1; m.visible = true; m.material.color.set('#bfefff'); m.position.set(A.x + (hash(i) - .5), .2 + e * .8, A.z + .4); m.scale.setScalar(.08); }); }
+  else if (t < 20.6) { A.set(0, -.95 + Math.sin(t * 1.6) * .06, -8); S.root.rotation.y = 0; shades.visible = t < 9 || t > 16; S.face(t < 9 ? 'relaxed' : t < 10.6 ? 'relaxed' : t < 16 ? 'sneaky' : t < 18.6 ? 'relaxed' : 'happy');
+    if (t >= 9.1 && t < 10.6) { sansAt = new THREE.Vector3(0, .15, -8); if (t > 9.5) emoAt = new THREE.Vector3(0, 2.4, -8); }
+    if (t > 9.4 && t < 16) bubbles.forEach((m, i) => { const ph = (t * .8 + hash(i)) % 1; m.visible = i < 12; const a = hash(i + 3) * 6.28; m.position.set(Math.cos(a) * (.6 + ph * 1.5), ph * .3, -8 + Math.sin(a) * (.6 + ph * 1.5)); m.scale.setScalar(.08 + hash(i) * .08); });
+    if (t >= 16 && t < 18.6) { S.body.position.x = Math.sin(t * 30) * .03 * seg(t, 16, 18.6); bubbles.forEach((m, i) => { const ph = (t * 1.5 + hash(i)) % 1; m.visible = true; m.material.color.set('#9dd85a'); const a = hash(i + 3) * 6.28; m.position.set(Math.cos(a) * ph * 1.2, ph * .4, -8.3 + Math.sin(a) * ph * 1.2); m.scale.setScalar(.06 + ph * .2); }); }
+    if (t >= 18.6) { const e = t - 18.6; S.body.rotation.x = .3; gasA.forEach((m, i) => { m.visible = e < 2.6; const a = hash(i) * 6.28, r = easeOut(clamp(e / 1)) * (1 + hash(i + 2) * 5); m.position.set(Math.cos(a) * r, .5 + hash(i + 3) * 3 * clamp(e * 2), -8 + Math.sin(a) * r * .6 - 1); m.scale.setScalar(.4 + e * 1.4); m.material.opacity = .38 * (1 - clamp((e - 1.6) / 1)); });
+      shockR.visible = e < 1.6; shockR.position.set(0, .2, -8); shockR.scale.setScalar(1 + e * 40); shockR.material.opacity = .8 * (1 - e / 1.6); A.y += bulge * .9; shk = .3 * (1 - clamp(e / 1.2)); } }
+  // tsunami
+  let wz = -60, wh = 0; if (t >= 20.6) { const k = seg(t, 20.6, 24.6); wz = lerp(-30, 18, easeIn2(k)); wh = lerp(2, 13, Math.min(1, k * 1.6)) * (t > 24.6 ? 1 - seg(t, 24.6, 26) : 1); wave.visible = wh > .2; wave.position.set(0, 0, wz); wBody.scale.y = wh; wBody.position.y = wh / 2; wCurl.scale.set(wh * .35, 1, wh * .35); wCurl.position.set(0, wh - wh * .1, 4); wFoam.position.set(0, wh + .1, 2.5);
+    if (t < 24.6) { A.set(0, wh + wh * .28, wz + 4); S.root.rotation.y = Math.PI; S.armL.rotation.z = -1.3; S.armR.rotation.z = 1.3; S.legL.rotation.x = .3; S.legR.rotation.x = -.3; S.face('happy'); shades.visible = true; S.body.rotation.z = Math.sin(t * 3) * .15; }
+    else { A.set(2 + seg(t, 24.6, 28) * 2, .15 + Math.sin(t * 2) * .05, 8 + seg(t, 24.6, 27) * 4); S.root.rotation.y = .6; shades.visible = true; S.face('relaxed'); S.armL.rotation.z = -.6; S.armR.rotation.z = .6; } }
+  // turistler
+  T.forEach((c, i) => { c.root.visible = true; const pr = props[i]; const base = new THREE.Vector3(pr.x + 1.2, .45, pr.z);
+    if (t < 13.4) { c.root.position.copy(base); c.root.rotation.set(-Math.PI / 2 + .3, 0, 0); c.face(i % 2 ? 'relaxed' : 'happy'); if (i === 4 && t > 11.4) { c.root.rotation.set(0, Math.PI, 0); c.root.position.y = 0; c.face('shock'); } }
+    else if (t < 24.6) { const u = seg(t, 13.4 + i * .1, 18 + i * .1); c.root.position.set(base.x + (i - 2.5) * u * .8, 0, base.z + u * 14); c.root.rotation.set(0, 0, 0); c.walk(t + i, 18, 1.1); c.armR.rotation.x = -2.5; c.armR.rotation.z = .5; c.face('scared');
+      if (t > 20.6) { c.root.rotation.y = Math.PI; c.reset(); c.root.visible = true; c.root.position.set(base.x + (i - 2.5) * .8, 0, base.z + 14); c.root.rotation.y = Math.PI; c.face('shock'); c.armL.rotation.z = -2.6; c.armR.rotation.z = 2.6; } }
+    else { const k = easeOut(seg(t, 24.6, 25.4)); c.root.position.set(base.x + (i - 2.5) * .8, 0, base.z + 14 + k * 4); c.root.rotation.set(t < 27 ? -k * 1.4 : 0, Math.PI, 0); c.face(t < 27 ? 'shock' : 'relaxed'); mudC[i].visible = t > 25.0; if (t >= 27) { c.root.position.y = 0; c.armL.rotation.z = -.3; c.armR.rotation.z = .3; } } });
+  // eşyalar uçuyor
+  props.forEach((p, i) => { if (t < 24.6) { p.u.position.set(p.x, 0, p.z); p.u.rotation.set(0, 0, 0); p.b.position.set(p.x + 1.2, 0, p.z); p.b.rotation.set(0, 0, 0); return; } const e = Math.min(2.2, t - 24.6);
+    p.u.position.set(p.x + (hash(i) - .5) * e * 6, Math.max(0, 6 * e - 4.9 * e * e * .6), p.z + e * 9); p.u.rotation.set(e * 3, e * 2, e * 4 * (hash(i + 2) - .5)); p.b.position.set(p.x + 1.2 + (hash(i + 5) - .5) * e * 4, Math.max(0, 4 * e - 4.9 * e * e * .7), p.z + e * 7); p.b.rotation.set(e * 4, e, 0); });
+  if (t > 24.6 && t < 26.6) sprays.forEach((m, i) => { const e = t - 24.6; m.visible = true; m.material.color.set('#7a4a22'); const a = hash(i) * 3.14; m.position.set((hash(i + 1) - .5) * 60, Math.max(0, 1 + (6 + hash(i + 2) * 8) * e - 9 * e * e), 18 + Math.cos(a) * e * 6); m.scale.setScalar(.3); });
+  // kamera
+  if (t < 3.4) { const k = easeIO(seg(t, 0, 3.4)); cam.set(lerp(30, 10, k), lerp(26, 9, k), lerp(46, 26, k)); look.set(0, 1, lerp(-20, -6, k)); fov = 55; }
+  else if (t < 7.0) { cam.set(4.5, 3.4, A.z + 8); look.copy(A).add(new THREE.Vector3(0, 1, -1)); fov = 52; }
+  else if (t < 11.2) { cam.set(2.6, 1.3, -4.4); look.set(0, .8, -8); fov = 46; }
+  else if (t < 16.0) { const k = seg(t, 11.2, 16); cam.set(lerp(4, 0, k), lerp(8, 26, k), lerp(4, 24, k)); look.set(0, 0, lerp(-8, -30, k)); fov = 55; }
+  else if (t < 18.6) { cam.set(1.8, 1.1, -5.2); look.set(0, .7, -8); fov = 44 - seg(t, 16, 18.6) * 8; }
+  else if (t < 20.6) { cam.set(14, 6, 8); look.set(0, 1, -10); fov = 56; }
+  else if (t < 24.6) { cam.set(6, 5, 30); look.set(0, wh * .8, wz); fov = 60; shk = .05 + seg(t, 22, 24.6) * .15; if (t > 22.0 && t < 23.4) { cam.set(A.x + 5, A.y + 2.5, A.z + 11); look.copy(A).add(new THREE.Vector3(0, .8, 0)); fov = 50; } }
+  else if (t < 27.4) { cam.set(-14, 9, 34); look.set(0, 2, 12); fov = 58; shk = .5 * (1 - seg(t, 24.6, 26)); if (t < 24.8) { fl = .8; fcol = '#7a4a22'; } }
+  else if (t < 30.8) { cam.set(7, 3.2, 20); look.set(2, .8, 12); fov = 54; }
+  else { const k = seg(t, 30.8, 34); cam.set(lerp(30, 50, k), lerp(30, 45, k), lerp(50, 60, k)); look.set(0, 0, -20); fov = 55; news = 1; }
+  camera.fov = fov; camera.near = .1; camera.far = 600; camera.updateProjectionMatrix();
+  camera.position.copy(cam).add(shake(t, shk)); camera.up.set(0, 1, 0); camera.lookAt(look);
+  canvas.style.filter = filt; renderer.render(scene, camera);
+  if (sansAt) { const [x, y] = PX(sansAt); const s = clamp(50 / camera.position.distanceTo(sansAt), 8, 22); el.sans.style.opacity = 1; el.sans.style.left = x + '%'; el.sans.style.top = y + '%'; el.sans.style.width = s + 'cqw'; el.sans.style.height = s * .7 + 'cqw'; } else el.sans.style.opacity = 0;
+  if (emoAt) { const [x, y] = PX(emoAt); el.emo.style.opacity = 1; el.emo.style.left = x + '%'; el.emo.style.top = clamp(y, 12, 80) + '%'; el.emo.style.fontSize = '8cqw'; el.emo.style.transform = `translate(-50%,-50%) scale(${easeOutBack(seg(t, 9.5, 9.8))}) rotate(${Math.sin(t * 4) * 12}deg)`; } else el.emo.style.opacity = 0;
+  const cap = timed(CAPS, t); setHTML(el.cap, cap); el.cap.style.opacity = cap ? 1 : 0; el.cap.style.color = /KAPALI|KAHVERENGİ/.test(cap) ? '#ffd84a' : '#fff'; el.cap.style.bottom = news ? '7cqw' : '';
+  let stA = null; for (const s of STAMPS) if (t >= s[0] && t < s[0] + 1.7) stA = s;
+  setHTML(el.stamp, stA ? stA[1] : ''); const sk = stA ? seg(t, stA[0], stA[0] + .3) : 0; el.stamp.style.opacity = stA ? 1 - seg(t, stA[0] + 1.3, stA[0] + 1.7) : 0; el.stamp.style.color = stA ? stA[2] : '#fff'; el.stamp.style.top = '28%'; el.stamp.style.fontSize = stA && stA[1].length > 12 ? '7.4cqw' : '9cqw';
+  const s2 = shake(t, 1.6); el.stamp.style.transform = `translate(${s2.x}cqw, calc(-50% + ${s2.y}cqw)) scale(${1 + .8 * (1 - easeOutBack(sk))}) rotate(-4deg)`; if (stA && t < stA[0] + .12) { fl = Math.max(fl, .3); fcol = stA[2]; }
+  el.aura.style.opacity = t > 3.4 ? 1 : 0; setHTML(el.auraV, t < 11.2 ? 'DENİZ: 🌊 TURKUAZ' : t < 20.8 ? 'DENİZ: 💩 KAHVERENGİ' : 'DURUM: 🌊💩 TSUNAMİ');
+  el.news.style.opacity = news || (t > 20.8 && t < 27.4) ? 1 : 0; $('newsT').style.transform = `translateX(${-((t * 14) % 100)}cqw)`;
+  [el.top, el.fps, el.phone].forEach(e => e.style.opacity = 0);
+  const ek = seg(t, 31.2, 31.7); setHTML(el.title, "ABDULLAH<br>ANTALYA'DA"); setHTML(el.small, 'deniz: kahverengi · tsunami: 1 · mavi bayrak: 0'); el.title.style.whiteSpace = 'normal'; el.title.style.fontSize = '7.5cqw'; el.title.style.lineHeight = '1.1'; el.title.style.top = '40%'; el.small.style.top = '62%';
+  el.title.style.opacity = ek; el.title.style.transform = `translateY(-50%) scale(${1 + .3 * (1 - easeOutBack(ek))})`; el.small.style.opacity = seg(t, 31.7, 32.1); if (t > 31.2) { fl = Math.max(fl, .45 * seg(t, 31.2, 31.5)); fcol = '#000'; }
+  el.flash.style.opacity = fl; el.flash.style.background = fcol;
+  el.bar.style.width = (t / DUR * 100) + '%';
+}
+const easeIn2 = k => k * k;
+
+/* ---------- SES ---------- */
+function buildAudio(ac, T) {
+  const out = ac.createDynamicsCompressor(); out.threshold.value = -14; out.ratio.value = 6; out.connect(ac.destination);
+  const master = ac.createGain(); master.gain.value = .7; master.connect(out);
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+  let seed = 77; const nbuf = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate);
+  { const d = nbuf.getChannelData(0); for (let i = 0; i < d.length; i++) { seed = (seed * 16807) % 2147483647; d[i] = seed / 2147483647 * 2 - 1; } }
+  const env = (g, s, dur, vol, att = .008) => { g.gain.setValueAtTime(0, s); g.gain.linearRampToValueAtTime(vol, s + att); g.gain.exponentialRampToValueAtTime(.0001, s + dur); };
+  function tone(type, f, s, dur, vol, { fEnd, dest = master, vib = 0, lp = 0 } = {}) {
+    s += T; const o = ac.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, s);
+    if (fEnd) o.frequency.exponentialRampToValueAtTime(fEnd, s + dur);
+    const g = ac.createGain(); env(g, s, dur, vol); let n = o;
+    if (lp) { const f2 = ac.createBiquadFilter(); f2.type = 'lowpass'; f2.frequency.value = lp; o.connect(f2); n = f2; }
+    n.connect(g); g.connect(dest);
+    if (vib) { const l = ac.createOscillator(); l.frequency.value = 6; const lg = ac.createGain(); lg.gain.value = vib; l.connect(lg); lg.connect(o.frequency); l.start(s); l.stop(s + dur + .05); }
+    o.start(s); o.stop(s + dur + .05);
+  }
+  function noise(s, dur, vol, freq, type = 'lowpass', dest = master) {
+    s += T; const n = ac.createBufferSource(); n.buffer = nbuf; n.loop = true;
+    const f = ac.createBiquadFilter(); f.type = type; f.frequency.value = freq;
+    const g = ac.createGain(); env(g, s, dur, vol, .004); n.connect(f); f.connect(g); g.connect(dest); n.start(s); n.stop(s + dur + .05);
+  }
+  const dist = ac.createWaveShaper(); { const c = new Float32Array(1024); for (let i = 0; i < 1024; i++) c[i] = Math.tanh((i / 512 - 1) * 9); dist.curve = c; }
+  const dg = ac.createGain(); dg.gain.value = .55; dist.connect(dg); dg.connect(master);
+  function boom(s, big) { tone('sine', big ? 150 : 120, s, big ? 2.2 : 1, 1, { fEnd: 32 }); noise(s, big ? .7 : .35, .7, 500);
+    if (big) { tone('sine', 110, s, 1.8, .9, { fEnd: 30, dest: dist }); noise(s, 1, .5, 1200, 'lowpass', dist); tone('sawtooth', 220, s, 1.2, .25, { fEnd: 55 }); } }
+  function mumble(s, dur, base) { for (let x = 0; x < dur; x += .085) tone('square', base * (1 + (hash(s * 10 + x * 37) - .5) * .5), s + x, .07, .05, { lp: 1600 }); }
+  const keys = (a, b) => { for (let x = a; x < b; x += .11) noise(x + hash(x) * .05, .025, .08, 3000, 'highpass'); };
+  // --- phonk aletleri ---
+  const verb = ac.createConvolver(); { const len = ac.sampleRate * 2.2, b = ac.createBuffer(2, len, ac.sampleRate); let sd = 3;
+    for (let ch = 0; ch < 2; ch++) { const dd = b.getChannelData(ch); for (let i = 0; i < len; i++) { sd = (sd * 16807) % 2147483647; dd[i] = (sd / 2147483647 * 2 - 1) * Math.pow(1 - i / len, 3); } } verb.buffer = b; }
+  const vg = ac.createGain(); vg.gain.value = .35; verb.connect(vg); vg.connect(master);
+  function cowbell(f, s, vol = .09) { [1, 1.48].forEach(m => { const ss = s + T; const o = ac.createOscillator(); o.type = 'square'; o.frequency.value = f * m;
+    const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1800; bp.Q.value = 1.2; const g = ac.createGain(); env(g, ss, .28, vol, .002);
+    o.connect(bp); bp.connect(g); g.connect(master); g.connect(verb); o.start(ss); o.stop(ss + .35); }); }
+  const kick = s => { tone('sine', 160, s, .45, .9, { fEnd: 38 }); };
+  const b808 = (f, s, d = .55) => { tone('sine', f, s, d, .55, { fEnd: f * .92, dest: dist }); tone('sine', f, s, d, .5, { fEnd: f * .92 }); };
+  const clap = s => { noise(s, .16, .45, 1600, 'bandpass'); noise(s + .012, .12, .3, 1300, 'bandpass', dist); };
+  const hat = (s, v = .08) => noise(s, .03, v, 8000, 'highpass');
+  function phonk(a, b, { bpm = 130, root = 41, mel }) {
+    const st = 60 / bpm / 4; let i = 0;
+    for (let s = a; s < b - .01; s += st, i++) { const k = i % 16, bar = (i / 16 | 0);
+      if (k === 0 || k === 7 || k === 10) { kick(s); b808(mtof(root + (bar % 2 && k === 10 ? 3 : 0)), s); }
+      if (k === 4 || k === 12) clap(s);
+      if (k % 2 === 0) hat(s, k % 4 ? .05 : .08);
+      const m = mel[(i) % mel.length]; if (m != null) cowbell(mtof(m), s);
+    }
+  }
+  const pad = (notes, s, d, v = .05) => notes.forEach(m => { tone('sawtooth', mtof(m), s, d, v, { lp: 900 }); tone('sine', mtof(m + 12), s, d, v * .6); });
+  const riser = (s, d) => { noise(s, d, .18, 1200, 'bandpass'); tone('sine', 200, s, d, .06, { fEnd: 1800 }); };
+  const MEL1 = [65, null, 65, 68, null, 65, 63, null, 60, null, 63, null, 65, 68, 70, null];
+  const MEL2 = [72, null, null, 72, 70, null, 67, null, 72, null, 75, null, 74, null, 70, null];
+
+  const choir = (notes, s, d, v = .045) => notes.forEach((m, i) => { tone('sawtooth', mtof(m), s, d, v, { lp: 1400, vib: 3 + i }); tone('triangle', mtof(m + 12), s, d, v * .7, { vib: 4 }); });
+  const plus = s => { boom(s, false); choir([60, 64, 67, 72], s, 2.2, .05); tone('sine', mtof(96), s, 1.2, .08); tone('sine', mtof(103), s + .08, 1.2, .06); };
+  const minus = s => { boom(s, true); tone('sawtooth', 600, s, 1.4, .18, { fEnd: 60, lp: 1800 }); };
+  const steps = (a, b, gap, v = .12) => { for (let x = a; x < b; x += gap) noise(x, .05, v, 650, 'bandpass'); };
+  const scratch = s => { noise(s, .3, .5, 2500, 'bandpass'); tone('sawtooth', 900, s, .3, .15, { fEnd: 120 }); };
+  // ===== BIRAKIYOR =====
+  function fart(s, d, f = 85, v = .5) { const ss = s + T; const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(f, ss); for (let x = 0; x < d; x += .03) o.frequency.setValueAtTime(f * (.75 + hash(s * 31 + x * 97) * .6) * (1 - x / d * .3), ss + x);
+    const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 700; lp.Q.value = 4; const g = ac.createGain(); g.gain.setValueAtTime(0, ss); g.gain.linearRampToValueAtTime(v, ss + .03); for (let x = .03; x < d; x += .025) g.gain.setValueAtTime(v * (.45 + hash(s * 13 + x * 51) * .55), ss + x); g.gain.exponentialRampToValueAtTime(.0001, ss + d);
+    o.connect(lp); lp.connect(g); g.connect(master); g.connect(dist); o.start(ss); o.stop(ss + d + .05); noise(s, d, v * .4, 260, 'bandpass'); }
+  const plop = s => { tone('sine', 900, s, .12, .25, { fEnd: 180 }); noise(s, .05, .2, 800, 'bandpass'); };
+  const beep = (s, d = 1.4) => tone('sine', 1000, s, d, .12);
+  const whistle = s => [79, 84, 83, 79, 76, 79, 81, 79].forEach((m, i) => tone('sine', mtof(m + 12), s + i * .2, .18, .06, { vib: 6 }));
+  const squish = s => { noise(s, .35, .6, 500, 'bandpass'); tone('sine', 300, s, .3, .3, { fEnd: 90 }); noise(s + .1, .3, .3, 1200, 'bandpass'); };
+  const slide = (s, d) => { tone('sine', 300, s, d, .1, { fEnd: 1400 }); noise(s, d, .1, 2000, 'bandpass'); };
+  const tuba = (m, s, d = .25) => tone('sawtooth', mtof(m), s, d, .12, { lp: 500 });
+  const sneak = (a, b) => { const N = [57, null, 60, null, 62, 63, 64, null, 67, null, 64, null, 62, null, 60, null]; let i = 0; for (let s = a; s < b; s += .18, i++) { const m = N[i % 16]; if (m) tone('triangle', mtof(m), s, .14, .1); if (i % 4 === 0) tuba(33 + (i % 8 ? 7 : 0), s, .3); } };
+  const polka = (a, b) => { const N = [36, 43, 40, 43]; const M = [72, 74, 76, 77, 79, null, 79, null, 81, 79, 77, 76, 74, null, 72, null]; let i = 0; for (let s = a; s < b; s += .22, i++) { if (i % 2 === 0) tuba(N[(i / 2 | 0) % 4], s); else tone('square', mtof(64), s, .1, .025); const m = M[i % 16]; if (m) tone('triangle', mtof(m), s, .18, .06); } };
+  if (CARD !== null) return;
+  const surf = (a, b, v = .05) => { for (let x = a; x < b; x += 2.2) noise(x, 2.0, v, 500); };
+  surf(0, 34, .05); for (let x = .4; x < 3.4; x += .7) tone('sine', 1900 + hash(x) * 400, x, .12, .02, { fEnd: 2300 });
+  const summer = (a, b) => { const M = [76, 79, 81, 79, 76, 74, 76, 72]; let i = 0; for (let s = a; s < b - .05; s += .25, i++) { tone('triangle', mtof(M[i % 8]), s, .2, .05); if (i % 2 === 0) { tone('sine', mtof([52, 57, 55, 50][(i >> 2) % 4]), s, .3, .08); noise(s + .125, .04, .05, 6000, 'highpass'); } } };
+  summer(.2, 9.0); for (let x = 5.2; x < 6.6; x += .2) noise(x, .1, .1, 1200, 'bandpass');
+  beep(9.15, 1.4); fart(9.2, .8, 80, .45); for (let i = 0; i < 10; i++) tone('sine', 300 + hash(i) * 300, 9.6 + i * .25, .06, .05, { fEnd: 700 });
+  tone('square', 2800, 11.4, .5, .08, { vib: 40 }); tone('square', 2800, 12.2, .5, .08, { vib: 40 }); for (let v = 0; v < 5; v++) mumble(13.4 + v * .08, 2.4, 460 + v * 70); steps(13.4, 16, .08, .12);
+  tone('sawtooth', 55, 16, 2.6, .06, { lp: 300 }); for (let x = 16; x < 18.6; x += .12) tone('sine', 200 + (x - 16) * 200, x, .08, .04, { fEnd: 500 });
+  fart(18.6, 2.4, 55, .9); fart(18.65, 2.2, 82, .5); noise(18.6, 2.4, .3, 200); boom(18.8, true);
+  boom(20.8, true); noise(20.8, 4, .25, 300); tone('sawtooth', 45, 20.8, 4, .08, { lp: 260 }); choir([45, 52, 57, 60], 20.8, 3.8, .045); for (let x = 20.8; x < 24.6; x += .5) { tone('square', 950, x, .22, .05, { lp: 3000 }); tone('square', 700, x + .25, .22, .05, { lp: 3000 }); }
+  boom(24.6, true); noise(24.6, 2.4, .6, 700); for (let v = 0; v < 6; v++) mumble(24.8 + v * .06, 1.6, 420 + v * 70);
+  surf(27.4, 34, .07); polka(27.6, 31.2); [72, 76, 79, 84].forEach((m, i) => { tone('triangle', mtof(m), 31.2 + i * .16, i === 3 ? 1.4 : .2, .09); tone('square', mtof(m - 12), 31.2 + i * .16, .15, .03); });
+}
+
+
+/* ---------- oynatma ---------- */
+function resize() { const r = stageRect(); renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize); resize(); renderAt(0);
+
+if (RENDER_MODE) {
+  window.renderAt = t => renderAt(t); window.DUR = DUR;
+  window.renderAudioWav = async () => {
+    const sr = 44100, oac = new OfflineAudioContext(2, Math.ceil(sr * DUR), sr); buildAudio(oac, 0); const buf = await oac.startRendering();
+    const n = buf.length, d = new DataView(new ArrayBuffer(44 + n * 4)); const S = (o, s) => [...s].forEach((c, i) => d.setUint8(o + i, c.charCodeAt(0)));
+    S(0, 'RIFF'); d.setUint32(4, 36 + n * 4, true); S(8, 'WAVEfmt '); d.setUint32(16, 16, true); d.setUint16(20, 1, true); d.setUint16(22, 2, true);
+    d.setUint32(24, sr, true); d.setUint32(28, sr * 4, true); d.setUint16(32, 4, true); d.setUint16(34, 16, true); S(36, 'data'); d.setUint32(40, n * 4, true);
+    const a = buf.getChannelData(0), b = buf.getChannelData(1);
+    for (let i = 0; i < n; i++) { d.setInt16(44 + i * 4, clamp(a[i], -1, 1) * 32767, true); d.setInt16(46 + i * 4, clamp(b[i], -1, 1) * 32767, true); }
+    const u8 = new Uint8Array(d.buffer); let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
+    return btoa(s);
+  };
+  window.READY = true;
+} else {
+  let ac = null, start = 0; const now = () => ac ? ac.currentTime : performance.now() / 1000;
+  const schedule = () => { start = now() + .08; if (ac) buildAudio(ac, start); };
+  $('play').onclick = async () => {
+    try { ac = new (window.AudioContext || window.webkitAudioContext)(); await ac.resume(); } catch (e) { ac = null; }
+    $('ui').style.display = 'none'; schedule();
+    (function loop() { let t = now() - start; if (t >= DUR) { schedule(); t = 0; } renderAt(Math.max(0, t)); requestAnimationFrame(loop); })();
+  };
+}
+</script>
+</body>
+</html>
