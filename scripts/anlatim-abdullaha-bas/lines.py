@@ -1,0 +1,2 @@
+L=[(.3,"Lunaparkta yeni oyun: Abdullah'a bas!"),(3.1,"Mehmet jetonu attı."),(6.0,"Bir Abdullah çıktı. Bastı."),(8.7,"Bir tane daha. Bastı."),(10.6,"Her basışta bir osuruk."),(12.6,"Mehmet: Abdullah'a basayım ama... hangisine?"),
+(15.3,"Hepsi aynı anda çıktı."),(17.2,"Ve döndüler..."),(18.6,"Osuruk!"),(21.2,"Makine çöktü."),(22.9,"Ödül: dokuz osuruk."),(26.6,"Gerçek Abdullah: Beni mi arıyordun?"),(30.0,"Abdullah'a bas. Ama hangisine?")]
