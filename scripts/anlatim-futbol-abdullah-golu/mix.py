@@ -9,7 +9,7 @@ for (t,txt),n in zip(L,cnt):
     if tt>t+.05: print('shift',txt[:30],round(tt-t,2))
 f=[];lab=[]
 for j,(a,b,t) in enumerate(seg):
-    s=max(0,a-80)/1000; e=min(17363,b+180)/1000; d=int(t*1000)
+    s=max(0,a-80)/1000; e=min(19443,b+180)/1000; d=int(t*1000)
     f.append(f"[1:a]atrim={s}:{e},asetpts=PTS-STARTPTS,afade=t=in:d=0.02,afade=t=out:st={e-s-0.06:.3f}:d=0.06,adelay={d}|{d}[n{j}]"); lab.append(f"[n{j}]")
 f.append(''.join(lab)+f"amix=inputs={len(seg)}:normalize=0,aresample=44100,pan=stereo|c0=c0|c1=c0,volume=5.5,apad,asplit=2[nar][sc]")
 f.append("[0:a]aresample=44100[mus];[mus][sc]sidechaincompress=threshold=0.03:ratio=6:attack=20:release=300[duck]")
