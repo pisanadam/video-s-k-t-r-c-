@@ -1,0 +1,1 @@
+L=[(0.3, 'Ceza sahası içinde pozisyon var'), (2.9, 'Yetişin'), (4.7, 'Hayır'), (5.8, 'Ne oluyor'), (7.6, 'Top ağlarımıza gitti'), (10.4, 'Abdullah topu aldı'), (12.6, 'Osurarak topu götürdü'), (15.1, 'Geçti'), (16.0, 'geçti'), (17.2, 'geçti'), (19.4, 'Ve'), (20.6, 'mükemmel bir gol'), (22.5, 'Abdullah'), (30.4, 'Çok osuran arkadaşına gönder')]
